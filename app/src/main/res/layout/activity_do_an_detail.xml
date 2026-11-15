@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainDetail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Light">
+
+        <!-- Toolbar with back button -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarDetail"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:titleTextColor="@color/white"
+            tools:title="Chi tiết Đồ án" />
+
+        <!-- Header: Thong tin tong quan & Tien do -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp">
+
+            <TextView
+                android:id="@+id/tvDetailTen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="Xây dựng App Android Quản lý Tiến độ" />
+
+            <TextView
+                android:id="@+id/tvDetailGiangVien"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="GVHD: TS. Nguyễn Văn A" />
+
+            <TextView
+                android:id="@+id/tvDetailThoiGian"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="Hạn nộp: 2026-06-30" />
+
+            <!-- Progress Bar row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvDetailTienDoLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/project_progress"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDetailTienDoValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="3/5 (60%)" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progressDetail"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="6dp"
+                android:max="100"
+                android:progressDrawable="@drawable/custom_progress_drawable"
+                tools:progress="60" />
+
+        </LinearLayout>
+
+        <!-- TabLayout -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayoutDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/surface"
+            app:tabIndicatorColor="@color/primary"
+            app:tabIndicatorHeight="3dp"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabTextColor="@color/text_secondary" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPagerDetail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

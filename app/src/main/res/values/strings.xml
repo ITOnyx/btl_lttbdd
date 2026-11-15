@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">Quản lý Tiến độ Đồ án</string>
+
+    <!-- General Actions -->
+    <string name="save">Lưu</string>
+    <string name="cancel">Hủy</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Sửa</string>
+    <string name="close">Đóng</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="select_date">Chọn ngày</string>
+    <string name="select_time">Chọn giờ</string>
+
+    <!-- Đồ án -->
+    <string name="title_projects">Danh sách Đồ án</string>
+    <string name="add_project">Thêm đồ án</string>
+    <string name="edit_project">Sửa đồ án</string>
+    <string name="delete_project_title">Xóa đồ án</string>
+    <string name="delete_project_confirm">Bạn có chắc chắn muốn xóa đồ án \"%s\"? Thao tác này sẽ xóa toàn bộ nhiệm vụ và cuộc hẹn liên quan!</string>
+    <string name="project_name">Tên đồ án / Đề tài</string>
+    <string name="project_desc">Mô tả tóm tắt</string>
+    <string name="project_supervisor">Giảng viên hướng dẫn</string>
+    <string name="project_start_date">Ngày bắt đầu</string>
+    <string name="project_due_date">Hạn nộp</string>
+    <string name="project_progress">Tiến độ hoàn thành</string>
+    <string name="empty_projects">Chưa có đồ án nào.\nNhấn nút + để thêm đồ án mới!</string>
+    <string name="error_empty_project_name">Vui lòng nhập tên đồ án</string>
+    <string name="error_invalid_due_date">Hạn nộp phải sau hoặc cùng ngày bắt đầu</string>
+    <string name="supervisor_format">GVHD: %s</string>
+    <string name="supervisor_unassigned">(Chưa phân công)</string>
+    <string name="date_range_format">%1$s → %2$s</string>
+    <string name="detail_date_range_format">Thời gian: %1$s → %2$s</string>
+    <string name="due_date_format">Hạn nộp: %s</string>
+    <string name="no_due_date">Chưa đặt hạn nộp</string>
+    <string name="default_progress_text">0/0 (0%)</string>
+
+    <!-- Nhiệm vụ -->
+    <string name="tab_tasks">Nhiệm vụ</string>
+    <string name="title_tasks">Danh sách Nhiệm vụ</string>
+    <string name="add_task">Thêm nhiệm vụ</string>
+    <string name="edit_task">Sửa nhiệm vụ</string>
+    <string name="delete_task_title">Xóa nhiệm vụ</string>
+    <string name="delete_task_confirm">Bạn có chắc chắn muốn xóa nhiệm vụ \"%s\"?</string>
+    <string name="task_name">Tên nhiệm vụ / Đầu việc</string>
+    <string name="task_note">Ghi chú chi tiết</string>
+    <string name="task_due_date">Hạn hoàn thành</string>
+    <string name="task_completed">Đã hoàn thành</string>
+    <string name="task_pending">Chưa hoàn thành</string>
+    <string name="empty_tasks">Chưa có nhiệm vụ nào cho đồ án này.</string>
+    <string name="error_empty_task_name">Vui lòng nhập tên nhiệm vụ</string>
+    <string name="task_due_format">Hạn: %s</string>
+    <string name="task_no_due">Không có hạn</string>
+    <string name="error_task_due_after_project">Hạn hoàn thành không được vượt quá hạn nộp đồ án (%s)</string>
+
+    <!-- Cuộc hẹn -->
+    <string name="tab_meetings">Lịch hẹn GV</string>
+    <string name="title_meetings">Lịch hẹn Giảng viên</string>
+    <string name="add_meeting">Thêm lịch hẹn</string>
+    <string name="edit_meeting">Sửa lịch hẹn</string>
+    <string name="delete_meeting_title">Xóa lịch hẹn</string>
+    <string name="delete_meeting_confirm">Bạn có chắc chắn muốn xóa lịch hẹn \"%s\"?</string>
+    <string name="meeting_title">Tiêu đề cuộc hẹn</string>
+    <string name="meeting_time">Thời gian hẹn</string>
+    <string name="meeting_location">Địa điểm (Phòng học / Online)</string>
+    <string name="meeting_notes">Nội dung trao đổi / Ghi chú</string>
+    <string name="meeting_upcoming">Sắp diễn ra</string>
+    <string name="meeting_passed">Đã qua</string>
+    <string name="empty_meetings">Chưa có lịch hẹn nào với giảng viên.</string>
+    <string name="error_empty_meeting_title">Vui lòng nhập tiêu đề cuộc hẹn</string>
+    <string name="error_empty_meeting_time">Vui lòng chọn thời gian hẹn</string>
+
+    <!-- Thông báo chung -->
+    <string name="action_success">Thao tác thành công</string>
+    <string name="action_failed">Thao tác thất bại</string>
+    <string name="error_project_not_found">Không tìm thấy đồ án</string>
+    <string name="error_project_deleted">Đồ án không tồn tại hoặc đã bị xóa</string>
+</resources>
