@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Quản lý Tiến độ Đồ án</string>
+    <string name="app_name">Theo dõi đồ án</string>
 
     <!-- General Actions -->
     <string name="save">Lưu</string>
@@ -74,4 +74,14 @@
     <string name="action_failed">Thao tác thất bại</string>
     <string name="error_project_not_found">Không tìm thấy đồ án</string>
     <string name="error_project_deleted">Đồ án không tồn tại hoặc đã bị xóa</string>
+
+    <!-- Nạp dữ liệu mẫu -->
+    <string name="action_load_sample_data">Nạp dữ liệu mẫu</string>
+    <string name="dialog_sample_data_title">Nạp dữ liệu mẫu</string>
+    <string name="dialog_sample_data_message">Bạn có muốn nạp bộ dữ liệu mẫu (4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn) để minh họa các tính năng của ứng dụng không?</string>
+    <string name="dialog_sample_data_exists_title">Cơ sở dữ liệu đã có dữ liệu</string>
+    <string name="dialog_sample_data_exists_message">Hiện tại đã có đồ án trong cơ sở dữ liệu. Bạn có muốn thêm tiếp dữ liệu mẫu vào danh sách hiện tại không?</string>
+    <string name="action_add_more">Thêm vào</string>
+    <string name="sample_data_success_format">Đã nạp thành công %1$d đồ án, %2$d nhiệm vụ và %3$d cuộc hẹn mẫu.</string>
+    <string name="sample_data_failed">Nạp dữ liệu mẫu thất bại. Đã hoàn tác các thay đổi.</string>
 </resources>

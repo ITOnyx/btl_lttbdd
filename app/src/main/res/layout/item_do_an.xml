@@ -13,7 +13,7 @@
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardBackgroundColor="@color/surface"
-    app:cardCornerRadius="14dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     app:strokeColor="@color/card_stroke"
     app:strokeWidth="1dp">
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="18dp">
 
         <!-- Header: Title and Action Buttons -->
         <LinearLayout
@@ -37,10 +37,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
                 android:maxLines="2"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp"
-                android:textStyle="bold"
                 tools:text="Hệ thống Theo dõi Tiến độ Đồ án" />
 
             <ImageButton
@@ -50,7 +50,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/edit_project"
                 android:padding="6dp"
-                android:src="@drawable/ic_edit" />
+                android:src="@drawable/ic_edit"
+                app:tint="@color/text_secondary" />
 
             <ImageButton
                 android:id="@+id/btnDelete"
@@ -59,7 +60,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/delete_project_title"
                 android:padding="6dp"
-                android:src="@drawable/ic_delete" />
+                android:src="@drawable/ic_delete"
+                app:tint="@color/status_expired" />
         </LinearLayout>
 
         <!-- Description (if any) -->
@@ -71,7 +73,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp"
+            android:textSize="13.5sp"
             tools:text="Mô tả tóm tắt về đề tài nghiên cứu và phát triển phần mềm" />
 
         <!-- Info row: Giang vien -->
@@ -86,13 +88,14 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_person" />
+                android:src="@drawable/ic_person"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tvGiangVien"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="8dp"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 tools:text="GVHD: TS. Nguyễn Văn A" />
@@ -110,13 +113,14 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_calendar" />
+                android:src="@drawable/ic_calendar"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tvThoiGian"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="8dp"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 tools:text="Hạn nộp: 2026-06-30" />
@@ -126,8 +130,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="12dp"
             android:background="@color/divider" />
 
         <!-- Progress Header & Bar -->
@@ -141,18 +145,18 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/project_progress"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textSize="12.5sp" />
 
             <TextView
                 android:id="@+id/tvTienDo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/primary"
-                android:textSize="13sp"
-                android:textStyle="bold"
+                android:textSize="13.5sp"
                 tools:text="3/5 (60%)" />
         </LinearLayout>
 
@@ -160,8 +164,8 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="8dp"
-            android:layout_marginTop="6dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="8dp"
             android:max="100"
             android:progressDrawable="@drawable/custom_progress_drawable"
             tools:progress="60" />

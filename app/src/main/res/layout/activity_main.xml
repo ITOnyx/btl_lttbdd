@@ -50,17 +50,24 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_empty_state"
-                app:tint="@color/text_hint" />
+            <FrameLayout
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:background="@drawable/bg_circle_icon">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_empty_state"
+                    app:tint="@color/primary" />
+            </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
                 android:text="@string/empty_projects"
