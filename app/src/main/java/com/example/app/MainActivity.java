@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
     @Override
     public void onEditClick(DoAn doAn, int position) {
         Intent intent = new Intent(MainActivity.this, DoAnFormActivity.class);
-        intent.putExtra(DoAnDetailActivity.EXTRA_DO_AN_ID, doAn.getId());
+        intent.putExtra(DoAnFormActivity.EXTRA_DO_AN_ID, doAn.getId());
         startActivity(intent);
     }
 

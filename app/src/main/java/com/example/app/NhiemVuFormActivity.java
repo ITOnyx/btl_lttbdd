@@ -15,6 +15,10 @@ import java.util.Locale;
 // Màn hình thêm mới hoặc cập nhật thông tin nhiệm vụ của đồ án
 public class NhiemVuFormActivity extends AppCompatActivity {
 
+    // Hằng số Intent nhận ID đồ án và ID nhiệm vụ
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+    public static final String EXTRA_NHIEM_VU_ID = "nhiem_vu_id";
+
     private Toolbar toolbarNhiemVuForm;
     private EditText edtTenNhiemVu;
     private EditText edtGhiChu;
@@ -34,9 +38,9 @@ public class NhiemVuFormActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-        // Đọc ID đồ án và ID nhiệm vụ từ Intent
-        doAnId = getIntent().getIntExtra("do_an_id", -1);
-        nhiemVuId = getIntent().getIntExtra("nhiem_vu_id", -1);
+        // Đọc ID đồ án và ID nhiệm vụ từ Intent bằng hằng số
+        doAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
+        nhiemVuId = getIntent().getIntExtra(EXTRA_NHIEM_VU_ID, -1);
 
         // Ánh xạ các View
         toolbarNhiemVuForm = findViewById(R.id.toolbarNhiemVuForm);

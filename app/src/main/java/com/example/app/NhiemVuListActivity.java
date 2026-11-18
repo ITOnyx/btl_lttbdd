@@ -23,6 +23,9 @@ import java.util.List;
 // Màn hình danh sách Nhiệm vụ (Khớp đúng khung mẫu slide 193)
 public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAdapter.OnNhiemVuClickListener {
 
+    // Hằng số Intent nhận ID đồ án
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+
     // Khai báo các thuộc tính thành viên theo đúng mẫu slide 193
     private RecyclerView rvNhiemVu;
     private NhiemVuAdapter mNhiemVuAdapter;
@@ -44,7 +47,7 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
 
         mDbHelper = new DBHelper(this);
 
-        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        mDoAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
         if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();
@@ -81,6 +84,7 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         rvNhiemVu.setItemAnimator(new DefaultItemAnimator());
 
         // Tắt nháy CheckBox khi notifyItemChanged (slide 219)
+        // Lý do: SimpleItemAnimator mặc định chạy fade animation khi notifyItemChanged làm dòng nhấp nháy
         if (rvNhiemVu.getItemAnimator() instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) rvNhiemVu.getItemAnimator()).setSupportsChangeAnimations(false);
         }
@@ -89,10 +93,10 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         rvNhiemVu.addItemDecoration(divider);
 
-        // Bấm nút thêm mới nhiệm vụ -> mở form
+        // Bấm nút thêm mới nhiệm vụ -> mở form bằng hằng số EXTRA_DO_AN_ID
         mFabAddNhiemVu.setOnClickListener(v -> {
             Intent intent = new Intent(NhiemVuListActivity.this, NhiemVuFormActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(NhiemVuFormActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
     }
@@ -120,20 +124,18 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         }
     }
 
-    // Tick CheckBox: cập nhật SQLite + cập nhật đối tượng + notifyItemChanged(position)
+    // Tick CheckBox: chỉ ghi SQLite; KHÔNG gọi notifyItemChanged vì UI và gạch ngang đã được cập nhật trực tiếp trong Adapter
     @Override
     public void onToggleStatus(NhiemVu nv, boolean isCompleted, int position) {
         mDbHelper.updateNhiemVuStatus(nv.getId(), isCompleted ? 1 : 0);
-        nv.setDaHoanThanh(isCompleted ? 1 : 0);
-        mNhiemVuAdapter.notifyItemChanged(position);
         Toast.makeText(this, isCompleted ? "Đã hoàn thành: " + nv.getTen() : "Đã hủy hoàn thành", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onEdit(NhiemVu nv, int position) {
         Intent intent = new Intent(NhiemVuListActivity.this, NhiemVuFormActivity.class);
-        intent.putExtra("do_an_id", mDoAnId);
-        intent.putExtra("nhiem_vu_id", nv.getId());
+        intent.putExtra(NhiemVuFormActivity.EXTRA_DO_AN_ID, mDoAnId);
+        intent.putExtra(NhiemVuFormActivity.EXTRA_NHIEM_VU_ID, nv.getId());
         startActivity(intent);
     }
 

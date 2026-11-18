@@ -9,45 +9,42 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-// Adapter nhiều kiểu dòng (Khớp chuẩn khung slide 195–208)
+// Adapter nhiều kiểu dòng (Khớp chuẩn khung slide 202–208)
 public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     // Khai báo hằng số TAG theo mẫu bài giảng
     private static final String TAG = "TimelineAdapter";
 
-    // Khai báo các hằng số nhận diện ViewType theo đúng mẫu slide 198
+    // 1. Khai báo các hằng số nhận diện ViewType theo đúng mẫu slide 202
     public static final int HEADER = 0;
     public static final int TASK = 1;
     public static final int MEETING = 2;
 
-    // Khai báo các thuộc tính thành viên theo mẫu slide 199
+    // 2. Khai báo các thuộc tính thành viên theo mẫu slide 202
     private List<Object> mObjects;
     private Context mContext;
 
+    // 3. Constructor theo mẫu slide 202
     public TimelineAdapter(Context context, List<Object> objects) {
         mContext = context;
         mObjects = objects;
     }
 
-    // Xác định kiểu dòng theo mẫu slide 201
+    // Xác định kiểu dòng theo mẫu slide 206
     @Override
     public int getItemViewType(int position) {
         if (mObjects == null || position < 0 || position >= mObjects.size()) {
             return -1;
         }
 
-        // Kiểm tra đối tượng bằng instanceof (mẫu slide 201)
+        // Kiểm tra đối tượng bằng instanceof (mẫu slide 206)
         if (mObjects.get(position) instanceof String) {
             return HEADER;
         } else if (mObjects.get(position) instanceof NhiemVu) {
@@ -58,7 +55,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return -1;
     }
 
-    // Nạp layout tương ứng với viewType theo mẫu slide 202
+    // Nạp layout tương ứng với viewType theo mẫu slide 207
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -80,13 +77,13 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
         }
 
-        // KHÁC SLIDE: Trong slide 202 cuối hàm trả về null; tuy nhiên Android RecyclerView
+        // KHÁC SLIDE: Trong slide cuối hàm trả về null; tuy nhiên Android RecyclerView
         // không cho phép ViewHolder null và sẽ crash ứng dụng với NullPointerException.
         // Ta ném ngoại lệ rõ ràng để bảo vệ an toàn mã nguồn.
         throw new IllegalArgumentException("Kiểu dòng không hợp lệ: " + viewType);
     }
 
-    // Ép kiểu holder và gắn dữ liệu theo mẫu slide 203
+    // Ép kiểu holder và gắn dữ liệu theo mẫu slide 208
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
@@ -104,13 +101,16 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 if (nv.getGhiChu() != null && !nv.getGhiChu().trim().isEmpty()) {
                     t.tvGhiChu.setVisibility(View.VISIBLE);
-                    t.tvGhiChu.setText(nv.getGhiChu());
+                    t.tvGhiChu.setText(nv.getGhiChu().trim());
                 } else {
                     t.tvGhiChu.setVisibility(View.GONE);
                 }
 
-                String han = nv.getHanHoanThanh() != null ? nv.getHanHoanThanh() : "Chưa đặt";
-                t.tvHanHoanThanh.setText("Hạn: " + han);
+                if (nv.getHanHoanThanh() != null && !nv.getHanHoanThanh().trim().isEmpty()) {
+                    t.tvHanHoanThanh.setText(mContext.getString(R.string.deadline_prefix) + nv.getHanHoanThanh().trim());
+                } else {
+                    t.tvHanHoanThanh.setText(mContext.getString(R.string.deadline_prefix) + mContext.getString(R.string.not_set));
+                }
 
                 boolean daXong = (nv.getDaHoanThanh() == 1);
                 t.cbHoanThanh.setChecked(daXong);
@@ -127,25 +127,28 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 CuocHen ch = (CuocHen) mObjects.get(position);
 
                 m.tvTitle.setText(ch.getTieuDe());
-                m.tvThoiGian.setText(ch.getThoiGian() != null ? ch.getThoiGian() : "Chưa đặt");
+
+                if (ch.getThoiGian() != null && !ch.getThoiGian().trim().isEmpty()) {
+                    m.tvThoiGian.setText(ch.getThoiGian().trim());
+                } else {
+                    m.tvThoiGian.setText(mContext.getString(R.string.not_set));
+                }
 
                 if (ch.getDiaDiem() != null && !ch.getDiaDiem().trim().isEmpty()) {
                     m.layoutDiaDiem.setVisibility(View.VISIBLE);
-                    m.tvDiaDiem.setText(ch.getDiaDiem());
+                    m.tvDiaDiem.setText(ch.getDiaDiem().trim());
                 } else {
                     m.layoutDiaDiem.setVisibility(View.GONE);
                 }
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-                String now = sdf.format(new Date());
-                boolean daQua = (ch.getThoiGian() != null && ch.getThoiGian().compareTo(now) < 0);
-
+                // Gọi hàm logic dùng chung kiểm tra lịch hẹn đã qua hay chưa
+                boolean daQua = DBHelper.laDaQua(ch.getThoiGian());
                 if (daQua) {
-                    m.tvStatusBadge.setText("Đã qua");
+                    m.tvStatusBadge.setText(mContext.getString(R.string.meeting_passed));
                     m.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_passed);
                     m.tvStatusBadge.setTextColor(ContextCompat.getColor(mContext, R.color.status_expired));
                 } else {
-                    m.tvStatusBadge.setText("Sắp tới");
+                    m.tvStatusBadge.setText(mContext.getString(R.string.meeting_upcoming));
                     m.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_upcoming);
                     m.tvStatusBadge.setTextColor(ContextCompat.getColor(mContext, R.color.status_completed));
                 }
@@ -156,33 +159,26 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
+        // Trả về số lượng phần tử theo mẫu slide 208
         return mObjects != null ? mObjects.size() : 0;
     }
 
     // ==============================================================
-    // 3 LỚP VIEWHOLDER LỒNG NHAU (MẪU SLIDE 200, 204)
+    // 3 LỚP VIEWHOLDER LỒNG NHAU (MẪU SLIDE 203–205)
     // ==============================================================
 
-    // 1. ViewHolder cho dòng tiêu đề nhóm (mẫu slide 200)
+    // 1. ViewHolder cho dòng tiêu đề nhóm (mẫu slide 203)
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
 
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
-            // Thiết lập sự kiện chọn dòng nếu cần (slide 203)
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int pos = getAdapterPosition();
-                    if (pos == RecyclerView.NO_POSITION) return;
-                    Toast.makeText(mContext, "Nhóm: " + mObjects.get(pos), Toast.LENGTH_SHORT).show();
-                }
-            });
+            // Header không bắt sự kiện click
         }
     }
 
-    // 2. ViewHolder cho dòng nhiệm vụ (mẫu slide 200)
+    // 2. ViewHolder cho dòng nhiệm vụ (mẫu slide 204)
     public class TaskViewHolder extends RecyclerView.ViewHolder {
         public CheckBox cbHoanThanh;
         public TextView tvTitle;
@@ -196,7 +192,11 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             tvGhiChu = (TextView) itemView.findViewById(R.id.tv_ghi_chu);
             tvHanHoanThanh = (TextView) itemView.findViewById(R.id.tv_han_hoan_thanh);
 
-            // Thiết lập sự kiện chọn dòng (slide 203)
+            // Chỉ hiển thị; đổi trạng thái ở màn hình Nhiệm vụ
+            cbHoanThanh.setClickable(false);
+            cbHoanThanh.setFocusable(false);
+
+            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -205,11 +205,9 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     Object obj = mObjects.get(pos);
                     if (obj instanceof NhiemVu) {
                         NhiemVu nv = (NhiemVu) obj;
-                        Toast.makeText(mContext, "Nhiệm vụ: " + nv.getTen(), Toast.LENGTH_SHORT).show();
-
                         Intent intent = new Intent(mContext, NhiemVuFormActivity.class);
-                        intent.putExtra("do_an_id", nv.getDoAnId());
-                        intent.putExtra("nhiem_vu_id", nv.getId());
+                        intent.putExtra(NhiemVuFormActivity.EXTRA_DO_AN_ID, nv.getDoAnId());
+                        intent.putExtra(NhiemVuFormActivity.EXTRA_NHIEM_VU_ID, nv.getId());
                         mContext.startActivity(intent);
                     }
                 }
@@ -217,7 +215,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    // 3. ViewHolder cho dòng cuộc hẹn (mẫu slide 200)
+    // 3. ViewHolder cho dòng cuộc hẹn (mẫu slide 205)
     public class MeetingViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
         public TextView tvStatusBadge;
@@ -233,7 +231,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             layoutDiaDiem = (LinearLayout) itemView.findViewById(R.id.layout_dia_diem);
             tvDiaDiem = (TextView) itemView.findViewById(R.id.tv_dia_diem);
 
-            // Thiết lập sự kiện chọn dòng (slide 203)
+            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -242,11 +240,9 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     Object obj = mObjects.get(pos);
                     if (obj instanceof CuocHen) {
                         CuocHen ch = (CuocHen) obj;
-                        Toast.makeText(mContext, "Lịch hẹn: " + ch.getTieuDe(), Toast.LENGTH_SHORT).show();
-
                         Intent intent = new Intent(mContext, CuocHenFormActivity.class);
-                        intent.putExtra("do_an_id", ch.getDoAnId());
-                        intent.putExtra("cuoc_hen_id", ch.getId());
+                        intent.putExtra(CuocHenFormActivity.EXTRA_DO_AN_ID, ch.getDoAnId());
+                        intent.putExtra(CuocHenFormActivity.EXTRA_CUOC_HEN_ID, ch.getId());
                         mContext.startActivity(intent);
                     }
                 }

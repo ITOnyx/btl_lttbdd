@@ -92,28 +92,28 @@ public class DoAnDetailActivity extends AppCompatActivity {
         // Bấm nút xem danh sách Nhiệm vụ
         mBtnXemNhiemVu.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, NhiemVuListActivity.class);
-            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
+            intent.putExtra(NhiemVuListActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xem danh sách Cuộc hẹn
         mBtnXemCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, CuocHenListActivity.class);
-            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
+            intent.putExtra(CuocHenListActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xem Dòng thời gian đồ án (Mục D1: Multiple View Type)
         mBtnXemDongThoiGian.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, TimelineActivity.class);
-            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
+            intent.putExtra(TimelineActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút chỉnh sửa đồ án
         mBtnSuaDoAn.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, DoAnFormActivity.class);
-            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
+            intent.putExtra(DoAnFormActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 

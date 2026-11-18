@@ -16,6 +16,10 @@ import java.util.Locale;
 // Màn hình thêm mới hoặc cập nhật thông tin cuộc hẹn trao đổi với giảng viên
 public class CuocHenFormActivity extends AppCompatActivity {
 
+    // Hằng số Intent nhận ID đồ án và ID cuộc hẹn
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+    public static final String EXTRA_CUOC_HEN_ID = "cuoc_hen_id";
+
     private Toolbar toolbarCuocHenForm;
     private EditText edtTieuDe;
     private EditText edtThoiGian;
@@ -36,9 +40,9 @@ public class CuocHenFormActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-        // Đọc ID đồ án và ID cuộc hẹn từ Intent
-        doAnId = getIntent().getIntExtra("do_an_id", -1);
-        cuocHenId = getIntent().getIntExtra("cuoc_hen_id", -1);
+        // Đọc ID đồ án và ID cuộc hẹn từ Intent bằng hằng số
+        doAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
+        cuocHenId = getIntent().getIntExtra(EXTRA_CUOC_HEN_ID, -1);
 
         // Ánh xạ các thành phần giao diện
         toolbarCuocHenForm = findViewById(R.id.toolbarCuocHenForm);
