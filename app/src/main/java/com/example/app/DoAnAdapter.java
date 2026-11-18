@@ -14,14 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter hiển thị danh sách Đồ án theo chuẩn 5 bước RecyclerView (slide 184–194)
+// Adapter hiển thị danh sách Đồ án theo chuẩn bài giảng (slide 184–223)
 public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder> {
 
-    // Giao diện callback để lắng nghe sự kiện click/sửa/xóa từ Activity
+    // Giao diện callback nhận sự kiện click kèm theo vị trí adapter position
     public interface OnDoAnClickListener {
-        void onItemClick(DoAn doAn);
-        void onEditClick(DoAn doAn);
-        void onDeleteClick(DoAn doAn);
+        void onItemClick(DoAn doAn, int position);
+        void onEditClick(DoAn doAn, int position);
+        void onDeleteClick(DoAn doAn, int position);
     }
 
     // Các thuộc tính thành viên với tiền tố m như bài giảng (slide 184)
@@ -45,10 +45,50 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         this.mDbHelper = new DBHelper(context);
     }
 
-    // Setter listener nếu cần đăng ký sau
     public void setOnDoAnClickListener(OnDoAnClickListener listener) {
         this.mListener = listener;
     }
+
+    // ==============================================================
+    // 3 HÀM ANIMATION CỐT LÕI THEO BÀI GIẢNG (slide 211–223)
+    // ==============================================================
+
+    // 1. Thêm phần tử tại vị trí chỉ định có hiệu ứng chèn (slide 213–215)
+    public void addItem(int position, DoAn item) {
+        if (mDoAns != null && position >= 0 && position <= mDoAns.size()) {
+            mDoAns.add(position, item);
+            notifyItemInserted(position);
+        }
+    }
+
+    // Thêm phần tử vào cuối danh sách có hiệu ứng chèn (slide 213–215)
+    public void addItem(DoAn item) {
+        if (mDoAns != null) {
+            addItem(mDoAns.size(), item);
+        }
+    }
+
+    // 2. Xóa phần tử tại vị trí chỉ định có hiệu ứng xóa (slide 216–218)
+    public void removeItem(int position) {
+        if (mDoAns != null && position >= 0 && position < mDoAns.size()) {
+            mDoAns.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    // 3. Thay thế phần tử tại vị trí chỉ định có hiệu ứng đổi (slide 219–221)
+    // Đúng mẫu bài giảng: remove + add + notifyItemChanged
+    public void replaceItem(int position, DoAn item) {
+        if (mDoAns != null && position >= 0 && position < mDoAns.size()) {
+            mDoAns.remove(position);
+            mDoAns.add(position, item);
+            notifyItemChanged(position);
+        }
+    }
+
+    // ==============================================================
+    // CÁC HÀM OVERRIDE RECYCLERVIEW.ADAPTER CƠ BẢN
+    // ==============================================================
 
     // Bước 4: onCreateViewHolder - Nạp layout row_do_an.xml với attachToRoot = false
     @NonNull
@@ -145,7 +185,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                     if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
                         DoAn doAn = mDoAns.get(position);
                         if (mListener != null) {
-                            mListener.onItemClick(doAn);
+                            mListener.onItemClick(doAn, position);
                         } else {
                             // Mở màn hình chi tiết đồ án bằng Intent (slide 194)
                             Intent intent = new Intent(mContext, DoAnDetailActivity.class);
@@ -163,7 +203,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
                         if (mListener != null) {
-                            mListener.onDeleteClick(mDoAns.get(position));
+                            mListener.onDeleteClick(mDoAns.get(position), position);
                             return true;
                         }
                     }
@@ -178,7 +218,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
                         if (mListener != null) {
-                            mListener.onEditClick(mDoAns.get(position));
+                            mListener.onEditClick(mDoAns.get(position), position);
                         }
                     }
                 }
@@ -191,7 +231,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
                         if (mListener != null) {
-                            mListener.onDeleteClick(mDoAns.get(position));
+                            mListener.onDeleteClick(mDoAns.get(position), position);
                         }
                     }
                 }

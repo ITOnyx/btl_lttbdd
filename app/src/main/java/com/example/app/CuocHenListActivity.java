@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-// Màn hình hiển thị và quản lý danh sách cuộc hẹn của đồ án (Áp dụng 5 bước RecyclerView)
+// Màn hình hiển thị và quản lý danh sách cuộc hẹn của đồ án (Áp dụng 5 bước RecyclerView và Animation)
 public class CuocHenListActivity extends AppCompatActivity implements CuocHenAdapter.OnCuocHenClickListener {
 
     // Khai báo các thuộc tính thành viên với tiền tố m như bài giảng
@@ -51,7 +52,7 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         mLayoutEmptyCuocHen = findViewById(R.id.layoutEmptyCuocHen);
         mFabAddCuocHen = findViewById(R.id.fabAddCuocHen);
 
-        // Nút Back trên Toolbar
+        // Cấu hình nút Back trên Toolbar
         mToolbarCuocHen.setNavigationOnClickListener(v -> finish());
 
         // Đặt tiêu đề Toolbar theo tên đồ án
@@ -68,7 +69,10 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         mRvCuocHen.setAdapter(mAdapter);
         mRvCuocHen.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        // Bấm nút thêm mới cuộc hẹn
+        // Mục B2: Cài đặt DefaultItemAnimator (thêm: alpha 0->1, xóa: 1->0, đổi: 1->0 rồi 0->1)
+        mRvCuocHen.setItemAnimator(new DefaultItemAnimator());
+
+        // Bắt sự kiện bấm nút thêm cuộc hẹn mới
         mFabAddCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
             intent.putExtra("do_an_id", mDoAnId);
@@ -87,9 +91,16 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
     private void loadData() {
         mListCuocHen.clear();
         mListCuocHen.addAll(mDbHelper.getCuocHenByDoAnId(mDoAnId));
+
+        // Mục B4: Nạp lại toàn bộ danh sách từ CSDL - dùng notifyDataSetChanged() không có animation (slide 212)
         mAdapter.notifyDataSetChanged();
 
-        if (mListCuocHen.isEmpty()) {
+        checkEmptyState();
+    }
+
+    // Mục B6: Cập nhật giao diện trống tại chỗ
+    private void checkEmptyState() {
+        if (mAdapter.getItemCount() == 0) {
             mLayoutEmptyCuocHen.setVisibility(View.VISIBLE);
             mRvCuocHen.setVisibility(View.GONE);
         } else {
@@ -98,24 +109,31 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         }
     }
 
-    // Chuyển sang màn hình sửa cuộc hẹn
+    // Chuyển sang màn hình chỉnh sửa cuộc hẹn
     @Override
-    public void onEdit(CuocHen ch) {
+    public void onEdit(CuocHen ch, int position) {
         Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
         intent.putExtra("do_an_id", mDoAnId);
         intent.putExtra("cuoc_hen_id", ch.getId());
         startActivity(intent);
     }
 
-    // Hiển thị hộp thoại AlertDialog xác nhận xóa cuộc hẹn
+    // Mục B3: Hiển thị AlertDialog xác nhận xóa cuộc hẹn
     @Override
-    public void onDelete(CuocHen ch) {
+    public void onDelete(CuocHen ch, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Xác nhận xóa cuộc hẹn");
         builder.setMessage("Bạn có chắc chắn muốn xóa lịch hẹn: \"" + ch.getTieuDe() + "\" không?");
         builder.setPositiveButton("Xóa", (dialog, which) -> {
+            // 1. Xóa khỏi CSDL SQLite
             mDbHelper.deleteCuocHen(ch.getId());
-            loadData();
+
+            // 2. Xóa khỏi Adapter với hoạt ảnh removeItem (slide 216)
+            mAdapter.removeItem(position);
+
+            // 3. Cập nhật Empty state tại chỗ
+            checkEmptyState();
+
             Toast.makeText(CuocHenListActivity.this, "Đã xóa cuộc hẹn thành công!", Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());

@@ -14,14 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter hiển thị danh sách Nhiệm vụ theo chuẩn 5 bước RecyclerView (slide 184–194)
+// Adapter hiển thị danh sách Nhiệm vụ theo chuẩn bài giảng (slide 184–223)
 public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuViewHolder> {
 
-    // Giao diện callback để lắng nghe sự kiện đổi trạng thái, sửa và xóa
+    // Giao diện callback nhận sự kiện đổi trạng thái, sửa và xóa kèm vị trí adapter position
     public interface OnNhiemVuClickListener {
-        void onToggleStatus(NhiemVu nv, boolean isCompleted);
-        void onEdit(NhiemVu nv);
-        void onDelete(NhiemVu nv);
+        void onToggleStatus(NhiemVu nv, boolean isCompleted, int position);
+        void onEdit(NhiemVu nv, int position);
+        void onDelete(NhiemVu nv, int position);
     }
 
     // Các thuộc tính thành viên với tiền tố m như bài giảng (slide 184)
@@ -46,6 +46,47 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
     public void setOnNhiemVuClickListener(OnNhiemVuClickListener listener) {
         this.mListener = listener;
     }
+
+    // ==============================================================
+    // 3 HÀM ANIMATION CỐT LÕI THEO BÀI GIẢNG (slide 211–223)
+    // ==============================================================
+
+    // 1. Thêm phần tử tại vị trí chỉ định có hiệu ứng chèn (slide 213–215)
+    public void addItem(int position, NhiemVu item) {
+        if (mNhiemVus != null && position >= 0 && position <= mNhiemVus.size()) {
+            mNhiemVus.add(position, item);
+            notifyItemInserted(position);
+        }
+    }
+
+    // Thêm phần tử vào cuối danh sách có hiệu ứng chèn (slide 213–215)
+    public void addItem(NhiemVu item) {
+        if (mNhiemVus != null) {
+            addItem(mNhiemVus.size(), item);
+        }
+    }
+
+    // 2. Xóa phần tử tại vị trí chỉ định có hiệu ứng xóa (slide 216–218)
+    public void removeItem(int position) {
+        if (mNhiemVus != null && position >= 0 && position < mNhiemVus.size()) {
+            mNhiemVus.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    // 3. Thay thế phần tử tại vị trí chỉ định có hiệu ứng đổi (slide 219–221)
+    // Đúng mẫu bài giảng: remove + add + notifyItemChanged
+    public void replaceItem(int position, NhiemVu item) {
+        if (mNhiemVus != null && position >= 0 && position < mNhiemVus.size()) {
+            mNhiemVus.remove(position);
+            mNhiemVus.add(position, item);
+            notifyItemChanged(position);
+        }
+    }
+
+    // ==============================================================
+    // CÁC HÀM OVERRIDE RECYCLERVIEW.ADAPTER CƠ BẢN
+    // ==============================================================
 
     // Bước 4: onCreateViewHolder - Nạp layout row_nhiem_vu.xml với attachToRoot = false
     @NonNull
@@ -120,7 +161,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mNhiemVus != null && position < mNhiemVus.size()) {
                         if (mListener != null) {
-                            mListener.onEdit(mNhiemVus.get(position));
+                            mListener.onEdit(mNhiemVus.get(position), position);
                         }
                     }
                 }
@@ -133,7 +174,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mNhiemVus != null && position < mNhiemVus.size()) {
                         if (mListener != null) {
-                            mListener.onToggleStatus(mNhiemVus.get(position), cbHoanThanh.isChecked());
+                            mListener.onToggleStatus(mNhiemVus.get(position), cbHoanThanh.isChecked(), position);
                         }
                     }
                 }
@@ -146,7 +187,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mNhiemVus != null && position < mNhiemVus.size()) {
                         if (mListener != null) {
-                            mListener.onEdit(mNhiemVus.get(position));
+                            mListener.onEdit(mNhiemVus.get(position), position);
                         }
                     }
                 }
@@ -159,7 +200,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mNhiemVus != null && position < mNhiemVus.size()) {
                         if (mListener != null) {
-                            mListener.onDelete(mNhiemVus.get(position));
+                            mListener.onDelete(mNhiemVus.get(position), position);
                         }
                     }
                 }

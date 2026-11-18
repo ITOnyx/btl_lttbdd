@@ -17,13 +17,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-// Adapter hiển thị danh sách Cuộc hẹn theo chuẩn 5 bước RecyclerView (slide 184–194)
+// Adapter hiển thị danh sách Cuộc hẹn theo chuẩn bài giảng (slide 184–223)
 public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenViewHolder> {
 
-    // Giao diện callback để lắng nghe sự kiện sửa và xóa cuộc hẹn
+    // Giao diện callback nhận sự kiện sửa và xóa cuộc hẹn kèm vị trí adapter position
     public interface OnCuocHenClickListener {
-        void onEdit(CuocHen ch);
-        void onDelete(CuocHen ch);
+        void onEdit(CuocHen ch, int position);
+        void onDelete(CuocHen ch, int position);
     }
 
     // Các thuộc tính thành viên với tiền tố m như bài giảng (slide 184)
@@ -48,6 +48,47 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
     public void setOnCuocHenClickListener(OnCuocHenClickListener listener) {
         this.mListener = listener;
     }
+
+    // ==============================================================
+    // 3 HÀM ANIMATION CỐT LÕI THEO BÀI GIẢNG (slide 211–223)
+    // ==============================================================
+
+    // 1. Thêm phần tử tại vị trí chỉ định có hiệu ứng chèn (slide 213–215)
+    public void addItem(int position, CuocHen item) {
+        if (mCuocHens != null && position >= 0 && position <= mCuocHens.size()) {
+            mCuocHens.add(position, item);
+            notifyItemInserted(position);
+        }
+    }
+
+    // Thêm phần tử vào cuối danh sách có hiệu ứng chèn (slide 213–215)
+    public void addItem(CuocHen item) {
+        if (mCuocHens != null) {
+            addItem(mCuocHens.size(), item);
+        }
+    }
+
+    // 2. Xóa phần tử tại vị trí chỉ định có hiệu ứng xóa (slide 216–218)
+    public void removeItem(int position) {
+        if (mCuocHens != null && position >= 0 && position < mCuocHens.size()) {
+            mCuocHens.remove(position);
+            notifyItemRemoved(position);
+        }
+    }
+
+    // 3. Thay thế phần tử tại vị trí chỉ định có hiệu ứng đổi (slide 219–221)
+    // Đúng mẫu bài giảng: remove + add + notifyItemChanged
+    public void replaceItem(int position, CuocHen item) {
+        if (mCuocHens != null && position >= 0 && position < mCuocHens.size()) {
+            mCuocHens.remove(position);
+            mCuocHens.add(position, item);
+            notifyItemChanged(position);
+        }
+    }
+
+    // ==============================================================
+    // CÁC HÀM OVERRIDE RECYCLERVIEW.ADAPTER CƠ BẢN
+    // ==============================================================
 
     // Bước 4: onCreateViewHolder - Nạp layout row_cuoc_hen.xml với attachToRoot = false
     @NonNull
@@ -137,7 +178,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mCuocHens != null && position < mCuocHens.size()) {
                         if (mListener != null) {
-                            mListener.onEdit(mCuocHens.get(position));
+                            mListener.onEdit(mCuocHens.get(position), position);
                         }
                     }
                 }
@@ -150,7 +191,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mCuocHens != null && position < mCuocHens.size()) {
                         if (mListener != null) {
-                            mListener.onEdit(mCuocHens.get(position));
+                            mListener.onEdit(mCuocHens.get(position), position);
                         }
                     }
                 }
@@ -163,7 +204,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && mCuocHens != null && position < mCuocHens.size()) {
                         if (mListener != null) {
-                            mListener.onDelete(mCuocHens.get(position));
+                            mListener.onDelete(mCuocHens.get(position), position);
                         }
                     }
                 }
