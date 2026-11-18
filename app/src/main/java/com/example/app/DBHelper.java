@@ -17,6 +17,22 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "tiendo.db";
     public static final int DATABASE_VERSION = 1;
 
+    // Định dạng ngày giờ chuẩn dùng chung (tạo 1 lần static final theo yêu cầu)
+    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+
+    // Hàm tiện ích kiểm tra thời gian cuộc hẹn đã qua hay chưa (dùng chung cho CuocHenAdapter và TimelineAdapter)
+    public static boolean laDaQua(String thoiGian) {
+        if (thoiGian == null || thoiGian.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            String currentDateTime = DATE_TIME_FORMAT.format(new Date());
+            return thoiGian.trim().compareTo(currentDateTime) < 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // Khởi tạo DBHelper với context của ứng dụng
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -248,8 +264,7 @@ public class DBHelper extends SQLiteOpenHelper {
         c1.close();
 
         // 2. Thống kê cuộc hẹn sắp tới (thời gian >= hiện tại)
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String currentDateTime = sdf.format(new Date());
+        String currentDateTime = DATE_TIME_FORMAT.format(new Date());
         Cursor c2 = db.rawQuery("SELECT COUNT(*) FROM CuocHen WHERE do_an_id = ? AND thoi_gian >= ?", new String[]{String.valueOf(doAnId), currentDateTime});
         if (c2.moveToNext()) {
             stats[3] = c2.getInt(0);

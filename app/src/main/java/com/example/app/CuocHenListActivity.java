@@ -21,6 +21,9 @@ import java.util.List;
 // Màn hình danh sách Cuộc hẹn (Khớp đúng khung mẫu slide 193)
 public class CuocHenListActivity extends AppCompatActivity implements CuocHenAdapter.OnCuocHenClickListener {
 
+    // Hằng số Intent nhận ID đồ án
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+
     // Khai báo các thuộc tính thành viên theo đúng mẫu slide 193
     private RecyclerView rvCuocHen;
     private CuocHenAdapter mCuocHenAdapter;
@@ -42,7 +45,7 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
 
         mDbHelper = new DBHelper(this);
 
-        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        mDoAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
         if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();
@@ -78,10 +81,10 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
         rvCuocHen.setItemAnimator(new DefaultItemAnimator());
 
-        // Bấm nút thêm cuộc hẹn mới -> mở form
+        // Bấm nút thêm cuộc hẹn mới -> mở form bằng hằng số
         mFabAddCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(CuocHenFormActivity.EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
     }
@@ -112,8 +115,8 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
     @Override
     public void onEdit(CuocHen ch, int position) {
         Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
-        intent.putExtra("do_an_id", mDoAnId);
-        intent.putExtra("cuoc_hen_id", ch.getId());
+        intent.putExtra(CuocHenFormActivity.EXTRA_DO_AN_ID, mDoAnId);
+        intent.putExtra(CuocHenFormActivity.EXTRA_CUOC_HEN_ID, ch.getId());
         startActivity(intent);
     }
 

@@ -33,20 +33,11 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         void onDelete(NhiemVu nv, int position);
     }
 
-    // Constructor theo mẫu slide 190: (Context context, List<NhiemVu> datas)
-    public NhiemVuAdapter(Context context, List<NhiemVu> datas) {
+    // Constructor duy nhất thống nhất nhận listener (Context context, List<NhiemVu> datas, OnNhiemVuClickListener listener)
+    public NhiemVuAdapter(Context context, List<NhiemVu> datas, OnNhiemVuClickListener listener) {
         mContext = context;
         mNhiemVus = datas;
         mLayoutInflater = LayoutInflater.from(context);
-    }
-
-    // Constructor mở rộng nhận thêm listener
-    public NhiemVuAdapter(Context context, List<NhiemVu> datas, OnNhiemVuClickListener listener) {
-        this(context, datas);
-        mListener = listener;
-    }
-
-    public void setOnNhiemVuClickListener(OnNhiemVuClickListener listener) {
         mListener = listener;
     }
 
@@ -117,15 +108,20 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         // Gắn dữ liệu vào ViewHolder
         holder.tvTitle.setText(nv.getTen());
 
+        // Ghi chú (ẩn nếu rỗng hoặc null sau khi trim)
         if (nv.getGhiChu() != null && !nv.getGhiChu().trim().isEmpty()) {
             holder.tvGhiChu.setVisibility(View.VISIBLE);
-            holder.tvGhiChu.setText(nv.getGhiChu());
+            holder.tvGhiChu.setText(nv.getGhiChu().trim());
         } else {
             holder.tvGhiChu.setVisibility(View.GONE);
         }
 
-        String han = nv.getHanHoanThanh() != null ? nv.getHanHoanThanh() : "Chưa đặt";
-        holder.tvHanHoanThanh.setText("Hạn: " + han);
+        // Hạn hoàn thành (kiểm tra null hoặc rỗng sau trim)
+        if (nv.getHanHoanThanh() != null && !nv.getHanHoanThanh().trim().isEmpty()) {
+            holder.tvHanHoanThanh.setText(mContext.getString(R.string.deadline_prefix) + nv.getHanHoanThanh().trim());
+        } else {
+            holder.tvHanHoanThanh.setText(mContext.getString(R.string.deadline_prefix) + mContext.getString(R.string.not_set));
+        }
 
         boolean daXong = (nv.getDaHoanThanh() == 1);
         holder.cbHoanThanh.setChecked(daXong);
@@ -165,7 +161,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
             btnEditTask = (ImageButton) itemView.findViewById(R.id.btn_edit_task);
             btnDeleteTask = (ImageButton) itemView.findViewById(R.id.btn_delete_task);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194, 203)
+            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -192,14 +188,22 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                 }
             });
 
-            // Bắt sự kiện CheckBox hoàn thành
+            // Bắt sự kiện CheckBox hoàn thành: cập nhật ngay model và gạch ngang, sau đó báo listener
             cbHoanThanh.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position == RecyclerView.NO_POSITION) return;
+                    NhiemVu nv = mNhiemVus.get(position);
+                    boolean checked = cbHoanThanh.isChecked();
+                    nv.setDaHoanThanh(checked ? 1 : 0);
+                    if (checked) {
+                        tvTitle.setPaintFlags(tvTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    } else {
+                        tvTitle.setPaintFlags(tvTitle.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    }
                     if (mListener != null) {
-                        mListener.onToggleStatus(mNhiemVus.get(position), cbHoanThanh.isChecked(), position);
+                        mListener.onToggleStatus(nv, checked, position);
                     }
                 }
             });

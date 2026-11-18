@@ -81,6 +81,12 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
     // Thay thế/đổi phần tử tại vị trí position (mẫu slide 221: remove + add + notifyItemChanged)
     public void replaceItem(int position, DoAn item) {
         if (mDoAns != null && position >= 0 && position < mDoAns.size()) {
+            DoAn oldItem = mDoAns.get(position);
+            // Đảm bảo đối tượng mới có soNhiemVuXong và tongNhiemVu đúng (sao chép số đếm cũ nếu chưa nạp, không để tiến độ về 0/0)
+            if (item != null && item.getTongNhiemVu() == 0 && item.getSoNhiemVuXong() == 0 && oldItem != null) {
+                item.setTongNhiemVu(oldItem.getTongNhiemVu());
+                item.setSoNhiemVuXong(oldItem.getSoNhiemVuXong());
+            }
             mDoAns.remove(position);
             mDoAns.add(position, item);
             notifyItemChanged(position);
@@ -177,7 +183,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
             btnEdit = (ImageButton) itemView.findViewById(R.id.btn_edit);
             btnDelete = (ImageButton) itemView.findViewById(R.id.btn_delete);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194, 203)
+            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

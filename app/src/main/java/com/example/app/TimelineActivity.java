@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-// Màn hình Dòng thời gian của đồ án (Mục D: Áp dụng Multiple View Type theo slide 195–210)
+// Màn hình Dòng thời gian của đồ án (Mục D: Áp dụng Multiple View Type theo slide 209–210)
 public class TimelineActivity extends AppCompatActivity {
+
+    // Hằng số Intent nhận ID đồ án
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
 
     private Toolbar mToolbarTimeline;
     private RecyclerView mRvTimeline;
@@ -32,8 +35,8 @@ public class TimelineActivity extends AppCompatActivity {
 
         mDbHelper = new DBHelper(this);
 
-        // Đọc ID đồ án truyền từ màn hình chi tiết
-        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        // Đọc ID đồ án truyền từ màn hình chi tiết bằng hằng số
+        mDoAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
         if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();

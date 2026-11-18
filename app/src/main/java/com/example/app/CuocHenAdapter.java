@@ -12,10 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 // Adapter một kiểu dòng hiển thị Cuộc hẹn (Khớp chuẩn khung slide 190–191, 194, 220–223)
 public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenViewHolder> {
@@ -35,20 +32,11 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         void onDelete(CuocHen ch, int position);
     }
 
-    // Constructor theo mẫu slide 190: (Context context, List<CuocHen> datas)
-    public CuocHenAdapter(Context context, List<CuocHen> datas) {
+    // Constructor duy nhất thống nhất nhận listener (Context context, List<CuocHen> datas, OnCuocHenClickListener listener)
+    public CuocHenAdapter(Context context, List<CuocHen> datas, OnCuocHenClickListener listener) {
         mContext = context;
         mCuocHens = datas;
         mLayoutInflater = LayoutInflater.from(context);
-    }
-
-    // Constructor mở rộng nhận thêm listener
-    public CuocHenAdapter(Context context, List<CuocHen> datas, OnCuocHenClickListener listener) {
-        this(context, datas);
-        mListener = listener;
-    }
-
-    public void setOnCuocHenClickListener(OnCuocHenClickListener listener) {
         mListener = listener;
     }
 
@@ -118,32 +106,38 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
 
         // Gắn dữ liệu vào ViewHolder
         holder.tvTitle.setText(ch.getTieuDe());
-        holder.tvThoiGian.setText(ch.getThoiGian() != null ? ch.getThoiGian() : "Chưa đặt");
 
+        // Thời gian cuộc hẹn (kiểm tra null hoặc rỗng sau trim coi là chưa có)
+        if (ch.getThoiGian() != null && !ch.getThoiGian().trim().isEmpty()) {
+            holder.tvThoiGian.setText(ch.getThoiGian().trim());
+        } else {
+            holder.tvThoiGian.setText(mContext.getString(R.string.not_set));
+        }
+
+        // Địa điểm (ẩn nếu rỗng hoặc null sau khi trim)
         if (ch.getDiaDiem() != null && !ch.getDiaDiem().trim().isEmpty()) {
             holder.layoutDiaDiem.setVisibility(View.VISIBLE);
-            holder.tvDiaDiem.setText(ch.getDiaDiem());
+            holder.tvDiaDiem.setText(ch.getDiaDiem().trim());
         } else {
             holder.layoutDiaDiem.setVisibility(View.GONE);
         }
 
+        // Ghi chú (ẩn nếu rỗng hoặc null sau khi trim)
         if (ch.getGhiChu() != null && !ch.getGhiChu().trim().isEmpty()) {
             holder.tvGhiChu.setVisibility(View.VISIBLE);
-            holder.tvGhiChu.setText(ch.getGhiChu());
+            holder.tvGhiChu.setText(ch.getGhiChu().trim());
         } else {
             holder.tvGhiChu.setVisibility(View.GONE);
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String currentDateTime = sdf.format(new Date());
-
-        boolean daQua = (ch.getThoiGian() != null && ch.getThoiGian().compareTo(currentDateTime) < 0);
+        // Kiểm tra cuộc hẹn đã qua hay chưa bằng hàm dùng chung laDaQua trong DBHelper
+        boolean daQua = DBHelper.laDaQua(ch.getThoiGian());
         if (daQua) {
-            holder.tvStatusBadge.setText("Đã qua");
+            holder.tvStatusBadge.setText(mContext.getString(R.string.meeting_passed));
             holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_passed);
             holder.tvStatusBadge.setTextColor(ContextCompat.getColor(mContext, R.color.status_expired));
         } else {
-            holder.tvStatusBadge.setText("Sắp tới");
+            holder.tvStatusBadge.setText(mContext.getString(R.string.meeting_upcoming));
             holder.tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_upcoming);
             holder.tvStatusBadge.setTextColor(ContextCompat.getColor(mContext, R.color.status_completed));
         }
@@ -181,7 +175,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
             btnEditMeeting = (ImageButton) itemView.findViewById(R.id.btn_edit_meeting);
             btnDeleteMeeting = (ImageButton) itemView.findViewById(R.id.btn_delete_meeting);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194, 203)
+            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

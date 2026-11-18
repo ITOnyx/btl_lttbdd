@@ -15,6 +15,9 @@ import java.util.Locale;
 // Màn hình thêm mới hoặc chỉnh sửa thông tin đồ án
 public class DoAnFormActivity extends AppCompatActivity {
 
+    // Hằng số Intent nhận ID đồ án
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+
     private EditText edtTen;
     private EditText edtGiangVien;
     private EditText edtMoTa;
@@ -53,8 +56,8 @@ public class DoAnFormActivity extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // Đọc ID đồ án truyền từ Intent (nếu có)
-        doAnId = getIntent().getIntExtra("do_an_id", -1);
+        // Đọc ID đồ án truyền từ Intent (nếu có) bằng hằng số EXTRA_DO_AN_ID
+        doAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
 
         if (doAnId != -1) {
             // Chế độ chỉnh sửa đồ án

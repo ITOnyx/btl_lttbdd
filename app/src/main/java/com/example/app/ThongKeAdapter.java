@@ -15,12 +15,10 @@ import java.util.List;
 // Adapter hiển thị các thẻ thống kê nhỏ trên RecyclerView cuộn ngang (slide 185, 192)
 public class ThongKeAdapter extends RecyclerView.Adapter<ThongKeAdapter.ThongKeViewHolder> {
 
-    private Context mContext;
     private List<ThongKeItem> mItems;
     private LayoutInflater mLayoutInflater;
 
     public ThongKeAdapter(Context context, List<ThongKeItem> items) {
-        this.mContext = context;
         this.mItems = items;
         this.mLayoutInflater = LayoutInflater.from(context);
     }
@@ -36,7 +34,7 @@ public class ThongKeAdapter extends RecyclerView.Adapter<ThongKeAdapter.ThongKeV
     public void onBindViewHolder(@NonNull ThongKeViewHolder holder, int position) {
         ThongKeItem item = mItems.get(position);
         holder.tvTitle.setText(item.getTieuDe());
-        holder.tvGiaTri.setText(item.getGiaTri());
+        holder.tvGiaTri.setText(String.valueOf(item.getGiaTri()));
         holder.ivIcon.setImageResource(item.getIconResId());
     }
 
