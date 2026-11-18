@@ -291,17 +291,61 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 
 ---
 
-## 1. BẢNG ĐỐI CHIẾU BÀI GIẢNG → DỰ ÁN THỰC TẾ
+## 1. BẢNG ĐỐI CHIẾU CHI TIẾT TỪNG SLIDE → FILE / HÀM THỰC TẾ TRONG DỰ ÁN
 
-| Slide | Nội dung bài giảng | Áp dụng thực tế trong dự án |
-| :--- | :--- | :--- |
-| **182–183** | **RecyclerView vs ListView**: ViewHolder, LayoutManager, ItemAnimator, ItemDecoration, cách bắt sự kiện | - **ViewHolder**: Bắt buộc trong cả 5 Adapter: `DoAnAdapter.DoAnViewHolder`, `NhiemVuAdapter.NhiemVuViewHolder`, `CuocHenAdapter.CuocHenViewHolder`, `ThongKeAdapter.ThongKeViewHolder`, và 3 ViewHolder trong `TimelineAdapter`.<br>- **LayoutManager**: Dùng `LinearLayoutManager` (dọc, ngang) và `GridLayoutManager` (lưới 2 cột).<br>- **ItemAnimator**: Cài đặt `DefaultItemAnimator` trên tất cả RecyclerView danh sách.<br>- **ItemDecoration**: Sử dụng `DividerItemDecoration` trong danh sách nhiệm vụ (`NhiemVuListActivity`).<br>- **Cách bắt sự kiện**: Bắt ngay trong constructor ViewHolder, không đặt trong `onBindViewHolder`. |
-| **184** | **Adapter**: `onCreateViewHolder`, `onBindViewHolder` | Đã chuẩn hóa trong 5 Adapter (`DoAnAdapter`, `NhiemVuAdapter`, `CuocHenAdapter`, `ThongKeAdapter`, `TimelineAdapter`). |
-| **185, 192** | **LayoutManager**: Linear (dọc/ngang), Grid, StaggeredGrid; ItemAnimator | - Cuộn dọc: `MainActivity`, `NhiemVuListActivity`, `CuocHenListActivity`, `TimelineActivity`.<br>- Cuộn ngang: Thẻ thống kê tại `DoAnDetailActivity` (`rv_thong_ke`).<br>- Lưới 2 cột: Nút chuyển đổi chế độ xem trên Toolbar `MainActivity`.<br>- StaggeredGrid: Giải thích lý thuyết vấn đáp (không áp dụng do dữ liệu đồ án cần cấu trúc đều). |
-| **186–193** | **5 bước làm RecyclerView cơ bản** | Áp dụng chuẩn chỉ 100% cho 3 thực thể chính: Đồ án, Nhiệm vụ, Cuộc hẹn (xem mục 3 bên dưới). |
-| **194** | **Chọn item**: `setOnClickListener` trong constructor ViewHolder, `getAdapterPosition` | Đặt toàn bộ click/long-click trong constructor ViewHolder; kiểm tra `getAdapterPosition() != RecyclerView.NO_POSITION`; click đồ án mở `DoAnDetailActivity` bằng Intent. |
-| **195–210** | **Multiple View Type** | Tạo `TimelineActivity` và `TimelineAdapter` gộp cả 3 kiểu dòng: Tiêu đề phân nhóm (`HEADER`), Nhiệm vụ (`TASK`), và Cuộc hẹn (`MEETING`) vào chung 1 RecyclerView. |
-| **211–223** | **Animation**: ItemAnimator, DefaultItemAnimator, notifyItem*, addItem/removeItem/replaceItem, scrollToPosition | Viết đúng 3 hàm animation (`addItem`, `removeItem`, `replaceItem`) trong cả 3 Adapter; xóa gọi `removeItem`; tick CheckBox gọi `notifyItemChanged`; tắt nháy bằng `setSupportsChangeAnimations(false)`. |
+### A. Nhóm Slide 184–194 (5 bước cơ bản, Adapter & Chọn Item)
+| Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
+| :--- | :--- | :--- | :--- |
+| **184** | Cấu trúc Adapter: `onCreateViewHolder`, `onBindViewHolder`, `getItemCount` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% chữ ký hàm và kiểu trả về. |
+| **185, 192** | `LayoutManager` (Linear dọc/ngang, Grid 2 cột) | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`applyLayoutManager`), [DoAnDetailActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnDetailActivity.java) (`rv_thong_ke`) | Dùng cả `LinearLayoutManager` (dọc, ngang) và `GridLayoutManager` (lưới 2 cột). |
+| **186** | Bước 1 & 2: Model Serializable & khai báo thẻ RecyclerView trong Activity | [DoAn.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAn.java), [NhiemVu.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVu.java), [CuocHen.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHen.java), [activity_main.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_main.xml) (`@+id/rv_do_an`) | Model chuẩn JavaBean `implements Serializable`. |
+| **187** | Bước 3: Layout 1 dòng (`row_do_an.xml`, `row_nhiem_vu.xml`, `row_cuoc_hen.xml`) | [row_do_an.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_do_an.xml), [row_nhiem_vu.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_nhiem_vu.xml), [row_cuoc_hen.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_cuoc_hen.xml) | ID dạng `tv_title`, `tv_...`, có `android:ellipsize="end"`. |
+| **188–191** | Bước 4: Viết Adapter chi tiết theo khung slide (TAG, mDatas, mContext, mLayoutInflater) | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% khung mẫu slide 190–191. |
+| **193** | Bước 5: Viết Activity theo đúng thứ tự `onCreate` (setContentView $\rightarrow$ findViewById $\rightarrow$ List $\rightarrow$ Adapter $\rightarrow$ setAdapter $\rightarrow$ setLayoutManager $\rightarrow$ setItemAnimator) | `onCreate()` trong [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java), [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java), [CuocHenListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenListActivity.java) | Tuân thủ chính xác thứ tự gọi hàm slide 193. |
+| **194** | Chọn item trong constructor ViewHolder: `getAdapterPosition()`, mở màn hình chi tiết | Constructor `DoAnViewHolder` trong [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java) | Kiểm tra `position == NO_POSITION return;` an toàn. |
+
+### B. Nhóm Slide 195–210 (Kỹ thuật Nhiều kiểu dòng - Multiple View Type)
+| Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
+| :--- | :--- | :--- | :--- |
+| **198** | Khai báo hằng số ViewType (`HEADER`, `TASK`, `MEETING`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 24–26) | `public static final int HEADER = 0, TASK = 1, MEETING = 2;` |
+| **199** | Khai báo `List<Object> mObjects` và `Context mContext` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 29–30) | Chứa lẫn `String`, `NhiemVu`, `CuocHen`. |
+| **200, 204** | 3 lớp lồng ViewHolder (`HeaderViewHolder`, `TaskViewHolder`, `MeetingViewHolder`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 155–250) | Mỗi ViewHolder có `setOnClickListener` trong constructor theo slide 203. |
+| **201** | `getItemViewType(int position)` dùng `instanceof` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`getItemViewType`) | Trả về `HEADER`, `TASK`, `MEETING` hoặc `-1`. |
+| **202** | `onCreateViewHolder`: `switch(viewType)` inflate layout tương ứng | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onCreateViewHolder`) | **[KHÁC SLIDE]**: Ném `IllegalArgumentException` thay vì `return null`. |
+| **203** | `onBindViewHolder`: `switch(getItemViewType(position))` ép kiểu và gán dữ liệu | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onBindViewHolder`) | Ép kiểu an toàn, gán dữ liệu chi tiết cho từng loại thẻ. |
+
+### C. Nhóm Slide 211–223 (Hoạt ảnh Animation & Các hàm Notify)
+| Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
+| :--- | :--- | :--- | :--- |
+| **211–212** | `ItemAnimator`, `DefaultItemAnimator`, `notifyDataSetChanged` không có animation | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`setItemAnimator`, `loadData`) | Dùng `DefaultItemAnimator`; gọi `notifyDataSetChanged()` khi nạp mới SQLite. |
+| **213–215** | `addItem(item)` và `addItem(position, item)` kèm `notifyItemInserted` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% mẫu hàm slide 220–221. |
+| **216–218** | `removeItem(position)` và `removeItem(item)` kèm `notifyItemRemoved` | Cả 3 Adapter; gọi tại `onDeleteClick` / `onDelete` trong 3 Activity | Xóa dữ liệu list trước rồi mới notify (mẫu slide 222). |
+| **219** | `notifyItemChanged` và tắt nháy qua `setSupportsChangeAnimations(false)` | [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java) (`onToggleStatus`) | Cập nhật dòng nhiệm vụ mượt mà không nháy màn hình. |
+| **220–223** | 3 nhóm hàm animation viết trong Adapter và `scrollToPosition` | Đầy đủ trong 3 Adapter; `rv.scrollToPosition` khi thêm phần tử | Kiểm tra biên `position >= 0 && position < size`. |
+
+---
+
+## 1.1. HAI ĐIỂM CODE DỰ ÁN CỐ TÌNH LÀM KHÁC SLIDE ĐỂ ĐẢM BẢO AN TOÀN
+
+Trong quá trình đối chiếu với slide của ThS. Nguyễn Hữu Trung, dự án có **2 điểm khác biệt có chủ ý** nhằm khắc phục lỗi tiềm ẩn trong bài giảng mẫu:
+
+1. **Khác biệt 1: Xử lý nhánh default trong `onCreateViewHolder` của `TimelineAdapter` (Slide 202)**:
+   - *Trong slide 202*: Sau câu lệnh `switch (viewType)`, ở cuối hàm thầy cô viết `return null;`.
+   - *Thực tế Android*: Nếu `onCreateViewHolder` trả về `null`, hệ thống `RecyclerView` nội bộ sẽ ném ngay lập tức ngoại lệ nghiêm trọng `java.lang.NullPointerException: ViewHolder views must not be null` làm văng ứng dụng ngay lập tức khi cuộn tới dòng không xác định.
+   - *Giải pháp trong dự án*: Thay thế `return null;` bằng lệnh ném ngoại lệ rõ ràng:
+     ```java
+     throw new IllegalArgumentException("Kiểu dòng không hợp lệ: " + viewType);
+     ```
+     Điều này giúp mã nguồn an toàn tuyệt đối và cảnh báo lỗi ngay khi có kiểu dữ liệu lạ.
+
+2. **Khác biệt 2: Giá trị trả về của sự kiện nhấn giữ `onLongClick` (Slide 194, 203)**:
+   - *Trong slide 194*: Hàm `onLongClick(View v)` trả về `false`.
+   - *Thực tế Android*: Cơ chế phân phối sự kiện cảm ứng (Touch Event Dispatch) quy định: nếu `onLongClick` trả về `false`, hệ thống hiểu là sự kiện chưa được xử lý xong, do đó khi người dùng nhấc ngón tay ra khỏi màn hình, sự kiện `onClick` (chạm thông thường) sẽ **tự động được kích hoạt tiếp theo**. Điều này dẫn đến lỗi người dùng vừa nhấn giữ để hiện hộp thoại Xóa thì màn hình Chi tiết lại bị mở đè lên!
+   - *Giải pháp trong dự án*: Luôn trả về `true`:
+     ```java
+     return true; // Tiêu thụ hoàn toàn sự kiện nhấn giữ, ngăn không cho onClick thường chạy sau khi nhấc tay
+     ```
+     Đảm bảo thao tác xóa diễn ra dứt khoát, không bị kích hoạt nhầm sự kiện click.
 
 ---
 
