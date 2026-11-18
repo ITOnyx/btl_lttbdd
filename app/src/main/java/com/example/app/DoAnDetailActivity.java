@@ -35,6 +35,7 @@ public class DoAnDetailActivity extends AppCompatActivity {
 
     private Button mBtnXemNhiemVu;
     private Button mBtnXemCuocHen;
+    private Button mBtnXemDongThoiGian;
     private Button mBtnSuaDoAn;
     private Button mBtnXoaDoAn;
     private Button mBtnQuayLaiDetail;
@@ -77,6 +78,7 @@ public class DoAnDetailActivity extends AppCompatActivity {
 
         mBtnXemNhiemVu = findViewById(R.id.btnXemNhiemVu);
         mBtnXemCuocHen = findViewById(R.id.btnXemCuocHen);
+        mBtnXemDongThoiGian = findViewById(R.id.btnXemDongThoiGian);
         mBtnSuaDoAn = findViewById(R.id.btnSuaDoAn);
         mBtnXoaDoAn = findViewById(R.id.btnXoaDoAn);
         mBtnQuayLaiDetail = findViewById(R.id.btnQuayLaiDetail);
@@ -94,6 +96,13 @@ public class DoAnDetailActivity extends AppCompatActivity {
         // Bấm nút xem danh sách Cuộc hẹn
         mBtnXemCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, CuocHenListActivity.class);
+            intent.putExtra("do_an_id", mDoAnId);
+            startActivity(intent);
+        });
+
+        // Bấm nút xem Dòng thời gian đồ án (Mục D1: Multiple View Type)
+        mBtnXemDongThoiGian.setOnClickListener(v -> {
+            Intent intent = new Intent(DoAnDetailActivity.this, TimelineActivity.class);
             intent.putExtra("do_an_id", mDoAnId);
             startActivity(intent);
         });
