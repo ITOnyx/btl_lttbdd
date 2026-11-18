@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout dòng tiêu đề phân nhóm (HeaderViewHolder: ViewType HEADER = 0, slide 195–210) -->
+<!-- Layout dòng tiêu đề phân nhóm (HeaderViewHolder: ViewType HEADER = 0) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

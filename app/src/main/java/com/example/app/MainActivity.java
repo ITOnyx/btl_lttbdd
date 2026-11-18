@@ -22,10 +22,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-// Màn hình danh sách Đồ án (Khớp đúng khung mẫu slide 193)
+// Màn hình danh sách Đồ án
 public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoAnClickListener {
 
-    // Khai báo các thuộc tính thành viên theo đúng mẫu slide 193
     private RecyclerView rvDoAn;
     private DoAnAdapter mDoAnAdapter;
     private List<DoAn> mDoAns;
@@ -43,8 +42,6 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Thứ tự onCreate chuẩn bài giảng slide 193:
-        // 1. setContentView
         setContentView(R.layout.activity_main);
 
         mToolbar = findViewById(R.id.toolbar);
@@ -66,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         // 5. Gắn Adapter vào RecyclerView
         rvDoAn.setAdapter(mDoAnAdapter);
 
-        // 6. Cài đặt LayoutManager theo mẫu slide 193
+        // 6. Cài đặt LayoutManager
         mPrefs = getSharedPreferences("app_settings", MODE_PRIVATE);
         mIsGridMode = mPrefs.getBoolean("is_grid_mode", false);
         if (mIsGridMode) {
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
             rvDoAn.setLayoutManager(linearLayoutManager);
         }
 
-        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
+        // 7. Cài đặt ItemAnimator
         rvDoAn.setItemAnimator(new DefaultItemAnimator());
 
         // Bấm nút thêm mới đồ án -> mở form
@@ -141,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         mDoAns.clear();
         mDoAns.addAll(mDbHelper.getAllDoAn());
 
-        // Dùng notifyDataSetChanged() khi tải lại toàn bộ từ CSDL - không có animation (slide 212)
+        // Dùng notifyDataSetChanged() khi tải lại toàn bộ từ CSDL
         mDoAnAdapter.notifyDataSetChanged();
 
         checkEmptyState();
@@ -157,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         }
     }
 
-    // Mở chi tiết đồ án dùng hằng số EXTRA_DO_AN_ID (Yêu cầu 6)
+    // Mở chi tiết đồ án
     @Override
     public void onItemClick(DoAn doAn, int position) {
         Intent intent = new Intent(MainActivity.this, DoAnDetailActivity.class);
@@ -173,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         startActivity(intent);
     }
 
-    // Xóa đồ án bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
+    // Xóa đồ án bằng removeItem(position)
     @Override
     public void onDeleteClick(DoAn doAn, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

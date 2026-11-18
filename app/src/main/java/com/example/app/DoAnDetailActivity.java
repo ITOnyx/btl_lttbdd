@@ -17,10 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 // Màn hình xem thông tin chi tiết một đồ án và điều hướng sang nhiệm vụ / cuộc hẹn
-// Minh họa LinearLayoutManager cuộn ngang theo bài giảng (slide 185, 192)
 public class DoAnDetailActivity extends AppCompatActivity {
 
-    // Hằng số chung truyền ID đồ án qua Intent (Yêu cầu 6)
+    // Hằng số chung truyền ID đồ án qua Intent
     public static final String EXTRA_DO_AN_ID = "do_an_id";
 
     private Toolbar mToolbarDetail;
@@ -31,7 +30,7 @@ public class DoAnDetailActivity extends AppCompatActivity {
     private TextView mTvDetailTienDo;
     private ProgressBar mProgressBarDetail;
 
-    // Mục C2: RecyclerView cuộn ngang hiển thị các thẻ thống kê nhỏ (slide 185, 192)
+    // RecyclerView cuộn ngang hiển thị các thẻ thống kê nhỏ
     private RecyclerView mRvThongKe;
     private ThongKeAdapter mThongKeAdapter;
     private ArrayList<ThongKeItem> mListThongKe;
@@ -70,13 +69,13 @@ public class DoAnDetailActivity extends AppCompatActivity {
         mTvDetailTienDo = findViewById(R.id.tvDetailTienDo);
         mProgressBarDetail = findViewById(R.id.progressBarDetail);
 
-        // Mục C2: Khởi tạo RecyclerView cuộn ngang
+        // Khởi tạo RecyclerView cuộn ngang
         mRvThongKe = findViewById(R.id.rv_thong_ke);
         mListThongKe = new ArrayList<>();
         mThongKeAdapter = new ThongKeAdapter(this, mListThongKe);
         mRvThongKe.setAdapter(mThongKeAdapter);
 
-        // Cài đặt LinearLayoutManager dạng cuộn NGANG (slide 185, 192)
+        // Cài đặt LinearLayoutManager dạng cuộn NGANG
         mRvThongKe.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         mBtnXemNhiemVu = findViewById(R.id.btnXemNhiemVu);
@@ -103,7 +102,7 @@ public class DoAnDetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Bấm nút xem Dòng thời gian đồ án (Mục D1: Multiple View Type)
+        // Bấm nút xem Dòng thời gian đồ án
         mBtnXemDongThoiGian.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, TimelineActivity.class);
             intent.putExtra(TimelineActivity.EXTRA_DO_AN_ID, mDoAnId);

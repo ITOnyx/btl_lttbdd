@@ -69,7 +69,7 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Màn hình Dòng thời gian (Timeline: Multiple View Type theo slide 195–210) -->
+        <!-- Màn hình Dòng thời gian (Timeline: Multiple View Type) -->
         <activity
             android:name=".TimelineActivity"
             android:exported="false"

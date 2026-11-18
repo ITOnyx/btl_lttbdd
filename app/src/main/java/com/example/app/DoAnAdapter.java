@@ -13,13 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter một kiểu dòng hiển thị Đồ án (Khớp chuẩn khung slide 190–191, 194, 220–223)
+// Adapter hiển thị danh sách Đồ án
 public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder> {
 
-    // Khai báo hằng số TAG theo mẫu slide 190
     private static final String TAG = "DoAnAdapter";
 
-    // Khai báo các thuộc tính thành viên tiền tố m theo mẫu slide 190
     private List<DoAn> mDoAns;
     private Context mContext;
     private LayoutInflater mLayoutInflater;
@@ -32,7 +30,6 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         void onDeleteClick(DoAn doAn, int position);
     }
 
-    // Constructor chính thống nhất nhận listener (Context context, List<DoAn> datas, OnDoAnClickListener listener)
     public DoAnAdapter(Context context, List<DoAn> datas, OnDoAnClickListener listener) {
         mContext = context;
         mDoAns = datas;
@@ -41,10 +38,10 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
     }
 
     // ==============================================================
-    // ANIMATION: ĐÚNG 3 NHÓM HÀM THEO MẪU SLIDE 220–223
+    // CÁC HÀM XỬ LÝ ANIMATION RECYCLERVIEW
     // ==============================================================
 
-    // Thêm phần tử vào cuối danh sách (mẫu slide 220)
+    // Thêm phần tử vào cuối danh sách
     public void addItem(DoAn item) {
         if (mDoAns != null) {
             mDoAns.add(item);
@@ -52,7 +49,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         }
     }
 
-    // Thêm phần tử tại vị trí position chỉ định (mẫu slide 220)
+    // Thêm phần tử tại vị trí chỉ định
     public void addItem(int position, DoAn item) {
         if (mDoAns != null && position >= 0 && position <= mDoAns.size()) {
             mDoAns.add(position, item);
@@ -60,7 +57,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         }
     }
 
-    // Xóa phần tử theo vị trí position (mẫu slide 221)
+    // Xóa phần tử theo vị trí
     public void removeItem(int position) {
         if (mDoAns != null && position >= 0 && position < mDoAns.size()) {
             mDoAns.remove(position);
@@ -68,7 +65,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         }
     }
 
-    // Xóa phần tử theo đối tượng dùng indexOf (mở rộng an toàn từ mẫu slide 221)
+    // Xóa phần tử theo đối tượng dùng indexOf
     public void removeItem(DoAn item) {
         if (mDoAns != null) {
             int index = mDoAns.indexOf(item);
@@ -78,7 +75,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         }
     }
 
-    // Thay thế/đổi phần tử tại vị trí position (mẫu slide 221: remove + add + notifyItemChanged)
+    // Thay thế phần tử tại vị trí chỉ định
     public void replaceItem(int position, DoAn item) {
         if (mDoAns != null && position >= 0 && position < mDoAns.size()) {
             DoAn oldItem = mDoAns.get(position);
@@ -94,26 +91,22 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
     }
 
     // ==============================================================
-    // CÁC PHƯƠNG THỨC CHÍNH CỦA RECYCLERVIEW.ADAPTER (SLIDE 190–191)
+    // CÁC PHƯƠNG THỨC CHÍNH CỦA RECYCLERVIEW.ADAPTER
     // ==============================================================
 
     @NonNull
     @Override
     public DoAnViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate view từ row_do_an.xml (mẫu slide 190)
         View itemView = mLayoutInflater.inflate(R.layout.row_do_an, parent, false);
         return new DoAnViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull DoAnViewHolder holder, int position) {
-        // Lấy đồ án theo vị trí và gắn dữ liệu vào ViewHolder (mẫu slide 190)
         DoAn doAn = mDoAns.get(position);
 
-        // Gắn tiêu đề đồ án
         holder.tvTitle.setText(doAn.getTen());
 
-        // Mô tả tóm tắt: ẩn nếu rỗng hoặc null sau khi trim
         if (doAn.getMoTa() != null && !doAn.getMoTa().trim().isEmpty()) {
             holder.tvMoTa.setVisibility(View.VISIBLE);
             holder.tvMoTa.setText(doAn.getMoTa().trim());
@@ -121,14 +114,12 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
             holder.tvMoTa.setVisibility(View.GONE);
         }
 
-        // Giảng viên hướng dẫn: kiểm tra null và rỗng sau khi trim, dùng chuỗi từ strings.xml
         if (doAn.getGiangVien() != null && !doAn.getGiangVien().trim().isEmpty()) {
             holder.tvGiangVien.setText(mContext.getString(R.string.gvhd_prefix) + doAn.getGiangVien().trim());
         } else {
             holder.tvGiangVien.setText(mContext.getString(R.string.gvhd_prefix) + mContext.getString(R.string.not_available));
         }
 
-        // Thời gian: ngày bắt đầu và hạn nộp (kiểm tra null hoặc rỗng sau trim coi là chưa có)
         boolean hasNgayBatDau = doAn.getNgayBatDau() != null && !doAn.getNgayBatDau().trim().isEmpty();
         boolean hasHanNop = doAn.getHanNop() != null && !doAn.getHanNop().trim().isEmpty();
 
@@ -143,7 +134,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         }
         holder.tvThoiGian.setText(tg);
 
-        // Hiển thị tiến độ hoàn thành từ thuộc tính model được nạp sẵn qua LEFT JOIN (không gọi DBHelper)
+        // Hiển thị tiến độ hoàn thành từ thuộc tính model được nạp sẵn qua LEFT JOIN
         int tong = doAn.getTongNhiemVu();
         int xong = doAn.getSoNhiemVuXong();
         int phanTram = (tong == 0) ? 0 : (xong * 100 / tong);
@@ -153,12 +144,11 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
 
     @Override
     public int getItemCount() {
-        // Trả về số lượng phần tử (mẫu slide 191)
         return mDoAns != null ? mDoAns.size() : 0;
     }
 
     // ==============================================================
-    // LỚP VIEWHOLDER NỘI BỘ (MẪU SLIDE 191, 194, 203)
+    // LỚP VIEWHOLDER NỘI BỘ
     // ==============================================================
 
     class DoAnViewHolder extends RecyclerView.ViewHolder {
@@ -173,7 +163,6 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
 
         public DoAnViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Ánh xạ View bằng findViewById ép kiểu theo mẫu slide 191
             tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
             tvMoTa = (TextView) itemView.findViewById(R.id.tv_mo_ta);
             tvGiangVien = (TextView) itemView.findViewById(R.id.tv_giang_vien);
@@ -183,12 +172,11 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
             btnEdit = (ImageButton) itemView.findViewById(R.id.btn_edit);
             btnDelete = (ImageButton) itemView.findViewById(R.id.btn_delete);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
+            // Thiết lập sự kiện chọn dòng
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
-                    // Kiểm tra an toàn khác slide: tránh crash khi đang xóa dòng
                     if (position == RecyclerView.NO_POSITION) return;
                     if (mListener != null) {
                         mListener.onItemClick(mDoAns.get(position), position);
@@ -196,9 +184,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                 }
             });
 
-            // Sự kiện nhấn giữ (onLongClick) (mẫu slide 222):
-            // KHÁC SLIDE: Slide trả về false làm sự kiện click chạy tiếp khi nhấc tay;
-            // Ở đây trả về true để tiêu thụ hoàn toàn sự kiện, ngăn click nhầm sau khi nhấn giữ.
+            // Sự kiện nhấn giữ (onLongClick): Trả về true để tiêu thụ sự kiện, ngăn click nhầm sau khi nhấn giữ
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -206,7 +192,7 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
                     if (position == RecyclerView.NO_POSITION) return false;
                     if (mListener != null) {
                         mListener.onDeleteClick(mDoAns.get(position), position);
-                        return true; // Đã tiêu thụ sự kiện long click an toàn
+                        return true;
                     }
                     return false;
                 }

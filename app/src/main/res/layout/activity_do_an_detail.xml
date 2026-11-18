@@ -161,7 +161,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Mục C2: RecyclerView cuộn ngang hiển thị thẻ thống kê nhanh (slide 185, 192) -->
+            <!-- Mục C2: RecyclerView cuộn ngang hiển thị thẻ thống kê nhanh -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

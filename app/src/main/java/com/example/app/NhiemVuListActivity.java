@@ -20,13 +20,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-// Màn hình danh sách Nhiệm vụ (Khớp đúng khung mẫu slide 193)
+// Màn hình danh sách Nhiệm vụ
 public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAdapter.OnNhiemVuClickListener {
 
     // Hằng số Intent nhận ID đồ án
     public static final String EXTRA_DO_AN_ID = "do_an_id";
 
-    // Khai báo các thuộc tính thành viên theo đúng mẫu slide 193
     private RecyclerView rvNhiemVu;
     private NhiemVuAdapter mNhiemVuAdapter;
     private List<NhiemVu> mNhiemVus;
@@ -41,8 +40,6 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Thứ tự onCreate chuẩn bài giảng slide 193:
-        // 1. setContentView
         setContentView(R.layout.activity_nhiem_vu_list);
 
         mDbHelper = new DBHelper(this);
@@ -76,15 +73,14 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         // 5. Gắn Adapter vào RecyclerView
         rvNhiemVu.setAdapter(mNhiemVuAdapter);
 
-        // 6. Cài đặt LayoutManager theo mẫu slide 193
+        // 6. Cài đặt LayoutManager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvNhiemVu.setLayoutManager(linearLayoutManager);
 
-        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
+        // 7. Cài đặt ItemAnimator
         rvNhiemVu.setItemAnimator(new DefaultItemAnimator());
 
-        // Tắt nháy CheckBox khi notifyItemChanged (slide 219)
-        // Lý do: SimpleItemAnimator mặc định chạy fade animation khi notifyItemChanged làm dòng nhấp nháy
+        // Tắt nháy CheckBox khi notifyItemChanged: SimpleItemAnimator mặc định chạy fade animation khi notifyItemChanged làm dòng nhấp nháy
         if (rvNhiemVu.getItemAnimator() instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) rvNhiemVu.getItemAnimator()).setSupportsChangeAnimations(false);
         }
@@ -139,7 +135,7 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         startActivity(intent);
     }
 
-    // Xóa nhiệm vụ bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
+    // Xóa nhiệm vụ bằng removeItem(position)
     @Override
     public void onDelete(NhiemVu nv, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
