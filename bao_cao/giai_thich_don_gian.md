@@ -283,3 +283,258 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 
 #### Câu 14: Vì sao các thao tác truy vấn SQLite trong bài được viết trực tiếp trên Main Thread mà không dùng Thread hay Coroutines?
 > **Trả lời:** Vì đây là ứng dụng quản lý cá nhân với cơ sở dữ liệu SQLite cục bộ có quy mô vài chục đến vài trăm bản ghi, tốc độ đọc/ghi diễn ra tức thời (dưới vài mili-giây), không gây hiện tượng giật lag (ANR). Cách viết này giúp luồng code thẳng, dễ debug và đúng với chuẩn mực các bài tập lớn môn Lập trình thiết bị di động.
+
+
+---
+
+# PHẦN 4: TOÀN BỘ BÀI GIẢNG RECYCLERVIEW (CHƯƠNG 11, ThS. NGUYỄN HỮU TRUNG, SLIDE 182–223)
+
+---
+
+## 1. BẢNG ĐỐI CHIẾU BÀI GIẢNG → DỰ ÁN THỰC TẾ
+
+| Slide | Nội dung bài giảng | Áp dụng thực tế trong dự án |
+| :--- | :--- | :--- |
+| **182–183** | **RecyclerView vs ListView**: ViewHolder, LayoutManager, ItemAnimator, ItemDecoration, cách bắt sự kiện | - **ViewHolder**: Bắt buộc trong cả 5 Adapter: `DoAnAdapter.DoAnViewHolder`, `NhiemVuAdapter.NhiemVuViewHolder`, `CuocHenAdapter.CuocHenViewHolder`, `ThongKeAdapter.ThongKeViewHolder`, và 3 ViewHolder trong `TimelineAdapter`.<br>- **LayoutManager**: Dùng `LinearLayoutManager` (dọc, ngang) và `GridLayoutManager` (lưới 2 cột).<br>- **ItemAnimator**: Cài đặt `DefaultItemAnimator` trên tất cả RecyclerView danh sách.<br>- **ItemDecoration**: Sử dụng `DividerItemDecoration` trong danh sách nhiệm vụ (`NhiemVuListActivity`).<br>- **Cách bắt sự kiện**: Bắt ngay trong constructor ViewHolder, không đặt trong `onBindViewHolder`. |
+| **184** | **Adapter**: `onCreateViewHolder`, `onBindViewHolder` | Đã chuẩn hóa trong 5 Adapter (`DoAnAdapter`, `NhiemVuAdapter`, `CuocHenAdapter`, `ThongKeAdapter`, `TimelineAdapter`). |
+| **185, 192** | **LayoutManager**: Linear (dọc/ngang), Grid, StaggeredGrid; ItemAnimator | - Cuộn dọc: `MainActivity`, `NhiemVuListActivity`, `CuocHenListActivity`, `TimelineActivity`.<br>- Cuộn ngang: Thẻ thống kê tại `DoAnDetailActivity` (`rv_thong_ke`).<br>- Lưới 2 cột: Nút chuyển đổi chế độ xem trên Toolbar `MainActivity`.<br>- StaggeredGrid: Giải thích lý thuyết vấn đáp (không áp dụng do dữ liệu đồ án cần cấu trúc đều). |
+| **186–193** | **5 bước làm RecyclerView cơ bản** | Áp dụng chuẩn chỉ 100% cho 3 thực thể chính: Đồ án, Nhiệm vụ, Cuộc hẹn (xem mục 3 bên dưới). |
+| **194** | **Chọn item**: `setOnClickListener` trong constructor ViewHolder, `getAdapterPosition` | Đặt toàn bộ click/long-click trong constructor ViewHolder; kiểm tra `getAdapterPosition() != RecyclerView.NO_POSITION`; click đồ án mở `DoAnDetailActivity` bằng Intent. |
+| **195–210** | **Multiple View Type** | Tạo `TimelineActivity` và `TimelineAdapter` gộp cả 3 kiểu dòng: Tiêu đề phân nhóm (`HEADER`), Nhiệm vụ (`TASK`), và Cuộc hẹn (`MEETING`) vào chung 1 RecyclerView. |
+| **211–223** | **Animation**: ItemAnimator, DefaultItemAnimator, notifyItem*, addItem/removeItem/replaceItem, scrollToPosition | Viết đúng 3 hàm animation (`addItem`, `removeItem`, `replaceItem`) trong cả 3 Adapter; xóa gọi `removeItem`; tick CheckBox gọi `notifyItemChanged`; tắt nháy bằng `setSupportsChangeAnimations(false)`. |
+
+---
+
+## 2. RECYCLERVIEW SO VỚI LISTVIEW (6 ĐIỂM BÀI GIẢNG SLIDE 182–183)
+
+1. **Bắt buộc sử dụng ViewHolder (Enforced ViewHolder Pattern)**:
+   - *ListView*: Mô hình ViewHolder chỉ là khuyến khích (optional). Lập trình viên có thể viết ẩu bằng cách liên tục gọi `findViewById` trong hàm `getView()`, khiến ứng dụng bị giật lag nghiêm trọng khi cuộn nhanh.
+   - *RecyclerView*: Cấu trúc lớp generic `RecyclerView.Adapter<VH>` **bắt buộc** phải khai báo lớp `ViewHolder`. Không có ViewHolder thì code không thể biên dịch được.
+2. **Tách rời cơ chế bố cục bằng `LayoutManager`**:
+   - *ListView*: Bị gắn cứng duy nhất một kiểu hiển thị là danh sách cuộn dọc 1 cột.
+   - *RecyclerView*: Tách biệt hoàn toàn việc sắp xếp giao diện cho `LayoutManager`. Lập trình viên có thể linh hoạt chuyển sang cuộn dọc, cuộn ngang, dạng lưới nhiều cột (`GridLayoutManager`) hay dạng lưới so le (`StaggeredGridLayoutManager`) mà không cần sửa một dòng code nào trong Adapter.
+3. **Tích hợp sẵn hệ thống hoạt ảnh (`ItemAnimator`)**:
+   - *ListView*: Không có animation mặc định. Khi thêm/xóa dòng, dữ liệu biến mất hoặc nhảy ra đột ngột.
+   - *RecyclerView*: Tích hợp sẵn `ItemAnimator` (mặc định là `DefaultItemAnimator`). Tự động xử lý chuyển động thêm (mờ sang rõ), xóa (mờ dần rồi co lại) và di chuyển các dòng xung quanh cực kỳ mượt mà.
+4. **Trang trí và phân cách độc lập (`ItemDecoration`)**:
+   - *ListView*: Đường kẻ phân cách (divider) bị gán cứng vào thuộc tính của ListView trong XML (`android:divider`).
+   - *RecyclerView*: Sử dụng `ItemDecoration` độc lập hoàn toàn với Adapter. Ta có thể tự do thêm đường kẻ, căn chỉnh lề (margin/padding) cho từng dòng hoặc vẽ các thành phần trang trí đặc biệt.
+5. **Cách bắt sự kiện click trên từng dòng**:
+   - *ListView*: Hỗ trợ sẵn hàm `setOnItemClickListener` ở cấp độ danh sách.
+   - *RecyclerView*: Bỏ hàm này, yêu cầu lập trình viên tự quản lý sự kiện. Cách làm chuẩn mực nhất theo bài giảng là **gắn sự kiện click ngay trong constructor của ViewHolder** để tái sử dụng lại đối tượng Listener, không tạo rác bộ nhớ.
+6. **Khả năng hiển thị nhiều kiểu dòng (Multiple View Type) sạch sẽ**:
+   - *RecyclerView* quản lý nhiều kiểu giao diện thông qua hàm `getItemViewType(position)`. Hệ thống tự động phân loại ViewType và lưu vào các ngăn đệm (Recycled Pool) riêng biệt, giúp tái chế View chính xác và tối ưu bộ nhớ RAM vượt trội so với ListView.
+
+---
+
+## 3. CÁC THÀNH PHẦN CỐT LÕI CỦA RECYCLERVIEW
+
+### A. Adapter
+Là cầu nối giữa tập dữ liệu (danh sách `List<T>`) và các View hiển thị:
+- `onCreateViewHolder(ViewGroup parent, int viewType)`: Nạp layout XML thành View và bọc vào một `ViewHolder`. Hàm này **chỉ được gọi khi không có View cũ nào trong bộ nhớ đệm tái sử dụng được** (thường chỉ chạy 8–12 lần tương ứng với số dòng hiển thị vừa vặn trên màn hình).
+- `onBindViewHolder(VH holder, int position)`: Lấy dữ liệu tại vị trí `position` trong danh sách và gán vào các View trong `holder`. Hàm này **chạy liên tục mỗi khi người dùng cuộn danh sách**.
+- `getItemCount()`: Trả về tổng số phần tử của danh sách (`mList.size()`).
+
+### B. LayoutManager
+Chịu trách nhiệm định vị, đo đạc kích thước và sắp xếp vị trí của các dòng View:
+- `LinearLayoutManager`: Cuộn dọc (`VERTICAL`) hoặc cuộn ngang (`HORIZONTAL`).
+- `GridLayoutManager`: Bố trí thành lưới $N$ cột đều nhau (trong dự án dùng lưới 2 cột cho đồ án).
+- `StaggeredGridLayoutManager`: Bố trí thành lưới so le (các ô có chiều cao khác nhau tự do như bảng ảnh Pinterest).
+
+### C. ItemAnimator
+Quản lý các hiệu ứng hoạt ảnh khi danh sách có sự biến động:
+- `ItemAnimator`: Lớp cơ sở trừu tượng quy định vòng đời chuyển động (Add, Remove, Move, Change).
+- `SimpleItemAnimator`: Lớp dẫn xuất giúp đơn giản hóa việc tính toán hoạt ảnh, cung cấp hàm `setSupportsChangeAnimations(boolean)` để tắt hiệu ứng nháy khi cập nhật dòng.
+- `DefaultItemAnimator`: Lớp hoạt ảnh mặc định của Android:
+  - Thêm phần tử: Alpha từ $0 \rightarrow 1$ (mờ sang rõ).
+  - Xóa phần tử: Alpha từ $1 \rightarrow 0$ (rõ sang mờ rồi biến mất, các dòng dưới trượt lên).
+  - Thay đổi phần tử: Alpha từ $1 \rightarrow 0$ rồi $0 \rightarrow 1$.
+
+---
+
+## 4. 5 BƯỚC LÀM RECYCLERVIEW CƠ BẢN TRONG BÀI GIẢNG & VỊ TRÍ CODE THẬT
+
+- **Bước 1: Tạo Model implements Serializable**
+  - *Mô tả*: Khai báo các thuộc tính, constructor có/không tham số, đầy đủ getter và setter theo chuẩn JavaBean.
+  - *Code thật*: [DoAn.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAn.java), [NhiemVu.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVu.java), [CuocHen.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHen.java).
+- **Bước 2: Khai báo thẻ RecyclerView trong Layout Activity**
+  - *Mô tả*: Thêm `<androidx.recyclerview.widget.RecyclerView>` vào giao diện, đặt ID dạng `rv_...`.
+  - *Code thật*: `android:id="@+id/rv_do_an"` trong [activity_main.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_main.xml), `android:id="@+id/rv_nhiem_vu"` trong [activity_nhiem_vu_list.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_nhiem_vu_list.xml), `android:id="@+id/rv_cuoc_hen"` trong [activity_cuoc_hen_list.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_cuoc_hen_list.xml).
+- **Bước 3: Thiết kế Layout cho một dòng (Row layout)**
+  - *Mô tả*: Tệp XML riêng biệt chứa các View thành phần, TextView có thuộc tính `android:ellipsize="end"`.
+  - *Code thật*: [row_do_an.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_do_an.xml), [row_nhiem_vu.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_nhiem_vu.xml), [row_cuoc_hen.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_cuoc_hen.xml).
+- **Bước 4: Viết Adapter và ViewHolder**
+  - *Mô tả*: Kế thừa `RecyclerView.Adapter<XxxAdapter.XxxViewHolder>`, biến thành viên tiền tố `m` (`mContext`, `mDoAns`, `mLayoutInflater`), `onCreateViewHolder` inflate `attachToRoot = false`, `onBindViewHolder` gán dữ liệu, ViewHolder là inner class gọi `findViewById`.
+  - *Code thật*: [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java).
+- **Bước 5: Thiết lập trong Activity**
+  - *Mô tả*: `findViewById` lấy RecyclerView, gán `setAdapter(mAdapter)` và `setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))`.
+  - *Code thật*: `onCreate()` trong [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java), [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java), [CuocHenListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenListActivity.java).
+
+---
+
+## 5. BẮT SỰ KIỆN CHỌN ITEM (SLIDE 194)
+
+- **Vị trí bắt sự kiện chuẩn**: Đặt `itemView.setOnClickListener` và `setOnLongClickListener` **ngay bên trong constructor của ViewHolder**.
+- **Vì sao không đặt trong `onBindViewHolder`?**: Vì `onBindViewHolder` chạy liên tục mỗi khi cuộn qua một dòng. Nếu đặt listener ở đó, mỗi lần bind hệ thống sẽ tạo mới một đối tượng anonymous listener trong bộ nhớ Heap, gây áp lực lớn cho bộ thu dọn rác (Garbage Collector). Đặt trong constructor của ViewHolder thì listener chỉ được tạo đúng một lần khi ViewHolder sinh ra.
+- **Cách lấy đối tượng an toàn**:
+  ```java
+  int position = getAdapterPosition();
+  if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
+      DoAn doAn = mDoAns.get(position);
+      // Mở Activity bằng Intent
+      Intent intent = new Intent(mContext, DoAnDetailActivity.class);
+      intent.putExtra("do_an_id", doAn.getId());
+      mContext.startActivity(intent);
+  }
+  ```
+  *Lưu ý*: Bắt buộc phải kiểm tra `position != RecyclerView.NO_POSITION` để tránh lỗi ứng dụng khi người dùng vô tình bấm vào dòng đang trong hiệu ứng bị xóa khỏi danh sách.
+
+---
+
+## 6. KỸ THUẬT MULTIPLE VIEW TYPE (SLIDE 195–210) & TIMELINEADAPTER
+
+- **Mục đích**: Hiển thị nhiều kiểu dòng có cấu trúc giao diện hoàn toàn khác nhau trong cùng một danh sách RecyclerView duy nhất.
+- **Áp dụng trong bài**: Màn hình Dòng thời gian đồ án ([TimelineActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineActivity.java)) sử dụng [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java):
+  - Dữ liệu: `List<Object> mObjects` chứa lẫn chuỗi `String` (tiêu đề nhóm), đối tượng `NhiemVu` và đối tượng `CuocHen`.
+  - Hằng số định danh: `HEADER = 0`, `TASK = 1`, `MEETING = 2`.
+  - Hàm quyết định kiểu:
+    ```java
+    @Override
+    public int getItemViewType(int position) {
+        Object obj = mObjects.get(position);
+        if (obj instanceof String) return HEADER;
+        else if (obj instanceof NhiemVu) return TASK;
+        else if (obj instanceof CuocHen) return MEETING;
+        return -1;
+    }
+    ```
+  - `onCreateViewHolder`: Dùng `switch(viewType)` để nạp `row_header.xml`, `row_timeline_task.xml` hoặc `row_timeline_meeting.xml`.
+  - `onBindViewHolder`: Dùng `switch(getItemViewType(position))` để ép kiểu đối tượng `HeaderViewHolder`, `TaskViewHolder` hoặc `MeetingViewHolder` tương ứng.
+
+---
+
+## 7. ANIMATION VÀ CÁC HÀM NOTIFY TRONG BÀI GIẢNG (SLIDE 211–223)
+
+### A. So sánh `notifyDataSetChanged()` và các hàm `notifyItem*()`
+- `notifyDataSetChanged()`: Thông báo toàn bộ tập dữ liệu đã thay đổi hoàn toàn. RecyclerView buộc phải hủy hết tất cả các View hiện tại và vẽ lại từ đầu. **Hàm này không có bất kỳ hiệu ứng hoạt ảnh nào** (slide 212). Thường dùng khi tải mới toàn bộ dữ liệu từ CSDL vào `onResume()`.
+- `notifyItemInserted(int position)`: Báo chèn 1 phần tử mới tại `position`. Kích hoạt hiệu ứng fade-in và đẩy các phần tử phía dưới xuống.
+- `notifyItemRemoved(int position)`: Báo xóa 1 phần tử tại `position`. Kích hoạt hiệu ứng fade-out và kéo các phần tử phía dưới lên lấp chỗ trống.
+- `notifyItemChanged(int position)`: Báo 1 phần tử thay đổi nội dung. Kích hoạt hiệu ứng mờ và hiện lại nội dung mới.
+- `notifyItemRangeInserted`, `notifyItemRangeRemoved`, `notifyItemRangeChanged`: Báo biến động trên một khoảng liên tiếp nhiều phần tử.
+
+### B. 3 Hàm cốt lõi theo mẫu bài giảng trong Adapter
+Đã được cài đặt đầy đủ trong `DoAnAdapter`, `NhiemVuAdapter`, `CuocHenAdapter`:
+```java
+// 1. Thêm phần tử có animation (slide 213–215)
+public void addItem(int position, T item) {
+    if (mList != null && position >= 0 && position <= mList.size()) {
+        mList.add(position, item);
+        notifyItemInserted(position);
+    }
+}
+
+// 2. Xóa phần tử có animation (slide 216–218)
+public void removeItem(int position) {
+    if (mList != null && position >= 0 && position < mList.size()) {
+        mList.remove(position);
+        notifyItemRemoved(position);
+    }
+}
+
+// 3. Thay thế/Cập nhật phần tử có animation (slide 219–221)
+public void replaceItem(int position, T item) {
+    if (mList != null && position >= 0 && position < mList.size()) {
+        mList.remove(position);
+        mList.add(position, item);
+        notifyItemChanged(position);
+    }
+}
+```
+
+### C. Quy tắc vàng khi gọi Animation
+**Bắt buộc phải cập nhật dữ liệu trong List trước rồi mới được gọi hàm notify**:
+1. `mList.remove(position);` $\rightarrow$ rồi mới `notifyItemRemoved(position);`
+2. `mList.add(position, item);` $\rightarrow$ rồi mới `notifyItemInserted(position);`
+*Hậu quả nếu làm ngược*: RecyclerView đối chiếu kích thước tập dữ liệu của Adapter với danh sách thực tế thấy không khớp, sẽ ném ngoại lệ `java.lang.IndexOutOfBoundsException` làm sập ứng dụng ngay lập tức!
+
+### D. Tắt hiệu ứng nháy màn hình khi tick CheckBox (Slide 219)
+Khi người dùng tick vào CheckBox của nhiệm vụ, ta gọi `notifyItemChanged(position)`. Mặc định `DefaultItemAnimator` sẽ làm mờ dòng đó và hiện lại (alpha $1 \rightarrow 0 \rightarrow 1$), gây cảm giác nhấp nháy khó chịu. Ta khắc phục bằng cách tắt hoạt ảnh thay đổi:
+```java
+if (mRvNhiemVu.getItemAnimator() instanceof SimpleItemAnimator) {
+    ((SimpleItemAnimator) mRvNhiemVu.getItemAnimator()).setSupportsChangeAnimations(false);
+}
+```
+
+---
+
+## 8. BỘ 17 CÂU HỎI & TRẢ LỜI VẤN ĐÁP BẢO VỆ CHUYÊN SÂU VỀ RECYCLERVIEW
+
+#### Câu 1: Vì sao RecyclerView lại bắt buộc phải dùng mô hình ViewHolder?
+> **Trả lời:** Trong ListView cũ, lập trình viên có thể bỏ qua ViewHolder và liên tục gọi `findViewById()` trong `getView()`. Mỗi lần gọi `findViewById()`, hệ thống phải duyệt cây giao diện (View Tree) tốn rất nhiều CPU. RecyclerView bắt buộc ViewHolder nhằm đảm bảo các tham chiếu View chỉ được tìm kiếm 1 lần khi View tạo ra, giúp quá trình cuộn danh sách đạt tốc độ 60fps mượt mà.
+
+#### Câu 2: Phương thức `onCreateViewHolder()` có được gọi cho mọi phần tử trong danh sách không?
+> **Trả lời:** **Không**. Nó chỉ được gọi khoảng 8 đến 12 lần tương ứng với số dòng đủ lấp đầy màn hình điện thoại (cộng thêm 1–2 View đệm ở hai đầu). Khi người dùng cuộn, các dòng cuộn ra khỏi màn hình sẽ được đưa vào ngăn đệm tái chế (Recycler Pool) và chuyển cho `onBindViewHolder()` nạp dữ liệu mới vào mà không hề gọi lại `onCreateViewHolder()`.
+
+#### Câu 3: Phương thức `onBindViewHolder()` được gọi khi nào?
+> **Trả lời:** Được gọi liên tục mỗi khi có một dòng sắp sửa xuất hiện trên màn hình khi người dùng cuộn tới, hoặc khi lập trình viên chủ động gọi các hàm `notifyItemChanged()`, `notifyDataSetChanged()`.
+
+#### Câu 4: Phương thức `getAdapterPosition()` (hoặc `getBindingAdapterPosition()`) dùng để làm gì và vì sao cần kiểm tra `!= RecyclerView.NO_POSITION`?
+> **Trả lời:** Dùng để lấy chỉ số vị trí thực tế của dòng hiện tại trong Adapter tại thời điểm người dùng click chuột. Cần kiểm tra `!= NO_POSITION` (giá trị `-1`) vì khi một dòng đang chạy hiệu ứng xóa hoặc di chuyển (animation), vị trí của nó tạm thời không xác định; nếu không kiểm tra sẽ gây văng app khi truy cập `mList.get(-1)`.
+
+#### Câu 5: Vì sao RecyclerView không thể hiển thị được nếu thiếu `LayoutManager`?
+> **Trả lời:** Bản thân RecyclerView chỉ là một container rỗng làm nhiệm vụ tái chế View. Nó không tự tính toán tọa độ $X, Y$ của từng phần tử. Trách nhiệm đo đạc (measure) và bố trí (layout) vị trí các View con hoàn toàn do `LayoutManager` đảm nhiệm. Nếu không có `LayoutManager`, RecyclerView sẽ không biết phải vẽ các dòng theo chiều dọc, chiều ngang hay lưới nên màn hình sẽ trắng trơn.
+
+#### Câu 6: `GridLayoutManager` khác với `StaggeredGridLayoutManager` ở điểm nào?
+> **Trả lời:**
+> - `GridLayoutManager`: Chia thành lưới các ô có kích thước đều nhau trên cùng một hàng. Chiều cao của hàng sẽ bị cố định theo ô có chiều cao lớn nhất trong hàng đó.
+> - `StaggeredGridLayoutManager`: Lưới so le dạng thác nước (như Pinterest). Các ô trên cùng một cột có chiều cao tự do khác nhau, ô phía dưới sẽ tự động chèn vào khoảng trống sát đáy của ô phía trên mà không bị ép đều theo hàng ngang.
+
+#### Câu 7: Kỹ thuật Multiple View Type dùng để giải quyết bài toán gì?
+> **Trả lời:** Dùng khi trong cùng một danh sách cần hiển thị các dòng có cấu trúc giao diện và layout XML hoàn toàn khác nhau. Trong dự án, em dùng nó cho màn hình `TimelineActivity` để hiển thị dòng tiêu đề nhóm (`row_header.xml`), dòng nhiệm vụ (`row_timeline_task.xml`) và dòng cuộc hẹn (`row_timeline_meeting.xml`).
+
+#### Câu 8: Trong Multiple View Type, vì sao danh sách dữ liệu truyền vào Adapter lại là `List<Object>`?
+> **Trả lời:** Vì danh sách này chứa nhiều kiểu đối tượng khác nhau (vừa có `String` làm tiêu đề, vừa có `NhiemVu`, vừa có `CuocHen`). Do đó, kiểu generic `Object` (lớp cha của mọi lớp trong Java) là kiểu dữ liệu phù hợp nhất để gom chung các đối tượng này vào cùng một `ArrayList`.
+
+#### Câu 9: Hàm `getItemViewType(int position)` đóng vai trò gì trong Multiple View Type?
+> **Trả lời:** Là hàm quyết định kiểu dòng. RecyclerView gọi hàm này trước tiên để biết phần tử tại `position` là kiểu gì (trả về hằng số 0, 1 hoặc 2), từ đó hệ thống chuyển đúng mã kiểu này sang tham số `viewType` của `onCreateViewHolder()` để inflate đúng tệp layout XML tương ứng.
+
+#### Câu 10: `notifyItemRemoved()` khác với `notifyDataSetChanged()` ở những điểm nào?
+> **Trả lời:**
+> - `notifyDataSetChanged()`: Làm mới toàn bộ danh sách, ép RecyclerView vẽ lại từ đầu, không xác định được vị trí nào vừa biến động và **hoàn toàn không có animation**.
+> - `notifyItemRemoved(position)`: Chỉ định rõ dòng tại vị trí `position` bị xóa. RecyclerView giữ nguyên toàn bộ các View khác, kích hoạt hiệu ứng mờ dần biến mất của dòng bị xóa và tự động kéo các dòng phía dưới trượt lên rất mượt mà.
+
+#### Câu 11: Vì sao bắt buộc phải xóa phần tử trong `ArrayList` trước rồi mới gọi `notifyItemRemoved()`?
+> **Trả lời:** Vì khi gọi `notifyItemRemoved(position)`, RecyclerView sẽ kiểm tra lại kích thước dữ liệu thông qua hàm `getItemCount()`. Nếu ta chưa xóa khỏi `ArrayList`, kích thước dữ liệu cũ và mới bị lệch nhau, RecyclerView sẽ phát hiện bất đồng bộ dữ liệu và ném ngoại lệ `IndexOutOfBoundsException` làm sập ứng dụng.
+
+#### Câu 12: `DefaultItemAnimator` xử lý hiệu ứng "thêm", "xóa", "sửa" như thế nào?
+> **Trả lời:**
+> - Thêm: Điều chỉnh thuộc tính Alpha mờ sang rõ từ $0 \rightarrow 1$.
+> - Xóa: Điều chỉnh thuộc tính Alpha từ $1 \rightarrow 0$ rồi co chiều cao dòng lại.
+> - Sửa/Đổi: Làm mờ nội dung cũ (Alpha $1 \rightarrow 0$) rồi làm rõ nội dung mới (Alpha $0 \rightarrow 1$).
+
+#### Câu 13: Vì sao khi tick CheckBox hoàn thành nhiệm vụ, dòng chữ bị nháy sáng và làm sao để khắc phục?
+> **Trả lời:** Khi gọi `notifyItemChanged()`, `DefaultItemAnimator` mặc định sẽ chạy hiệu ứng chuyển đổi Alpha từ $1 \rightarrow 0 \rightarrow 1$ nên mắt nhìn thấy như bị chớp nháy. Để khắc phục, ta ép kiểu sang `SimpleItemAnimator` và gọi `setSupportsChangeAnimations(false)` trong Activity.
+
+#### Câu 14: `ItemDecoration` là gì và mang lại lợi ích gì so với vẽ trực tiếp vào layout dòng?
+> **Trả lời:** `ItemDecoration` là lớp chuyên trách trang trí hoặc tạo khoảng đệm cho các ô trong RecyclerView mà không cần can thiệp vào mã nguồn của Adapter hay layout XML. Trong bài, em dùng `DividerItemDecoration` để tự động vẽ đường gạch ngang phân cách giữa các dòng nhiệm vụ một cách chuẩn mực.
+
+#### Câu 15: Hàm `scrollToPosition(int position)` dùng để làm gì?
+> **Trả lời:** Dùng để cuộn danh sách tức thì đến vị trí dòng chỉ định. Ví dụ khi người dùng thêm một nhiệm vụ mới vào cuối danh sách bằng hàm `addItem()`, ta gọi `rv.scrollToPosition(adapter.getItemCount() - 1)` để màn hình tự cuộn xuống dòng mới thêm, giúp người dùng nhìn thấy ngay kết quả.
+
+#### Câu 16: Khi xoay ngang màn hình điện thoại, RecyclerView hoạt động ra sao nếu dùng GridLayoutManager?
+> **Trả lời:** Khi xoay ngang, chiều rộng màn hình tăng lên. Nếu muốn tối ưu giao diện, ta có thể tự động tăng số cột `spanCount` (ví dụ từ 2 cột lên 3 hoặc 4 cột) để tận dụng không gian chiều ngang. Trong bài, em cấu hình thẻ `card_do_an.xml` với lề co giãn linh hoạt nên dù ở chế độ 2 cột dọc hay ngang thì các thẻ đồ án đều hiển thị vừa vặn, không bị tràn hay méo hình.
+
+#### Câu 17: Làm thế nào để tự tạo một hiệu ứng hoạt ảnh riêng cho RecyclerView nếu không muốn dùng `DefaultItemAnimator`?
+> **Trả lời:** Ta tạo một lớp Java mới kế thừa từ `SimpleItemAnimator` (hoặc `ItemAnimator`), sau đó ghi đè (override) 4 phương thức xử lý hoạt ảnh: `animateAdd()`, `animateRemove()`, `animateMove()` và `animateChange()`. Cuối cùng, gán hoạt ảnh tùy biến đó vào danh sách bằng lệnh `recyclerView.setItemAnimator(new MyCustomItemAnimator())`.
+
+---
+
+## 9. HẠN CHẾ ĐÃ BIẾT & PHẦN CHỈ GIẢI THÍCH LÝ THUYẾT
+
+Theo đúng nguyên tắc giữ ứng dụng ổn định, thực tế và dễ bảo vệ trước hội đồng, các nội dung sau **chỉ được giải thích lý thuyết chi tiết trong tài liệu này mà không cài đặt trực tiếp vào ứng dụng**:
+1. **`StaggeredGridLayoutManager` (Lưới so le)**:
+   - *Lý do*: Mô hình này chỉ phù hợp với các ứng dụng trưng bày tranh ảnh có chiều cao bất quy tắc (như Pinterest, Unsplash). Với ứng dụng quản lý tiến độ đồ án tốt nghiệp, các thẻ thông tin cần có độ đồng đều, ngay ngắn để sinh viên và giảng viên dễ theo dõi số liệu. Việc dùng Staggered Grid sẽ làm giao diện lộn xộn, mất thẩm mỹ và không đúng nghiệp vụ.
+2. **Kế thừa và viết riêng lớp con `SimpleItemAnimator` tùy biến**:
+   - *Lý do*: Hoạt ảnh mặc định `DefaultItemAnimator` của Android đã quá đủ mượt mà, chuyên nghiệp và ổn định. Việc tự viết lớp con kế thừa `SimpleItemAnimator` đòi hỏi can thiệp sâu vào ma trận render đồ họa và `ViewPropertyAnimator`, làm mã nguồn cồng kềnh, dễ phát sinh lỗi rò rỉ bộ nhớ (Memory Leak) mà không đem lại giá trị thực tế cho bài tập lớn.
+3. **Viết riêng lớp `ItemDecoration` tự vẽ Canvas tùy biến**:
+   - *Lý do*: Lớp có sẵn `DividerItemDecoration` của Android Jetpack đã giải quyết hoàn hảo bài toán vẽ vạch ngăn cách danh sách chỉ với 2 dòng lệnh gọn gàng.
