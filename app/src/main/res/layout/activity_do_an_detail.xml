@@ -161,6 +161,24 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Mục C2: RecyclerView cuộn ngang hiển thị thẻ thống kê nhanh (slide 185, 192) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Thống kê nhanh:"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_thong_ke"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                tools:listitem="@layout/row_thong_ke" />
+
             <!-- 2 Nút lớn xem Nhiệm vụ và Lịch hẹn -->
             <TextView
                 android:layout_width="wrap_content"

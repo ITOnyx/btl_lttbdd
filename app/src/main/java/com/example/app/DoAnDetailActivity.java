@@ -11,89 +11,108 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 // Màn hình xem thông tin chi tiết một đồ án và điều hướng sang nhiệm vụ / cuộc hẹn
+// Minh họa LinearLayoutManager cuộn ngang theo bài giảng (slide 185, 192)
 public class DoAnDetailActivity extends AppCompatActivity {
 
-    private Toolbar toolbarDetail;
-    private TextView tvDetailTen;
-    private TextView tvDetailMoTa;
-    private TextView tvDetailGiangVien;
-    private TextView tvDetailThoiGian;
-    private TextView tvDetailTienDo;
-    private ProgressBar progressBarDetail;
+    private Toolbar mToolbarDetail;
+    private TextView mTvDetailTen;
+    private TextView mTvDetailMoTa;
+    private TextView mTvDetailGiangVien;
+    private TextView mTvDetailThoiGian;
+    private TextView mTvDetailTienDo;
+    private ProgressBar mProgressBarDetail;
 
-    private Button btnXemNhiemVu;
-    private Button btnXemCuocHen;
-    private Button btnSuaDoAn;
-    private Button btnXoaDoAn;
-    private Button btnQuayLaiDetail;
+    // Mục C2: RecyclerView cuộn ngang hiển thị các thẻ thống kê nhỏ (slide 185, 192)
+    private RecyclerView mRvThongKe;
+    private ThongKeAdapter mThongKeAdapter;
+    private ArrayList<ThongKeItem> mListThongKe;
 
-    private DBHelper dbHelper;
-    private int doAnId = -1;
+    private Button mBtnXemNhiemVu;
+    private Button mBtnXemCuocHen;
+    private Button mBtnSuaDoAn;
+    private Button mBtnXoaDoAn;
+    private Button mBtnQuayLaiDetail;
+
+    private DBHelper mDbHelper;
+    private int mDoAnId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_do_an_detail);
 
-        dbHelper = new DBHelper(this);
+        mDbHelper = new DBHelper(this);
 
         // Đọc ID đồ án truyền từ màn hình danh sách
-        doAnId = getIntent().getIntExtra("do_an_id", -1);
-        if (doAnId == -1) {
+        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
         // Ánh xạ các View bằng findViewById
-        toolbarDetail = findViewById(R.id.toolbarDetail);
-        tvDetailTen = findViewById(R.id.tvDetailTen);
-        tvDetailMoTa = findViewById(R.id.tvDetailMoTa);
-        tvDetailGiangVien = findViewById(R.id.tvDetailGiangVien);
-        tvDetailThoiGian = findViewById(R.id.tvDetailThoiGian);
-        tvDetailTienDo = findViewById(R.id.tvDetailTienDo);
-        progressBarDetail = findViewById(R.id.progressBarDetail);
+        mToolbarDetail = findViewById(R.id.toolbarDetail);
+        mTvDetailTen = findViewById(R.id.tvDetailTen);
+        mTvDetailMoTa = findViewById(R.id.tvDetailMoTa);
+        mTvDetailGiangVien = findViewById(R.id.tvDetailGiangVien);
+        mTvDetailThoiGian = findViewById(R.id.tvDetailThoiGian);
+        mTvDetailTienDo = findViewById(R.id.tvDetailTienDo);
+        mProgressBarDetail = findViewById(R.id.progressBarDetail);
 
-        btnXemNhiemVu = findViewById(R.id.btnXemNhiemVu);
-        btnXemCuocHen = findViewById(R.id.btnXemCuocHen);
-        btnSuaDoAn = findViewById(R.id.btnSuaDoAn);
-        btnXoaDoAn = findViewById(R.id.btnXoaDoAn);
-        btnQuayLaiDetail = findViewById(R.id.btnQuayLaiDetail);
+        // Mục C2: Khởi tạo RecyclerView cuộn ngang
+        mRvThongKe = findViewById(R.id.rv_thong_ke);
+        mListThongKe = new ArrayList<>();
+        mThongKeAdapter = new ThongKeAdapter(this, mListThongKe);
+        mRvThongKe.setAdapter(mThongKeAdapter);
+
+        // Cài đặt LinearLayoutManager dạng cuộn NGANG (slide 185, 192)
+        mRvThongKe.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        mBtnXemNhiemVu = findViewById(R.id.btnXemNhiemVu);
+        mBtnXemCuocHen = findViewById(R.id.btnXemCuocHen);
+        mBtnSuaDoAn = findViewById(R.id.btnSuaDoAn);
+        mBtnXoaDoAn = findViewById(R.id.btnXoaDoAn);
+        mBtnQuayLaiDetail = findViewById(R.id.btnQuayLaiDetail);
 
         // Cấu hình nút Back trên Toolbar
-        toolbarDetail.setNavigationOnClickListener(v -> finish());
+        mToolbarDetail.setNavigationOnClickListener(v -> finish());
 
         // Bấm nút xem danh sách Nhiệm vụ
-        btnXemNhiemVu.setOnClickListener(v -> {
+        mBtnXemNhiemVu.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, NhiemVuListActivity.class);
-            intent.putExtra("do_an_id", doAnId);
+            intent.putExtra("do_an_id", mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xem danh sách Cuộc hẹn
-        btnXemCuocHen.setOnClickListener(v -> {
+        mBtnXemCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, CuocHenListActivity.class);
-            intent.putExtra("do_an_id", doAnId);
+            intent.putExtra("do_an_id", mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút chỉnh sửa đồ án
-        btnSuaDoAn.setOnClickListener(v -> {
+        mBtnSuaDoAn.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, DoAnFormActivity.class);
-            intent.putExtra("do_an_id", doAnId);
+            intent.putExtra("do_an_id", mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xóa đồ án
-        btnXoaDoAn.setOnClickListener(v -> hienThiHopThoaiXacNhanXoa());
+        mBtnXoaDoAn.setOnClickListener(v -> hienThiHopThoaiXacNhanXoa());
 
         // Bấm nút quay lại
-        btnQuayLaiDetail.setOnClickListener(v -> finish());
+        mBtnQuayLaiDetail.setOnClickListener(v -> finish());
     }
 
-    // Khi Activity hiển thị lại (ví dụ sau khi sửa hoặc thay đổi nhiệm vụ), tải lại dữ liệu mới nhất
+    // Khi Activity hiển thị lại, tải lại dữ liệu mới nhất
     @Override
     protected void onResume() {
         super.onResume();
@@ -102,31 +121,31 @@ public class DoAnDetailActivity extends AppCompatActivity {
 
     // Đọc thông tin đồ án và tiến độ từ SQLite hiển thị lên giao diện
     private void loadDoAnData() {
-        DoAn doAn = dbHelper.getDoAnById(doAnId);
+        DoAn doAn = mDbHelper.getDoAnById(mDoAnId);
         if (doAn == null) {
             finish();
             return;
         }
 
         // Gán thông tin lên các TextView
-        tvDetailTen.setText(doAn.getTen());
+        mTvDetailTen.setText(doAn.getTen());
 
         if (doAn.getMoTa() != null && !doAn.getMoTa().trim().isEmpty()) {
-            tvDetailMoTa.setVisibility(View.VISIBLE);
-            tvDetailMoTa.setText(doAn.getMoTa());
+            mTvDetailMoTa.setVisibility(View.VISIBLE);
+            mTvDetailMoTa.setText(doAn.getMoTa());
         } else {
-            tvDetailMoTa.setVisibility(View.GONE);
+            mTvDetailMoTa.setVisibility(View.GONE);
         }
 
-        tvDetailGiangVien.setText("GVHD: " + (doAn.getGiangVien() != null ? doAn.getGiangVien() : "Chưa có"));
+        mTvDetailGiangVien.setText("GVHD: " + (doAn.getGiangVien() != null ? doAn.getGiangVien() : "Chưa có"));
 
         String tg = "Từ: " + (doAn.getNgayBatDau() != null ? doAn.getNgayBatDau() : "---")
                 + "  đến  " + (doAn.getHanNop() != null ? doAn.getHanNop() : "---");
-        tvDetailThoiGian.setText(tg);
+        mTvDetailThoiGian.setText(tg);
 
         // Hiển thị tiến độ từ DBHelper
-        String tienDoStr = dbHelper.getTienDoDoAn(doAnId);
-        tvDetailTienDo.setText(tienDoStr);
+        String tienDoStr = mDbHelper.getTienDoDoAn(mDoAnId);
+        mTvDetailTienDo.setText(tienDoStr);
 
         int percent = 0;
         try {
@@ -138,7 +157,16 @@ public class DoAnDetailActivity extends AppCompatActivity {
         } catch (Exception ignored) {
             percent = 0;
         }
-        progressBarDetail.setProgress(percent);
+        mProgressBarDetail.setProgress(percent);
+
+        // Mục C2: Nạp dữ liệu 4 thẻ thống kê nhanh vào RecyclerView cuộn ngang
+        int[] stats = mDbHelper.getThongKeDoAn(mDoAnId);
+        mListThongKe.clear();
+        mListThongKe.add(new ThongKeItem("Tổng nhiệm vụ", String.valueOf(stats[0]), R.drawable.ic_clock));
+        mListThongKe.add(new ThongKeItem("Đã xong", String.valueOf(stats[1]), R.drawable.ic_calendar));
+        mListThongKe.add(new ThongKeItem("Chưa xong", String.valueOf(stats[2]), R.drawable.ic_clock));
+        mListThongKe.add(new ThongKeItem("Lịch hẹn sắp tới", String.valueOf(stats[3]), R.drawable.ic_calendar));
+        mThongKeAdapter.notifyDataSetChanged();
     }
 
     // Hiển thị hộp thoại AlertDialog xác nhận trước khi xóa đồ án
@@ -148,7 +176,7 @@ public class DoAnDetailActivity extends AppCompatActivity {
         builder.setMessage("Bạn có chắc chắn muốn xóa đồ án này không?\n\nToàn bộ nhiệm vụ và lịch hẹn liên quan sẽ tự động bị xóa.");
         builder.setPositiveButton("Xóa", (dialog, which) -> {
             // Xóa đồ án khỏi CSDL (Nhiệm vụ và Cuộc hẹn sẽ tự động bị xóa nhờ ON DELETE CASCADE)
-            dbHelper.deleteDoAn(doAnId);
+            mDbHelper.deleteDoAn(mDoAnId);
             Toast.makeText(DoAnDetailActivity.this, "Đã xóa đồ án thành công!", Toast.LENGTH_SHORT).show();
             finish();
         });

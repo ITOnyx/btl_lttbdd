@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Menu chuyển đổi chế độ xem Danh sách / Lưới cho màn hình chính (slide 185, 192) -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_toggle_layout"
+        android:icon="@drawable/ic_grid"
+        android:title="Chuyển chế độ xem"
+        app:showAsAction="always" />
+</menu>

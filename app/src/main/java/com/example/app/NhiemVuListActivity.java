@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
@@ -69,6 +70,11 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         // Bước 5: Gắn Adapter và LayoutManager dạng cuộn dọc (slide 185, 192)
         mRvNhiemVu.setAdapter(mAdapter);
         mRvNhiemVu.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        // Mục C4: Thêm đường kẻ phân cách DividerItemDecoration cho danh sách nhiệm vụ (slide 183)
+        // Đây là điểm vượt trội của RecyclerView so với ListView (ItemDecoration tách biệt độc lập với Adapter)
+        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        mRvNhiemVu.addItemDecoration(divider);
 
         // Mục B2: Cài đặt DefaultItemAnimator (thêm: alpha 0->1, xóa: 1->0, đổi: 1->0 rồi 0->1)
         mRvNhiemVu.setItemAnimator(new DefaultItemAnimator());

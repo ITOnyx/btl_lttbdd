@@ -5,7 +5,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 // Lớp quản lý cơ sở dữ liệu SQLite cho toàn bộ ứng dụng
 public class DBHelper extends SQLiteOpenHelper {
@@ -209,6 +212,33 @@ public class DBHelper extends SQLiteOpenHelper {
 
         int phanTram = (int) Math.round(((double) daHoanThanh * 100.0) / tong);
         return daHoanThanh + "/" + tong + " (" + phanTram + "%)";
+    }
+
+    // Lấy số liệu thống kê đồ án cho RecyclerView cuộn ngang (Mục C2: slide 185, 192)
+    // Trả về mảng 4 số nguyên: [0]: Tổng nhiệm vụ, [1]: Đã xong, [2]: Chưa xong, [3]: Lịch hẹn sắp tới
+    public int[] getThongKeDoAn(int doAnId) {
+        int[] stats = new int[]{0, 0, 0, 0};
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 1. Thống kê nhiệm vụ (tổng số, đã xong, chưa xong)
+        Cursor c1 = db.rawQuery("SELECT COUNT(*), SUM(da_hoan_thanh) FROM NhiemVu WHERE do_an_id = ?", new String[]{String.valueOf(doAnId)});
+        if (c1.moveToNext()) {
+            stats[0] = c1.getInt(0);
+            stats[1] = c1.getInt(1);
+            stats[2] = stats[0] - stats[1];
+        }
+        c1.close();
+
+        // 2. Thống kê cuộc hẹn sắp tới (thời gian >= hiện tại)
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String currentDateTime = sdf.format(new Date());
+        Cursor c2 = db.rawQuery("SELECT COUNT(*) FROM CuocHen WHERE do_an_id = ? AND thoi_gian >= ?", new String[]{String.valueOf(doAnId), currentDateTime});
+        if (c2.moveToNext()) {
+            stats[3] = c2.getInt(0);
+        }
+        c2.close();
+
+        return stats;
     }
 
     // ==========================================
