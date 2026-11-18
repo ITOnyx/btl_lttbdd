@@ -75,7 +75,7 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvCuocHen.setLayoutManager(linearLayoutManager);
 
-        // 7. Cài đặt ItemAnimator
+        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
         rvCuocHen.setItemAnimator(new DefaultItemAnimator());
 
         // Bấm nút thêm cuộc hẹn mới -> mở form
@@ -117,7 +117,7 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         startActivity(intent);
     }
 
-    // Xóa cuộc hẹn bằng removeItem(position) (mẫu slide 222)
+    // Xóa cuộc hẹn bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
     @Override
     public void onDelete(CuocHen ch, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

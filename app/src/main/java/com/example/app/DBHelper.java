@@ -130,11 +130,18 @@ public class DBHelper extends SQLiteOpenHelper {
     // CÁC HÀM XỬ LÝ DỮ LIỆU BẢNG ĐỒ ÁN (DoAn)
     // ==========================================
 
-    // Lấy toàn bộ danh sách đồ án, sắp xếp mới nhất lên đầu
+    // Lấy toàn bộ danh sách đồ án kèm thống kê nhiệm vụ bằng MỘT câu rawQuery LEFT JOIN + GROUP BY
     public ArrayList<DoAn> getAllDoAn() {
         ArrayList<DoAn> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop FROM DoAn ORDER BY id DESC", null);
+        String sql = "SELECT d.id, d.ten, d.mo_ta, d.giang_vien, d.ngay_bat_dau, d.han_nop, " +
+                "COUNT(n.id) AS tong, " +
+                "IFNULL(SUM(n.da_hoan_thanh), 0) AS xong " +
+                "FROM DoAn d " +
+                "LEFT JOIN NhiemVu n ON d.id = n.do_an_id " +
+                "GROUP BY d.id " +
+                "ORDER BY d.id DESC";
+        Cursor cursor = db.rawQuery(sql, null);
 
         while (cursor.moveToNext()) {
             int id = cursor.getInt(0);
@@ -143,18 +150,27 @@ public class DBHelper extends SQLiteOpenHelper {
             String giangVien = cursor.getString(3);
             String ngayBatDau = cursor.getString(4);
             String hanNop = cursor.getString(5);
+            int tong = cursor.getInt(6);
+            int xong = cursor.getInt(7);
 
-            list.add(new DoAn(id, ten, moTa, giangVien, ngayBatDau, hanNop));
+            list.add(new DoAn(id, ten, moTa, giangVien, ngayBatDau, hanNop, tong, xong));
         }
         cursor.close();
         return list;
     }
 
-    // Lấy thông tin chi tiết một đồ án theo ID
+    // Lấy thông tin chi tiết một đồ án theo ID kèm thống kê nhiệm vụ
     public DoAn getDoAnById(int id) {
         DoAn doAn = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop FROM DoAn WHERE id = ?", new String[]{String.valueOf(id)});
+        String sql = "SELECT d.id, d.ten, d.mo_ta, d.giang_vien, d.ngay_bat_dau, d.han_nop, " +
+                "COUNT(n.id) AS tong, " +
+                "IFNULL(SUM(n.da_hoan_thanh), 0) AS xong " +
+                "FROM DoAn d " +
+                "LEFT JOIN NhiemVu n ON d.id = n.do_an_id " +
+                "WHERE d.id = ? " +
+                "GROUP BY d.id";
+        Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(id)});
 
         if (cursor.moveToNext()) {
             int doAnId = cursor.getInt(0);
@@ -163,8 +179,10 @@ public class DBHelper extends SQLiteOpenHelper {
             String giangVien = cursor.getString(3);
             String ngayBatDau = cursor.getString(4);
             String hanNop = cursor.getString(5);
+            int tong = cursor.getInt(6);
+            int xong = cursor.getInt(7);
 
-            doAn = new DoAn(doAnId, ten, moTa, giangVien, ngayBatDau, hanNop);
+            doAn = new DoAn(doAnId, ten, moTa, giangVien, ngayBatDau, hanNop, tong, xong);
         }
         cursor.close();
         return doAn;

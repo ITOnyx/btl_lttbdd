@@ -10,6 +10,8 @@ public class DoAn implements Serializable {
     private String giangVien;
     private String ngayBatDau;
     private String hanNop;
+    private int tongNhiemVu;   // Tổng số nhiệm vụ của đồ án
+    private int soNhiemVuXong; // Số nhiệm vụ đã hoàn thành
 
     // Constructor mặc định không tham số
     public DoAn() {
@@ -17,12 +19,19 @@ public class DoAn implements Serializable {
 
     // Constructor đầy đủ tham số có ID (dùng khi đọc từ CSDL SQLite qua Cursor)
     public DoAn(int id, String ten, String moTa, String giangVien, String ngayBatDau, String hanNop) {
+        this(id, ten, moTa, giangVien, ngayBatDau, hanNop, 0, 0);
+    }
+
+    // Constructor đầy đủ tham số có ID và số liệu tiến độ nhiệm vụ (LEFT JOIN)
+    public DoAn(int id, String ten, String moTa, String giangVien, String ngayBatDau, String hanNop, int tongNhiemVu, int soNhiemVuXong) {
         this.id = id;
         this.ten = ten;
         this.moTa = moTa;
         this.giangVien = giangVien;
         this.ngayBatDau = ngayBatDau;
         this.hanNop = hanNop;
+        this.tongNhiemVu = tongNhiemVu;
+        this.soNhiemVuXong = soNhiemVuXong;
     }
 
     // Constructor không có ID (dùng khi thêm mới vào SQLite)
@@ -81,5 +90,21 @@ public class DoAn implements Serializable {
 
     public void setHanNop(String hanNop) {
         this.hanNop = hanNop;
+    }
+
+    public int getTongNhiemVu() {
+        return tongNhiemVu;
+    }
+
+    public void setTongNhiemVu(int tongNhiemVu) {
+        this.tongNhiemVu = tongNhiemVu;
+    }
+
+    public int getSoNhiemVuXong() {
+        return soNhiemVuXong;
+    }
+
+    public void setSoNhiemVuXong(int soNhiemVuXong) {
+        this.soNhiemVuXong = soNhiemVuXong;
     }
 }

@@ -77,7 +77,7 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvNhiemVu.setLayoutManager(linearLayoutManager);
 
-        // 7. Cài đặt ItemAnimator
+        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
         rvNhiemVu.setItemAnimator(new DefaultItemAnimator());
 
         // Tắt nháy CheckBox khi notifyItemChanged (slide 219)
@@ -137,7 +137,7 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         startActivity(intent);
     }
 
-    // Xóa nhiệm vụ bằng removeItem(position) (mẫu slide 222)
+    // Xóa nhiệm vụ bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
     @Override
     public void onDelete(NhiemVu nv, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
