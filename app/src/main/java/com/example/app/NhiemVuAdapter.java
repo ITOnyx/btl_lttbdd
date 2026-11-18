@@ -62,7 +62,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         }
     }
 
-    // Thêm phần tử tại vị trí position chỉ định (mẫu slide 221)
+    // Thêm phần tử tại vị trí position chỉ định (mẫu slide 220)
     public void addItem(int position, NhiemVu item) {
         if (mNhiemVus != null && position >= 0 && position <= mNhiemVus.size()) {
             mNhiemVus.add(position, item);
@@ -70,7 +70,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         }
     }
 
-    // Xóa phần tử theo vị trí position (mẫu slide 222)
+    // Xóa phần tử theo vị trí position (mẫu slide 221)
     public void removeItem(int position) {
         if (mNhiemVus != null && position >= 0 && position < mNhiemVus.size()) {
             mNhiemVus.remove(position);
@@ -78,7 +78,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         }
     }
 
-    // Xóa phần tử theo đối tượng dùng indexOf (mở rộng an toàn từ mẫu slide 222)
+    // Xóa phần tử theo đối tượng dùng indexOf (mở rộng an toàn từ mẫu slide 221)
     public void removeItem(NhiemVu item) {
         if (mNhiemVus != null) {
             int index = mNhiemVus.indexOf(item);
@@ -88,7 +88,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
         }
     }
 
-    // Thay thế/đổi phần tử tại vị trí position (mẫu slide 223: remove + add + notifyItemChanged)
+    // Thay thế/đổi phần tử tại vị trí position (mẫu slide 221: remove + add + notifyItemChanged)
     public void replaceItem(int position, NhiemVu item) {
         if (mNhiemVus != null && position >= 0 && position < mNhiemVus.size()) {
             mNhiemVus.remove(position);
@@ -111,10 +111,10 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
 
     @Override
     public void onBindViewHolder(@NonNull NhiemVuViewHolder holder, int position) {
-        // Lấy nhiệm vụ theo vị trí (mẫu slide 191)
+        // Lấy nhiệm vụ theo vị trí và gắn dữ liệu vào ViewHolder (mẫu slide 190)
         NhiemVu nv = mNhiemVus.get(position);
 
-        // Gắn dữ liệu vào ViewHolder (mẫu slide 191)
+        // Gắn dữ liệu vào ViewHolder
         holder.tvTitle.setText(nv.getTen());
 
         if (nv.getGhiChu() != null && !nv.getGhiChu().trim().isEmpty()) {
@@ -139,11 +139,12 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
 
     @Override
     public int getItemCount() {
+        // Trả về số lượng phần tử (mẫu slide 191)
         return mNhiemVus != null ? mNhiemVus.size() : 0;
     }
 
     // ==============================================================
-    // LỚP VIEWHOLDER NỘI BỘ (MẪU SLIDE 191, 194, 203)
+    // LỚP VIEWHOLDER NỘI BỘ (MẪU SLIDE 191)
     // ==============================================================
 
     class NhiemVuViewHolder extends RecyclerView.ViewHolder {
@@ -176,7 +177,7 @@ public class NhiemVuAdapter extends RecyclerView.Adapter<NhiemVuAdapter.NhiemVuV
                 }
             });
 
-            // Sự kiện nhấn giữ (onLongClick):
+            // Sự kiện nhấn giữ (onLongClick) (mẫu slide 222):
             // KHÁC SLIDE: Trả về true để tiêu thụ sự kiện, ngăn sự kiện click thường chạy tiếp theo
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

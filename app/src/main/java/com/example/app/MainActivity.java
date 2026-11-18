@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
             rvDoAn.setLayoutManager(linearLayoutManager);
         }
 
-        // 7. Cài đặt ItemAnimator
+        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
         rvDoAn.setItemAnimator(new DefaultItemAnimator());
 
         // Bấm nút thêm mới đồ án -> mở form
@@ -157,11 +157,11 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         }
     }
 
-    // Mở chi tiết đồ án
+    // Mở chi tiết đồ án dùng hằng số EXTRA_DO_AN_ID (Yêu cầu 6)
     @Override
     public void onItemClick(DoAn doAn, int position) {
         Intent intent = new Intent(MainActivity.this, DoAnDetailActivity.class);
-        intent.putExtra("do_an_id", doAn.getId());
+        intent.putExtra(DoAnDetailActivity.EXTRA_DO_AN_ID, doAn.getId());
         startActivity(intent);
     }
 
@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
     @Override
     public void onEditClick(DoAn doAn, int position) {
         Intent intent = new Intent(MainActivity.this, DoAnFormActivity.class);
-        intent.putExtra("do_an_id", doAn.getId());
+        intent.putExtra(DoAnDetailActivity.EXTRA_DO_AN_ID, doAn.getId());
         startActivity(intent);
     }
 
-    // Xóa đồ án bằng removeItem(position) (mẫu slide 222)
+    // Xóa đồ án bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
     @Override
     public void onDeleteClick(DoAn doAn, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

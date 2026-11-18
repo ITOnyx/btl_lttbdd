@@ -20,6 +20,9 @@ import java.util.ArrayList;
 // Minh họa LinearLayoutManager cuộn ngang theo bài giảng (slide 185, 192)
 public class DoAnDetailActivity extends AppCompatActivity {
 
+    // Hằng số chung truyền ID đồ án qua Intent (Yêu cầu 6)
+    public static final String EXTRA_DO_AN_ID = "do_an_id";
+
     private Toolbar mToolbarDetail;
     private TextView mTvDetailTen;
     private TextView mTvDetailMoTa;
@@ -50,8 +53,8 @@ public class DoAnDetailActivity extends AppCompatActivity {
 
         mDbHelper = new DBHelper(this);
 
-        // Đọc ID đồ án truyền từ màn hình danh sách
-        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        // Đọc ID đồ án truyền từ màn hình danh sách bằng hằng số EXTRA_DO_AN_ID
+        mDoAnId = getIntent().getIntExtra(EXTRA_DO_AN_ID, -1);
         if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();
@@ -89,28 +92,28 @@ public class DoAnDetailActivity extends AppCompatActivity {
         // Bấm nút xem danh sách Nhiệm vụ
         mBtnXemNhiemVu.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, NhiemVuListActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xem danh sách Cuộc hẹn
         mBtnXemCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, CuocHenListActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút xem Dòng thời gian đồ án (Mục D1: Multiple View Type)
         mBtnXemDongThoiGian.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, TimelineActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
         // Bấm nút chỉnh sửa đồ án
         mBtnSuaDoAn.setOnClickListener(v -> {
             Intent intent = new Intent(DoAnDetailActivity.this, DoAnFormActivity.class);
-            intent.putExtra("do_an_id", mDoAnId);
+            intent.putExtra(EXTRA_DO_AN_ID, mDoAnId);
             startActivity(intent);
         });
 
