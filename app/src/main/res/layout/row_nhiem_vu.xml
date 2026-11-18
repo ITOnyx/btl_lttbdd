@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Layout một dòng hiển thị thông tin Nhiệm vụ (Bước 3: row_nhiem_vu.xml) -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardNhiemVu"
+    android:id="@+id/card_nhiem_vu"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
@@ -22,16 +23,16 @@
         android:orientation="horizontal"
         android:padding="14dp">
 
-        <!-- Checkbox hoan thanh -->
+        <!-- Checkbox đánh dấu hoàn thành -->
         <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cbHoanThanh"
+            android:id="@+id/cb_hoan_thanh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="0dp"
             android:minHeight="0dp"
             android:padding="0dp" />
 
-        <!-- Noi dung nhiem vu -->
+        <!-- Khối nội dung nhiệm vụ -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -40,23 +41,28 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvTenNhiemVu"
+                android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
+                android:maxLines="2"
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 tools:text="Thiết kế giao diện người dùng" />
 
             <TextView
-                android:id="@+id/tvGhiChu"
+                android:id="@+id/tv_ghi_chu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 tools:text="Dùng Figma và tuân thủ Material Components" />
 
+            <!-- Hạn hoàn thành -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,10 +78,12 @@
                     app:tint="@color/text_secondary" />
 
                 <TextView
-                    android:id="@+id/tvHanHoanThanh"
+                    android:id="@+id/tv_han_hoan_thanh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:textColor="@color/text_secondary"
                     android:textSize="12.5sp"
                     tools:text="Hạn: 2026-03-30" />
@@ -83,9 +91,9 @@
 
         </LinearLayout>
 
-        <!-- Nut sua & xoa -->
+        <!-- Nút sửa & xóa nhiệm vụ -->
         <ImageButton
-            android:id="@+id/btnEditTask"
+            android:id="@+id/btn_edit_task"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -95,7 +103,7 @@
             app:tint="@color/text_secondary" />
 
         <ImageButton
-            android:id="@+id/btnDeleteTask"
+            android:id="@+id/btn_delete_task"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"

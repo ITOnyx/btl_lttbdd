@@ -1,6 +1,7 @@
 package com.example.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,48 +12,61 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
-// Adapter hiển thị danh sách đồ án lên RecyclerView
-public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.ViewHolder> {
+// Adapter hiển thị danh sách Đồ án theo chuẩn 5 bước RecyclerView (slide 184–194)
+public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder> {
 
-    // Giao diện xử lý các sự kiện click trên từng dòng đồ án
+    // Giao diện callback để lắng nghe sự kiện click/sửa/xóa từ Activity
     public interface OnDoAnClickListener {
         void onItemClick(DoAn doAn);
         void onEditClick(DoAn doAn);
         void onDeleteClick(DoAn doAn);
     }
 
-    private final Context context;
-    private final ArrayList<DoAn> list;
-    private final DBHelper dbHelper;
-    private final OnDoAnClickListener listener;
+    // Các thuộc tính thành viên với tiền tố m như bài giảng (slide 184)
+    private Context mContext;
+    private List<DoAn> mDoAns;
+    private LayoutInflater mLayoutInflater;
+    private DBHelper mDbHelper;
+    private OnDoAnClickListener mListener;
 
-    // Khởi tạo Adapter với context, danh sách dữ liệu và listener
-    public DoAnAdapter(Context context, ArrayList<DoAn> list, OnDoAnClickListener listener) {
-        this.context = context;
-        this.list = list;
-        this.listener = listener;
-        this.dbHelper = new DBHelper(context);
+    // Bước 4: Constructor cơ bản (Context, List) theo bài giảng
+    public DoAnAdapter(Context context, List<DoAn> doAns) {
+        this(context, doAns, null);
     }
 
-    // Tạo ViewHolder bằng cách nạp giao diện từ tệp item_do_an.xml
+    // Constructor mở rộng nhận thêm listener xử lý sự kiện
+    public DoAnAdapter(Context context, List<DoAn> doAns, OnDoAnClickListener listener) {
+        this.mContext = context;
+        this.mDoAns = doAns;
+        this.mListener = listener;
+        this.mLayoutInflater = LayoutInflater.from(context);
+        this.mDbHelper = new DBHelper(context);
+    }
+
+    // Setter listener nếu cần đăng ký sau
+    public void setOnDoAnClickListener(OnDoAnClickListener listener) {
+        this.mListener = listener;
+    }
+
+    // Bước 4: onCreateViewHolder - Nạp layout row_do_an.xml với attachToRoot = false
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_do_an, parent, false);
-        return new ViewHolder(view);
+    public DoAnViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = mLayoutInflater.inflate(R.layout.row_do_an, parent, false);
+        return new DoAnViewHolder(itemView);
     }
 
-    // Đổ dữ liệu từ đối tượng DoAn vào các View trên từng dòng
+    // Bước 4: onBindViewHolder - Lấy item theo position và gắn dữ liệu vào View
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DoAn doAn = list.get(position);
+    public void onBindViewHolder(@NonNull DoAnViewHolder holder, int position) {
+        DoAn doAn = mDoAns.get(position);
 
-        // Gán tên đồ án
-        holder.tvTen.setText(doAn.getTen());
+        // Gắn tiêu đề đồ án
+        holder.tvTitle.setText(doAn.getTen());
 
-        // Gán mô tả đồ án (nếu không có thì ẩn đi)
+        // Gắn mô tả (nếu rỗng thì ẩn đi)
         if (doAn.getMoTa() != null && !doAn.getMoTa().trim().isEmpty()) {
             holder.tvMoTa.setVisibility(View.VISIBLE);
             holder.tvMoTa.setText(doAn.getMoTa());
@@ -60,25 +74,25 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.ViewHolder> {
             holder.tvMoTa.setVisibility(View.GONE);
         }
 
-        // Gán giảng viên hướng dẫn
+        // Gắn giảng viên hướng dẫn
         if (doAn.getGiangVien() != null && !doAn.getGiangVien().trim().isEmpty()) {
             holder.tvGiangVien.setText("GVHD: " + doAn.getGiangVien());
         } else {
             holder.tvGiangVien.setText("GVHD: Chưa có");
         }
 
-        // Gán thời gian thực hiện đồ án
+        // Gắn khoảng thời gian thực hiện
         String tg = "Hạn: " + (doAn.getHanNop() != null ? doAn.getHanNop() : "Chưa đặt");
         if (doAn.getNgayBatDau() != null && !doAn.getNgayBatDau().isEmpty()) {
             tg = doAn.getNgayBatDau() + "  đến  " + (doAn.getHanNop() != null ? doAn.getHanNop() : "---");
         }
         holder.tvThoiGian.setText(tg);
 
-        // Lấy và hiển thị tiến độ từ DBHelper (dạng "x/y (z%)")
-        String tienDoStr = dbHelper.getTienDoDoAn(doAn.getId());
+        // Lấy tiến độ từ SQLite (dạng "x/y (z%)")
+        String tienDoStr = mDbHelper.getTienDoDoAn(doAn.getId());
         holder.tvTienDo.setText(tienDoStr);
 
-        // Cập nhật thanh ProgressBar theo phần trăm
+        // Cập nhật thanh ProgressBar
         int percent = 0;
         try {
             if (tienDoStr.contains("(") && tienDoStr.contains("%")) {
@@ -90,46 +104,18 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.ViewHolder> {
             percent = 0;
         }
         holder.progressBar.setProgress(percent);
-
-        // Bấm vào thẻ để xem chi tiết đồ án
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(doAn);
-            }
-        });
-
-        // Nhấn giữ thẻ để xóa đồ án
-        holder.itemView.setOnLongClickListener(v -> {
-            if (listener != null) {
-                listener.onDeleteClick(doAn);
-            }
-            return true;
-        });
-
-        // Bấm nút sửa đồ án
-        holder.btnEdit.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditClick(doAn);
-            }
-        });
-
-        // Bấm nút xóa đồ án
-        holder.btnDelete.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onDeleteClick(doAn);
-            }
-        });
     }
 
-    // Trả về tổng số phần tử trong danh sách
+    // Bước 4: getItemCount - Trả về số lượng phần tử trong danh sách mDoAns
     @Override
     public int getItemCount() {
-        return list != null ? list.size() : 0;
+        return mDoAns != null ? mDoAns.size() : 0;
     }
 
-    // Lớp ViewHolder giữ các thành phần giao diện của một dòng đồ án
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTen;
+    // Bước 4: ViewHolder là inner class, ánh xạ findViewById trong constructor
+    // Bước 6: Bắt sự kiện chọn item trong constructor của ViewHolder (slide 194)
+    public class DoAnViewHolder extends RecyclerView.ViewHolder {
+        TextView tvTitle;
         TextView tvMoTa;
         TextView tvGiangVien;
         TextView tvThoiGian;
@@ -138,17 +124,78 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.ViewHolder> {
         ImageButton btnEdit;
         ImageButton btnDelete;
 
-        // Ánh xạ các View thông qua findViewById
-        public ViewHolder(@NonNull View itemView) {
+        public DoAnViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTen = itemView.findViewById(R.id.tvTen);
-            tvMoTa = itemView.findViewById(R.id.tvMoTa);
-            tvGiangVien = itemView.findViewById(R.id.tvGiangVien);
-            tvThoiGian = itemView.findViewById(R.id.tvThoiGian);
-            tvTienDo = itemView.findViewById(R.id.tvTienDo);
-            progressBar = itemView.findViewById(R.id.progressBar);
-            btnEdit = itemView.findViewById(R.id.btnEdit);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
+            // Ánh xạ View bằng findViewById
+            tvTitle = itemView.findViewById(R.id.tv_title);
+            tvMoTa = itemView.findViewById(R.id.tv_mo_ta);
+            tvGiangVien = itemView.findViewById(R.id.tv_giang_vien);
+            tvThoiGian = itemView.findViewById(R.id.tv_thoi_gian);
+            tvTienDo = itemView.findViewById(R.id.tv_tien_do);
+            progressBar = itemView.findViewById(R.id.progress_bar);
+            btnEdit = itemView.findViewById(R.id.btn_edit);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
+
+            // Bắt sự kiện click chọn item trong constructor ViewHolder (slide 194)
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    // Kiểm tra getAdapterPosition() hợp lệ tránh crash khi item đang bị xóa
+                    if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
+                        DoAn doAn = mDoAns.get(position);
+                        if (mListener != null) {
+                            mListener.onItemClick(doAn);
+                        } else {
+                            // Mở màn hình chi tiết đồ án bằng Intent (slide 194)
+                            Intent intent = new Intent(mContext, DoAnDetailActivity.class);
+                            intent.putExtra("do_an_id", doAn.getId());
+                            mContext.startActivity(intent);
+                        }
+                    }
+                }
+            });
+
+            // Bắt sự kiện nhấn giữ (long click) trên dòng đồ án
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
+                        if (mListener != null) {
+                            mListener.onDeleteClick(mDoAns.get(position));
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+            // Bắt sự kiện bấm nút sửa
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
+                        if (mListener != null) {
+                            mListener.onEditClick(mDoAns.get(position));
+                        }
+                    }
+                }
+            });
+
+            // Bắt sự kiện bấm nút xóa
+            btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && mDoAns != null && position < mDoAns.size()) {
+                        if (mListener != null) {
+                            mListener.onDeleteClick(mDoAns.get(position));
+                        }
+                    }
+                }
+            });
         }
     }
 }

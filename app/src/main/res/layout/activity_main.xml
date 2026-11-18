@@ -28,15 +28,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- RecyclerView danh sách đồ án -->
+        <!-- RecyclerView danh sách đồ án (Bước 2: id dạng rv_do_an) -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvDoAn"
+            android:id="@+id/rv_do_an"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             android:paddingBottom="88dp"
-            tools:listitem="@layout/item_do_an" />
+            tools:listitem="@layout/row_do_an" />
 
         <!-- Giao diện khi chưa có dữ liệu (Empty state) -->
         <LinearLayout

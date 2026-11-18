@@ -28,15 +28,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- RecyclerView hiển thị danh sách cuộc hẹn -->
+        <!-- RecyclerView hiển thị danh sách cuộc hẹn (Bước 2: id dạng rv_cuoc_hen) -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCuocHen"
+            android:id="@+id/rv_cuoc_hen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             android:paddingBottom="88dp"
-            tools:listitem="@layout/item_cuoc_hen" />
+            tools:listitem="@layout/row_cuoc_hen" />
 
         <!-- Giao diện khi chưa có cuộc hẹn nào -->
         <LinearLayout

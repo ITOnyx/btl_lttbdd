@@ -16,102 +16,105 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-// Màn hình hiển thị và quản lý danh sách cuộc hẹn trao đổi với giảng viên
+// Màn hình hiển thị và quản lý danh sách cuộc hẹn của đồ án (Áp dụng 5 bước RecyclerView)
 public class CuocHenListActivity extends AppCompatActivity implements CuocHenAdapter.OnCuocHenClickListener {
 
-    private Toolbar toolbarCuocHen;
-    private RecyclerView rvCuocHen;
-    private LinearLayout layoutEmptyCuocHen;
-    private FloatingActionButton fabAddCuocHen;
+    // Khai báo các thuộc tính thành viên với tiền tố m như bài giảng
+    private Toolbar mToolbarCuocHen;
+    private RecyclerView mRvCuocHen;
+    private LinearLayout mLayoutEmptyCuocHen;
+    private FloatingActionButton mFabAddCuocHen;
 
-    private DBHelper dbHelper;
-    private int doAnId = -1;
-    private ArrayList<CuocHen> listCuocHen;
-    private CuocHenAdapter adapter;
+    private DBHelper mDbHelper;
+    private int mDoAnId = -1;
+    private ArrayList<CuocHen> mListCuocHen;
+    private CuocHenAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cuoc_hen_list);
 
-        dbHelper = new DBHelper(this);
+        mDbHelper = new DBHelper(this);
 
         // Đọc ID đồ án từ Intent
-        doAnId = getIntent().getIntExtra("do_an_id", -1);
-        if (doAnId == -1) {
+        mDoAnId = getIntent().getIntExtra("do_an_id", -1);
+        if (mDoAnId == -1) {
             Toast.makeText(this, "Không tìm thấy đồ án!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Ánh xạ các View
-        toolbarCuocHen = findViewById(R.id.toolbarCuocHen);
-        rvCuocHen = findViewById(R.id.rvCuocHen);
-        layoutEmptyCuocHen = findViewById(R.id.layoutEmptyCuocHen);
-        fabAddCuocHen = findViewById(R.id.fabAddCuocHen);
+        // Ánh xạ các View qua findViewById (Bước 2: rv_cuoc_hen)
+        mToolbarCuocHen = findViewById(R.id.toolbarCuocHen);
+        mRvCuocHen = findViewById(R.id.rv_cuoc_hen);
+        mLayoutEmptyCuocHen = findViewById(R.id.layoutEmptyCuocHen);
+        mFabAddCuocHen = findViewById(R.id.fabAddCuocHen);
 
-        // Cấu hình nút Back trên Toolbar
-        toolbarCuocHen.setNavigationOnClickListener(v -> finish());
+        // Nút Back trên Toolbar
+        mToolbarCuocHen.setNavigationOnClickListener(v -> finish());
 
         // Đặt tiêu đề Toolbar theo tên đồ án
-        DoAn doAn = dbHelper.getDoAnById(doAnId);
+        DoAn doAn = mDbHelper.getDoAnById(mDoAnId);
         if (doAn != null) {
-            toolbarCuocHen.setTitle("Lịch hẹn: " + doAn.getTen());
+            mToolbarCuocHen.setTitle("Lịch hẹn: " + doAn.getTen());
         }
 
-        // Khởi tạo danh sách và RecyclerView Adapter
-        listCuocHen = new ArrayList<>();
-        adapter = new CuocHenAdapter(this, listCuocHen, this);
-        rvCuocHen.setLayoutManager(new LinearLayoutManager(this));
-        rvCuocHen.setAdapter(adapter);
+        // Bước 5: Khởi tạo danh sách và RecyclerView Adapter
+        mListCuocHen = new ArrayList<>();
+        mAdapter = new CuocHenAdapter(this, mListCuocHen, this);
 
-        // Bắt sự kiện bấm nút thêm cuộc hẹn mới
-        fabAddCuocHen.setOnClickListener(v -> {
+        // Bước 5: Gắn Adapter và LayoutManager dạng cuộn dọc (slide 185, 192)
+        mRvCuocHen.setAdapter(mAdapter);
+        mRvCuocHen.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        // Bấm nút thêm mới cuộc hẹn
+        mFabAddCuocHen.setOnClickListener(v -> {
             Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
-            intent.putExtra("do_an_id", doAnId);
+            intent.putExtra("do_an_id", mDoAnId);
             startActivity(intent);
         });
     }
 
-    // Tải lại danh sách cuộc hẹn khi quay trở lại màn hình
+    // Bước 7: onResume nạp lại dữ liệu từ SQLite
     @Override
     protected void onResume() {
         super.onResume();
         loadData();
     }
 
-    // Đọc danh sách cuộc hẹn từ SQLite (sắp xếp tăng dần theo thời gian)
+    // Bước 7: Đọc danh sách cuộc hẹn từ DBHelper (rawQuery + Cursor)
     private void loadData() {
-        listCuocHen.clear();
-        listCuocHen.addAll(dbHelper.getCuocHenByDoAnId(doAnId));
-        adapter.notifyDataSetChanged();
+        mListCuocHen.clear();
+        mListCuocHen.addAll(mDbHelper.getCuocHenByDoAnId(mDoAnId));
+        mAdapter.notifyDataSetChanged();
 
-        if (listCuocHen.isEmpty()) {
-            layoutEmptyCuocHen.setVisibility(View.VISIBLE);
-            rvCuocHen.setVisibility(View.GONE);
+        if (mListCuocHen.isEmpty()) {
+            mLayoutEmptyCuocHen.setVisibility(View.VISIBLE);
+            mRvCuocHen.setVisibility(View.GONE);
         } else {
-            layoutEmptyCuocHen.setVisibility(View.GONE);
-            rvCuocHen.setVisibility(View.VISIBLE);
+            mLayoutEmptyCuocHen.setVisibility(View.GONE);
+            mRvCuocHen.setVisibility(View.VISIBLE);
         }
     }
 
-    // Chuyển sang màn hình chỉnh sửa cuộc hẹn
+    // Chuyển sang màn hình sửa cuộc hẹn
     @Override
     public void onEdit(CuocHen ch) {
         Intent intent = new Intent(CuocHenListActivity.this, CuocHenFormActivity.class);
-        intent.putExtra("do_an_id", doAnId);
+        intent.putExtra("do_an_id", mDoAnId);
         intent.putExtra("cuoc_hen_id", ch.getId());
         startActivity(intent);
     }
 
-    // Hiển thị AlertDialog xác nhận xóa cuộc hẹn
+    // Hiển thị hộp thoại AlertDialog xác nhận xóa cuộc hẹn
     @Override
     public void onDelete(CuocHen ch) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Xác nhận xóa cuộc hẹn");
         builder.setMessage("Bạn có chắc chắn muốn xóa lịch hẹn: \"" + ch.getTieuDe() + "\" không?");
         builder.setPositiveButton("Xóa", (dialog, which) -> {
-            dbHelper.deleteCuocHen(ch.getId());
+            mDbHelper.deleteCuocHen(ch.getId());
             loadData();
             Toast.makeText(CuocHenListActivity.this, "Đã xóa cuộc hẹn thành công!", Toast.LENGTH_SHORT).show();
         });

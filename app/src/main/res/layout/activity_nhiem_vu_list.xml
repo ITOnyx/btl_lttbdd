@@ -28,15 +28,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- RecyclerView hiển thị danh sách nhiệm vụ -->
+        <!-- RecyclerView hiển thị danh sách nhiệm vụ (Bước 2: id dạng rv_nhiem_vu) -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvNhiemVu"
+            android:id="@+id/rv_nhiem_vu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             android:paddingBottom="88dp"
-            tools:listitem="@layout/item_nhiem_vu" />
+            tools:listitem="@layout/row_nhiem_vu" />
 
         <!-- Giao diện khi chưa có nhiệm vụ nào -->
         <LinearLayout

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Layout một dòng hiển thị thông tin Cuộc hẹn (Bước 3: row_cuoc_hen.xml) -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardCuocHen"
+    android:id="@+id/card_cuoc_hen"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
@@ -21,7 +22,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header: Title, Badge and Action Buttons -->
+        <!-- Tiêu đề cuộc hẹn, Huy hiệu trạng thái và các nút chức năng -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,7 +30,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvTieuDe"
+                android:id="@+id/tv_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -40,24 +41,26 @@
                 android:textSize="15.5sp"
                 tools:text="Họp trao đổi đề cương chi tiết" />
 
-            <!-- Status Badge: Sap dien ra / Da qua -->
+            <!-- Huy hiệu trạng thái: Sắp diễn ra / Đã qua -->
             <TextView
-                android:id="@+id/tvStatusBadge"
+                android:id="@+id/tv_status_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="6dp"
                 android:background="@drawable/bg_badge_upcoming"
+                android:ellipsize="end"
                 android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:paddingStart="10dp"
                 android:paddingTop="4dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="4dp"
                 android:textColor="@color/status_completed"
                 android:textSize="11.5sp"
-                tools:text="Sắp diễn ra" />
+                tools:text="Sắp tới" />
 
             <ImageButton
-                android:id="@+id/btnEditMeeting"
+                android:id="@+id/btn_edit_meeting"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -67,7 +70,7 @@
                 app:tint="@color/text_secondary" />
 
             <ImageButton
-                android:id="@+id/btnDeleteMeeting"
+                android:id="@+id/btn_delete_meeting"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
@@ -78,7 +81,7 @@
 
         </LinearLayout>
 
-        <!-- Thoi gian hen -->
+        <!-- Thời gian hẹn -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,18 +97,20 @@
                 app:tint="@color/primary" />
 
             <TextView
-                android:id="@+id/tvThoiGian"
+                android:id="@+id/tv_thoi_gian"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 tools:text="2026-03-10 14:30" />
         </LinearLayout>
 
-        <!-- Dia diem -->
+        <!-- Địa điểm -->
         <LinearLayout
-            android:id="@+id/layoutDiaDiem"
+            android:id="@+id/layout_dia_diem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -120,21 +125,25 @@
                 app:tint="@color/primary" />
 
             <TextView
-                android:id="@+id/tvDiaDiem"
+                android:id="@+id/tv_dia_diem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 tools:text="Phòng C201, Nhà C" />
         </LinearLayout>
 
-        <!-- Ghi chu / Noi dung -->
+        <!-- Ghi chú / Nội dung chi tiết -->
         <TextView
-            android:id="@+id/tvGhiChu"
+            android:id="@+id/tv_ghi_chu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/text_hint"
             android:textSize="12.5sp"
             tools:text="Chuẩn bị bản in đề cương và slide báo cáo tổng quan" />
