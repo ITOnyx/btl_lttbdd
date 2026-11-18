@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter một kiểu dòng hiển thị Cuộc hẹn (Khớp chuẩn khung slide 190–191, 194, 220–223)
+// Adapter hiển thị danh sách Cuộc hẹn
 public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenViewHolder> {
 
-    // Khai báo hằng số TAG theo mẫu slide 190
     private static final String TAG = "CuocHenAdapter";
 
-    // Khai báo các thuộc tính thành viên tiền tố m theo mẫu slide 190
     private List<CuocHen> mCuocHens;
     private Context mContext;
     private LayoutInflater mLayoutInflater;
@@ -32,7 +30,6 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         void onDelete(CuocHen ch, int position);
     }
 
-    // Constructor duy nhất thống nhất nhận listener (Context context, List<CuocHen> datas, OnCuocHenClickListener listener)
     public CuocHenAdapter(Context context, List<CuocHen> datas, OnCuocHenClickListener listener) {
         mContext = context;
         mCuocHens = datas;
@@ -41,10 +38,10 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
     }
 
     // ==============================================================
-    // ANIMATION: ĐÚNG 3 NHÓM HÀM THEO MẪU SLIDE 220–223
+    // CÁC HÀM XỬ LÝ ANIMATION RECYCLERVIEW
     // ==============================================================
 
-    // Thêm phần tử vào cuối danh sách (mẫu slide 220)
+    // Thêm phần tử vào cuối danh sách
     public void addItem(CuocHen item) {
         if (mCuocHens != null) {
             mCuocHens.add(item);
@@ -52,7 +49,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         }
     }
 
-    // Thêm phần tử tại vị trí position chỉ định (mẫu slide 220)
+    // Thêm phần tử tại vị trí chỉ định
     public void addItem(int position, CuocHen item) {
         if (mCuocHens != null && position >= 0 && position <= mCuocHens.size()) {
             mCuocHens.add(position, item);
@@ -60,7 +57,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         }
     }
 
-    // Xóa phần tử theo vị trí position (mẫu slide 221)
+    // Xóa phần tử theo vị trí
     public void removeItem(int position) {
         if (mCuocHens != null && position >= 0 && position < mCuocHens.size()) {
             mCuocHens.remove(position);
@@ -68,7 +65,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         }
     }
 
-    // Xóa phần tử theo đối tượng dùng indexOf (mở rộng an toàn từ mẫu slide 221)
+    // Xóa phần tử theo đối tượng dùng indexOf
     public void removeItem(CuocHen item) {
         if (mCuocHens != null) {
             int index = mCuocHens.indexOf(item);
@@ -78,7 +75,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
         }
     }
 
-    // Thay thế/đổi phần tử tại vị trí position (mẫu slide 221: remove + add + notifyItemChanged)
+    // Thay thế phần tử tại vị trí chỉ định
     public void replaceItem(int position, CuocHen item) {
         if (mCuocHens != null && position >= 0 && position < mCuocHens.size()) {
             mCuocHens.remove(position);
@@ -88,33 +85,28 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
     }
 
     // ==============================================================
-    // CÁC PHƯƠNG THỨC CHÍNH CỦA RECYCLERVIEW.ADAPTER (SLIDE 190–191)
+    // CÁC PHƯƠNG THỨC CHÍNH CỦA RECYCLERVIEW.ADAPTER
     // ==============================================================
 
     @NonNull
     @Override
     public CuocHenViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate view từ row_cuoc_hen.xml (mẫu slide 190)
         View itemView = mLayoutInflater.inflate(R.layout.row_cuoc_hen, parent, false);
         return new CuocHenViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CuocHenViewHolder holder, int position) {
-        // Lấy cuộc hẹn theo vị trí và gắn dữ liệu vào ViewHolder (mẫu slide 190)
         CuocHen ch = mCuocHens.get(position);
 
-        // Gắn dữ liệu vào ViewHolder
         holder.tvTitle.setText(ch.getTieuDe());
 
-        // Thời gian cuộc hẹn (kiểm tra null hoặc rỗng sau trim coi là chưa có)
         if (ch.getThoiGian() != null && !ch.getThoiGian().trim().isEmpty()) {
             holder.tvThoiGian.setText(ch.getThoiGian().trim());
         } else {
             holder.tvThoiGian.setText(mContext.getString(R.string.not_set));
         }
 
-        // Địa điểm (ẩn nếu rỗng hoặc null sau khi trim)
         if (ch.getDiaDiem() != null && !ch.getDiaDiem().trim().isEmpty()) {
             holder.layoutDiaDiem.setVisibility(View.VISIBLE);
             holder.tvDiaDiem.setText(ch.getDiaDiem().trim());
@@ -122,7 +114,6 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
             holder.layoutDiaDiem.setVisibility(View.GONE);
         }
 
-        // Ghi chú (ẩn nếu rỗng hoặc null sau khi trim)
         if (ch.getGhiChu() != null && !ch.getGhiChu().trim().isEmpty()) {
             holder.tvGhiChu.setVisibility(View.VISIBLE);
             holder.tvGhiChu.setText(ch.getGhiChu().trim());
@@ -130,7 +121,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
             holder.tvGhiChu.setVisibility(View.GONE);
         }
 
-        // Kiểm tra cuộc hẹn đã qua hay chưa bằng hàm dùng chung laDaQua trong DBHelper
+        // Kiểm tra cuộc hẹn đã qua hay chưa bằng hàm tiện ích dùng chung
         boolean daQua = DBHelper.laDaQua(ch.getThoiGian());
         if (daQua) {
             holder.tvStatusBadge.setText(mContext.getString(R.string.meeting_passed));
@@ -145,12 +136,11 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
 
     @Override
     public int getItemCount() {
-        // Trả về số lượng phần tử (mẫu slide 191)
         return mCuocHens != null ? mCuocHens.size() : 0;
     }
 
     // ==============================================================
-    // LỚP VIEWHOLDER NỘI BỘ (MẪU SLIDE 191)
+    // LỚP VIEWHOLDER NỘI BỘ
     // ==============================================================
 
     class CuocHenViewHolder extends RecyclerView.ViewHolder {
@@ -165,7 +155,6 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
 
         public CuocHenViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Ánh xạ View bằng findViewById ép kiểu theo mẫu slide 191
             tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
             tvStatusBadge = (TextView) itemView.findViewById(R.id.tv_status_badge);
             tvThoiGian = (TextView) itemView.findViewById(R.id.tv_thoi_gian);
@@ -175,7 +164,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
             btnEditMeeting = (ImageButton) itemView.findViewById(R.id.btn_edit_meeting);
             btnDeleteMeeting = (ImageButton) itemView.findViewById(R.id.btn_delete_meeting);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
+            // Thiết lập sự kiện chọn dòng
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -187,8 +176,7 @@ public class CuocHenAdapter extends RecyclerView.Adapter<CuocHenAdapter.CuocHenV
                 }
             });
 
-            // Sự kiện nhấn giữ (onLongClick) (mẫu slide 222):
-            // KHÁC SLIDE: Trả về true để tiêu thụ sự kiện, ngăn sự kiện click thường chạy tiếp theo
+            // Sự kiện nhấn giữ (onLongClick): Trả về true để tiêu thụ sự kiện, ngăn sự kiện click thường chạy tiếp theo
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

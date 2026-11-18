@@ -16,35 +16,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter nhiều kiểu dòng (Khớp chuẩn khung slide 202–208)
+// Adapter nhiều kiểu dòng hiển thị Dòng thời gian
 public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    // Khai báo hằng số TAG theo mẫu bài giảng
     private static final String TAG = "TimelineAdapter";
 
-    // 1. Khai báo các hằng số nhận diện ViewType theo đúng mẫu slide 202
+    // Khai báo các hằng số nhận diện kiểu dòng ViewType
     public static final int HEADER = 0;
     public static final int TASK = 1;
     public static final int MEETING = 2;
 
-    // 2. Khai báo các thuộc tính thành viên theo mẫu slide 202
     private List<Object> mObjects;
     private Context mContext;
 
-    // 3. Constructor theo mẫu slide 202
     public TimelineAdapter(Context context, List<Object> objects) {
         mContext = context;
         mObjects = objects;
     }
 
-    // Xác định kiểu dòng theo mẫu slide 206
+    // Xác định kiểu dòng cho từng phần tử
     @Override
     public int getItemViewType(int position) {
         if (mObjects == null || position < 0 || position >= mObjects.size()) {
             return -1;
         }
 
-        // Kiểm tra đối tượng bằng instanceof (mẫu slide 206)
         if (mObjects.get(position) instanceof String) {
             return HEADER;
         } else if (mObjects.get(position) instanceof NhiemVu) {
@@ -55,7 +51,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return -1;
     }
 
-    // Nạp layout tương ứng với viewType theo mẫu slide 207
+    // Nạp layout tương ứng với từng kiểu dòng
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -77,13 +73,10 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 break;
         }
 
-        // KHÁC SLIDE: Trong slide cuối hàm trả về null; tuy nhiên Android RecyclerView
-        // không cho phép ViewHolder null và sẽ crash ứng dụng với NullPointerException.
-        // Ta ném ngoại lệ rõ ràng để bảo vệ an toàn mã nguồn.
         throw new IllegalArgumentException("Kiểu dòng không hợp lệ: " + viewType);
     }
 
-    // Ép kiểu holder và gắn dữ liệu theo mẫu slide 208
+    // Gắn dữ liệu tương ứng với từng ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
@@ -141,7 +134,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     m.layoutDiaDiem.setVisibility(View.GONE);
                 }
 
-                // Gọi hàm logic dùng chung kiểm tra lịch hẹn đã qua hay chưa
+                // Kiểm tra cuộc hẹn đã qua hay chưa bằng hàm dùng chung
                 boolean daQua = DBHelper.laDaQua(ch.getThoiGian());
                 if (daQua) {
                     m.tvStatusBadge.setText(mContext.getString(R.string.meeting_passed));
@@ -159,26 +152,24 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        // Trả về số lượng phần tử theo mẫu slide 208
         return mObjects != null ? mObjects.size() : 0;
     }
 
     // ==============================================================
-    // 3 LỚP VIEWHOLDER LỒNG NHAU (MẪU SLIDE 203–205)
+    // 3 LỚP VIEWHOLDER NỘI BỘ
     // ==============================================================
 
-    // 1. ViewHolder cho dòng tiêu đề nhóm (mẫu slide 203)
+    // 1. ViewHolder cho dòng tiêu đề nhóm
     public class HeaderViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
 
         public HeaderViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
-            // Header không bắt sự kiện click
         }
     }
 
-    // 2. ViewHolder cho dòng nhiệm vụ (mẫu slide 204)
+    // 2. ViewHolder cho dòng nhiệm vụ
     public class TaskViewHolder extends RecyclerView.ViewHolder {
         public CheckBox cbHoanThanh;
         public TextView tvTitle;
@@ -196,7 +187,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             cbHoanThanh.setClickable(false);
             cbHoanThanh.setFocusable(false);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
+            // Thiết lập sự kiện chọn dòng
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -215,7 +206,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    // 3. ViewHolder cho dòng cuộc hẹn (mẫu slide 205)
+    // 3. ViewHolder cho dòng cuộc hẹn
     public class MeetingViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle;
         public TextView tvStatusBadge;
@@ -231,7 +222,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             layoutDiaDiem = (LinearLayout) itemView.findViewById(R.id.layout_dia_diem);
             tvDiaDiem = (TextView) itemView.findViewById(R.id.tv_dia_diem);
 
-            // Thiết lập sự kiện chọn dòng (mẫu slide 194)
+            // Thiết lập sự kiện chọn dòng
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

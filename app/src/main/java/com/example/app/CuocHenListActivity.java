@@ -18,13 +18,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-// Màn hình danh sách Cuộc hẹn (Khớp đúng khung mẫu slide 193)
+// Màn hình danh sách Cuộc hẹn
 public class CuocHenListActivity extends AppCompatActivity implements CuocHenAdapter.OnCuocHenClickListener {
 
     // Hằng số Intent nhận ID đồ án
     public static final String EXTRA_DO_AN_ID = "do_an_id";
 
-    // Khai báo các thuộc tính thành viên theo đúng mẫu slide 193
     private RecyclerView rvCuocHen;
     private CuocHenAdapter mCuocHenAdapter;
     private List<CuocHen> mCuocHens;
@@ -39,8 +38,6 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Thứ tự onCreate chuẩn bài giảng slide 193:
-        // 1. setContentView
         setContentView(R.layout.activity_cuoc_hen_list);
 
         mDbHelper = new DBHelper(this);
@@ -74,11 +71,11 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         // 5. Gắn Adapter vào RecyclerView
         rvCuocHen.setAdapter(mCuocHenAdapter);
 
-        // 6. Cài đặt LayoutManager theo mẫu slide 193
+        // 6. Cài đặt LayoutManager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvCuocHen.setLayoutManager(linearLayoutManager);
 
-        // 7. Cài đặt ItemAnimator theo MainAnimationActivity (slide 223)
+        // 7. Cài đặt ItemAnimator
         rvCuocHen.setItemAnimator(new DefaultItemAnimator());
 
         // Bấm nút thêm cuộc hẹn mới -> mở form bằng hằng số
@@ -120,7 +117,7 @@ public class CuocHenListActivity extends AppCompatActivity implements CuocHenAda
         startActivity(intent);
     }
 
-    // Xóa cuộc hẹn bằng removeItem(position) (mẫu slide 221, MainAnimationActivity slide 223)
+    // Xóa cuộc hẹn bằng removeItem(position)
     @Override
     public void onDelete(CuocHen ch, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -2,7 +2,7 @@ package com.example.app;
 
 import java.io.Serializable;
 
-// Model cho từng thẻ thống kê nhỏ hiển thị trên RecyclerView cuộn ngang (slide 185, 192)
+// Model cho từng thẻ thống kê nhỏ hiển thị trên RecyclerView cuộn ngang
 public class ThongKeItem implements Serializable {
     private String tieuDe;
     private String giaTri;

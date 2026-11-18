@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-// Adapter hiển thị các thẻ thống kê nhỏ trên RecyclerView cuộn ngang (slide 185, 192)
+// Adapter hiển thị các thẻ thống kê nhỏ trên RecyclerView cuộn ngang
 public class ThongKeAdapter extends RecyclerView.Adapter<ThongKeAdapter.ThongKeViewHolder> {
 
     private List<ThongKeItem> mItems;

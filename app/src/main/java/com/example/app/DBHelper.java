@@ -248,7 +248,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return daHoanThanh + "/" + tong + " (" + phanTram + "%)";
     }
 
-    // Lấy số liệu thống kê đồ án cho RecyclerView cuộn ngang (Mục C2: slide 185, 192)
+    // Lấy số liệu thống kê đồ án cho RecyclerView cuộn ngang
     // Trả về mảng 4 số nguyên: [0]: Tổng nhiệm vụ, [1]: Đã xong, [2]: Chưa xong, [3]: Lịch hẹn sắp tới
     public int[] getThongKeDoAn(int doAnId) {
         int[] stats = new int[]{0, 0, 0, 0};

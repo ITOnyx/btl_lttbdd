@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-// Màn hình Dòng thời gian của đồ án (Mục D: Áp dụng Multiple View Type theo slide 209–210)
+// Màn hình Dòng thời gian của đồ án
 public class TimelineActivity extends AppCompatActivity {
 
     // Hằng số Intent nhận ID đồ án
@@ -73,7 +73,7 @@ public class TimelineActivity extends AppCompatActivity {
         loadTimelineData();
     }
 
-    // Mục D7: Nạp dữ liệu gộp cả Header, Nhiệm vụ và Lịch hẹn vào cùng một danh sách mListObjects (slide 199)
+    // Nạp dữ liệu gộp cả Header, Nhiệm vụ và Lịch hẹn vào cùng một danh sách mListObjects
     private void loadTimelineData() {
         mListObjects.clear();
 

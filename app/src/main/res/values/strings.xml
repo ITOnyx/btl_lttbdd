@@ -34,7 +34,7 @@
     <string name="no_due_date">Chưa đặt hạn nộp</string>
     <string name="default_progress_text">0/0 (0%)</string>
 
-    <!-- Nhãn hiển thị chuỗi trong DoAnAdapter và các Adapter (slide 190) -->
+    <!-- Nhãn hiển thị chuỗi trong DoAnAdapter và các Adapter -->
     <string name="gvhd_prefix">"GVHD: "</string>
     <string name="deadline_prefix">"Hạn: "</string>
     <string name="not_available">Chưa có</string>
