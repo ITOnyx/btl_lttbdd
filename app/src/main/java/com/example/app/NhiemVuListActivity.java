@@ -120,10 +120,26 @@ public class NhiemVuListActivity extends AppCompatActivity implements NhiemVuAda
         }
     }
 
-    // Tick CheckBox: chỉ ghi SQLite; KHÔNG gọi notifyItemChanged vì UI và gạch ngang đã được cập nhật trực tiếp trong Adapter
+    // Tick CheckBox: ghi SQLite rồi đọc lại danh sách đã sắp xếp (chưa xong lên trước, đã xong xuống dưới).
+    // Gạch ngang đã được Adapter cập nhật trực tiếp, nên chỉ cần notifyItemMoved để dòng trượt sang vị trí mới
+    // (không dùng notifyDataSetChanged để tránh vẽ lại toàn bộ danh sách).
     @Override
     public void onToggleStatus(NhiemVu nv, boolean isCompleted, int position) {
         mDbHelper.updateNhiemVuStatus(nv.getId(), isCompleted ? 1 : 0);
+
+        mNhiemVus.clear();
+        mNhiemVus.addAll(mDbHelper.getNhiemVuByDoAnId(mDoAnId));
+        int viTriMoi = -1;
+        for (int i = 0; i < mNhiemVus.size(); i++) {
+            if (mNhiemVus.get(i).getId() == nv.getId()) {
+                viTriMoi = i;
+                break;
+            }
+        }
+        if (viTriMoi != -1 && viTriMoi != position) {
+            mNhiemVuAdapter.notifyItemMoved(position, viTriMoi);
+        }
+
         Toast.makeText(this, isCompleted ? "Đã hoàn thành: " + nv.getTen() : "Đã hủy hoàn thành", Toast.LENGTH_SHORT).show();
     }
 

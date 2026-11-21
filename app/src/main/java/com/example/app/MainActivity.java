@@ -112,7 +112,26 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
             Toast.makeText(this, mIsGridMode ? "Chế độ lưới 2 cột" : "Chế độ danh sách", Toast.LENGTH_SHORT).show();
             return true;
         }
+        if (item.getItemId() == R.id.action_nap_du_lieu_mau) {
+            xacNhanNapDuLieuMau();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    // Hỏi xác nhận trước khi nạp lại dữ liệu mẫu vì thao tác này xóa toàn bộ dữ liệu hiện có
+    private void xacNhanNapDuLieuMau() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Nạp dữ liệu mẫu");
+        builder.setMessage("Toàn bộ đồ án, nhiệm vụ và cuộc hẹn hiện có sẽ bị xóa và thay bằng bộ dữ liệu mẫu "
+                + "(4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn).\n\nBạn có chắc chắn muốn tiếp tục?");
+        builder.setPositiveButton("Nạp dữ liệu", (dialog, which) -> {
+            mDbHelper.napLaiDuLieuMau();
+            loadData();
+            Toast.makeText(MainActivity.this, "Đã nạp dữ liệu mẫu thành công!", Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
     }
 
     private void updateMenuIcon() {

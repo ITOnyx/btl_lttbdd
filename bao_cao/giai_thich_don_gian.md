@@ -27,9 +27,9 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - *Làm gì*: Xóa 3 bảng cũ bằng `DROP TABLE IF EXISTS` và gọi lại `onCreate(db)` để tạo lại từ đầu.
     - *Khi nào gọi*: Chạy khi lập trình viên tăng hằng số `DATABASE_VERSION`.
   - `getAllDoAn()`:
-    - *Làm gì*: Lấy toàn bộ danh sách đồ án sắp xếp giảm dần theo ID để hiển thị đồ án mới nhất lên đầu.
+    - *Làm gì*: Lấy toàn bộ danh sách đồ án (mới nhất lên đầu) kèm số nhiệm vụ và số nhiệm vụ đã xong để vẽ thanh tiến độ, chỉ bằng một câu truy vấn.
     - *Khi nào gọi*: Được gọi trong hàm `loadData()` của `MainActivity`.
-    - *Câu SQL*: `SELECT id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop FROM DoAn ORDER BY id DESC`
+    - *Câu SQL*: `SELECT d.*, COUNT(n.id) AS tong, IFNULL(SUM(n.da_hoan_thanh), 0) AS xong FROM DoAn d LEFT JOIN NhiemVu n ON d.id = n.do_an_id GROUP BY d.id ORDER BY d.id DESC`
   - `getDoAnById(int id)`:
     - *Làm gì*: Lấy thông tin của 1 đồ án dựa theo ID truyền vào.
     - *Khi nào gọi*: Gọi khi mở `DoAnFormActivity` (chế độ sửa) hoặc `DoAnDetailActivity` (xem chi tiết) và `NhiemVuListActivity`/`CuocHenListActivity` (lấy tên đồ án làm tiêu đề).
@@ -49,11 +49,18 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
   - `getTienDoDoAn(int doAnId)`:
     - *Làm gì*: Đếm tổng số nhiệm vụ và tổng số nhiệm vụ đã xong (`da_hoan_thanh = 1`) của đồ án, tính tỷ lệ phần trăm và trả về chuỗi định dạng `"x/y (z%)"`.
     - *Khi nào gọi*: Gọi khi hiển thị danh sách trong `DoAnAdapter` và màn hình chi tiết trong `DoAnDetailActivity`.
-    - *Câu SQL*: `SELECT COUNT(*), SUM(da_hoan_thanh) FROM NhiemVu WHERE do_an_id = ?`
+    - *Câu SQL*: `SELECT COUNT(*), IFNULL(SUM(da_hoan_thanh), 0) FROM NhiemVu WHERE do_an_id = ?`
   - `getNhiemVuByDoAnId(int doAnId)`:
-    - *Làm gì*: Lấy danh sách nhiệm vụ của 1 đồ án theo ID, sắp xếp tăng dần theo ID.
-    - *Khi nào gọi*: Gọi trong `onResume()` của `NhiemVuListActivity`.
-    - *Câu SQL*: `SELECT id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh FROM NhiemVu WHERE do_an_id = ? ORDER BY id ASC`
+    - *Làm gì*: Lấy danh sách nhiệm vụ của 1 đồ án; việc **chưa xong lên trước, đã xong xuống dưới**, trong mỗi nhóm việc có hạn gần nhất lên đầu, việc chưa đặt hạn xếp cuối nhóm.
+    - *Khi nào gọi*: Gọi trong `onResume()` và `onToggleStatus()` của `NhiemVuListActivity`, và trong `TimelineActivity`.
+    - *Câu SQL*: `SELECT ... FROM NhiemVu WHERE do_an_id = ? ORDER BY da_hoan_thanh ASC, CASE WHEN han_hoan_thanh IS NULL OR han_hoan_thanh = '' THEN 1 ELSE 0 END, han_hoan_thanh ASC, id ASC`
+  - `getHanNhiemVuMuonNhat(int doAnId)`:
+    - *Làm gì*: Trả về hạn hoàn thành muộn nhất trong các nhiệm vụ của đồ án (hoặc `null`).
+    - *Khi nào gọi*: Gọi trong `DoAnFormActivity.luuDoAn()` khi sửa đồ án, để không cho dời hạn nộp sớm hơn nhiệm vụ đã có.
+    - *Câu SQL*: `SELECT MAX(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''`
+  - `napLaiDuLieuMau()`:
+    - *Làm gì*: Trong một Transaction: xóa toàn bộ dữ liệu 3 bảng, đặt lại bộ đếm `AUTOINCREMENT`, rồi gọi `chenDuLieuMau(db)` (cùng hàm mà `onCreate` dùng) để chèn lại 4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn.
+    - *Khi nào gọi*: Khi người dùng chọn menu ⋮ → "Nạp dữ liệu mẫu" và bấm xác nhận trong `MainActivity`.
   - `getNhiemVuById(int id)`:
     - *Làm gì*: Lấy thông tin 1 nhiệm vụ theo ID.
     - *Khi nào gọi*: Gọi trong `NhiemVuFormActivity` khi mở chế độ sửa nhiệm vụ.
@@ -120,10 +127,12 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - `onItemClick(DoAn doAn)`: Mở `DoAnDetailActivity` qua `Intent.putExtra("do_an_id", doAn.getId())`.
     - `onEditClick(DoAn doAn)`: Mở `DoAnFormActivity` qua `Intent.putExtra("do_an_id", doAn.getId())`.
     - `onDeleteClick(DoAn doAn)`: Bật hộp thoại `AlertDialog.Builder` xác nhận xóa đồ án; nếu người dùng chọn "Xóa", gọi `dbHelper.deleteDoAn(id)` và tải lại danh sách.
+    - `onOptionsItemSelected(...)`: Xử lý 2 mục menu: chuyển chế độ Danh sách / Lưới (lưu vào `SharedPreferences`) và "Nạp dữ liệu mẫu".
+    - `xacNhanNapDuLieuMau()`: Hiện `AlertDialog` cảnh báo dữ liệu hiện có sẽ bị thay thế; nếu đồng ý thì gọi `dbHelper.napLaiDuLieuMau()` rồi `loadData()`.
 - **DoAnAdapter.java**:
   - *Vai trò*: Cầu nối hiển thị danh sách `ArrayList<DoAn>` lên các dòng của RecyclerView.
   - *Các hàm*:
-    - `onCreateViewHolder(...)`: Nạp layout dòng `item_do_an.xml` và trả về một `ViewHolder`.
+    - `onCreateViewHolder(...)`: Nạp layout dòng `row_do_an.xml` và trả về một `ViewHolder`.
     - `onBindViewHolder(...)`: Đổ dữ liệu từ `DoAn` vào TextView tên, giảng viên, thời gian; gọi `dbHelper.getTienDoDoAn(id)` để lấy chuỗi tiến độ `"x/y (z%)"` và cập nhật thanh `ProgressBar`; gắn sự kiện click xem chi tiết, sửa và xóa.
     - `getItemCount()`: Trả về số lượng phần tử của danh sách (`list.size()`).
     - Lớp `ViewHolder`: Kế thừa `RecyclerView.ViewHolder`, dùng `findViewById` để lưu tham chiếu tới các View trên từng dòng.
@@ -137,7 +146,7 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - `onCreate(...)`: Ánh xạ View, kiểm tra `do_an_id` từ Intent. Nếu `do_an_id != -1` thì gọi `loadDoAnData` để nạp dữ liệu cũ; gắn sự kiện chọn ngày và lưu.
     - `loadDoAnData(int id)`: Đọc đồ án từ `dbHelper.getDoAnById(id)` và điền dữ liệu vào các ô EditText.
     - `moHopThoaiChonNgay(EditText targetEdt)`: Mở `DatePickerDialog` nguyên bản của Android, khi người dùng chọn xong sẽ format thành chuỗi `yyyy-MM-dd` và gán vào ô EditText.
-    - `luuDoAn()`: Kiểm tra tên không được rỗng (`setError`), kiểm tra hạn nộp không trước ngày bắt đầu (`hanNop.compareTo(ngayBatDau) < 0`), gọi `dbHelper.insertDoAn` hoặc `dbHelper.updateDoAn`, sau đó gọi `finish()` để đóng màn hình.
+    - `luuDoAn()`: Kiểm tra tên không được rỗng (`setError`), kiểm tra hạn nộp không trước ngày bắt đầu (`hanNop.compareTo(ngayBatDau) < 0`), khi sửa thì kiểm tra hạn nộp không sớm hơn nhiệm vụ muộn nhất (`getHanNhiemVuMuonNhat`), gọi `dbHelper.insertDoAn` hoặc `dbHelper.updateDoAn`, sau đó gọi `finish()` để đóng màn hình.
 - **DoAnDetailActivity.java**:
   - *Vai trò*: Màn hình xem chi tiết đồ án, xem tiến độ thực tế, cung cấp 2 nút điều hướng lớn tới danh sách Nhiệm vụ và Lịch hẹn.
   - *Các hàm*:
@@ -164,7 +173,7 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - `onBindViewHolder(...)`: Đổ dữ liệu tên, ghi chú, hạn; kiểm tra trạng thái `daHoanThanh == 1` để tick CheckBox và bật cờ gạch ngang chữ (`STRIKE_THRU_TEXT_FLAG`); dùng `cbHoanThanh.setOnClickListener` để xử lý tick trạng thái an toàn.
 - **NhiemVuFormActivity.java**:
   - *Vai trò*: Màn hình thêm mới / cập nhật nhiệm vụ.
-  - *Các hàm*: `onCreate`, `loadNhiemVuData`, `moHopThoaiChonNgay` (mở `DatePickerDialog`), `luuNhiemVu` (kiểm tra tên không rỗng, gọi `insertNhiemVu` hoặc `updateNhiemVu`, kết thúc bằng `finish()`).
+  - *Các hàm*: `onCreate`, `loadNhiemVuData`, `moHopThoaiChonNgay` (mở `DatePickerDialog`), `luuNhiemVu` (kiểm tra tên không rỗng, kiểm tra hạn hoàn thành không sau hạn nộp của đồ án, gọi `insertNhiemVu` hoặc `updateNhiemVu`, kết thúc bằng `finish()`).
 
 ---
 
@@ -214,11 +223,11 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 
 ### 3. Luồng Đánh Dấu (Tick) Hoàn Thành Một Nhiệm Vụ
 1. Tại màn hình danh sách nhiệm vụ `NhiemVuListActivity`, người dùng chạm vào CheckBox bên cạnh một nhiệm vụ.
-2. Sự kiện `setOnClickListener` trên CheckBox được kích hoạt -> Gọi hàm `onToggleStatus(nv, isChecked)`.
+2. Sự kiện `setOnClickListener` trên CheckBox được kích hoạt -> Adapter cập nhật model và gạch ngang chữ ngay -> Gọi `onToggleStatus(nv, isChecked, position)`.
 3. `NhiemVuListActivity` thực hiện:
    - Gọi `dbHelper.updateNhiemVuStatus(id, isChecked ? 1 : 0)`.
    - Lệnh SQL chạy: `UPDATE NhiemVu SET da_hoan_thanh = ? WHERE id = ?`.
-   - Gọi lại `loadData()`: Dòng nhiệm vụ vừa tick được gạch ngang chữ và CheckBox giữ nguyên dấu tick.
+   - Đọc lại danh sách đã sắp xếp bằng `getNhiemVuByDoAnId`, tìm vị trí mới của nhiệm vụ và gọi `notifyItemMoved(viTriCu, viTriMoi)`: dòng vừa tick trượt xuống nhóm "đã xong" (hoặc trượt lên khi bỏ tick).
 4. Khi người dùng bấm nút "Quay lại" trên Toolbar để trở về `DoAnDetailActivity`:
    - Hàm `onResume()` của `DoAnDetailActivity` tự động chạy -> Gọi `loadDoAnData()`.
    - Gọi `dbHelper.getTienDoDoAn(doAnId)`: Câu lệnh `SELECT COUNT(*), SUM(da_hoan_thanh)...` tính ra số lượng hoàn thành mới.
@@ -320,7 +329,7 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 | **211–212** | `ItemAnimator`, `DefaultItemAnimator`, `notifyDataSetChanged` không có animation | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`setItemAnimator`, `loadData`) | Dùng `DefaultItemAnimator`; gọi `notifyDataSetChanged()` khi nạp mới SQLite. |
 | **213–215** | `addItem(item)` và `addItem(position, item)` kèm `notifyItemInserted` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% mẫu hàm slide 220–221. |
 | **216–218** | `removeItem(position)` và `removeItem(item)` kèm `notifyItemRemoved` | Cả 3 Adapter; gọi tại `onDeleteClick` / `onDelete` trong 3 Activity | Xóa dữ liệu list trước rồi mới notify (mẫu slide 222). |
-| **219** | `notifyItemChanged` và tắt nháy qua `setSupportsChangeAnimations(false)` | [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java) (`onToggleStatus`) | Cập nhật dòng nhiệm vụ mượt mà không nháy màn hình. |
+| **219** | `notifyItemChanged` / `notifyItemMoved` và tắt nháy qua `setSupportsChangeAnimations(false)` | [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java) (`onToggleStatus`) | Tick xong dòng trượt về đúng nhóm bằng `notifyItemMoved`, không nháy màn hình. |
 | **220–223** | 3 nhóm hàm animation viết trong Adapter và `scrollToPosition` | Đầy đủ trong 3 Adapter; `rv.scrollToPosition` khi thêm phần tử | Kiểm tra biên `position >= 0 && position < size`. |
 
 ---

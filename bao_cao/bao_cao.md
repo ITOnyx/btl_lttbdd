@@ -4,7 +4,8 @@
 ---
 
 * **Học phần:** Lập trình Thiết bị Di động (LTTBDD)
-* **Nền tảng:** Android (Java, SQLite thuần, ViewBinding, Material Components)
+* **Nền tảng:** Android (Java, SQLite thuần qua `SQLiteOpenHelper`, RecyclerView, Material Components)
+* **Phiên bản hỗ trợ:** Android 7.0 (API 24) trở lên, `targetSdk 37`
 * **Package:** `com.example.app`
 * **Cơ sở dữ liệu:** `tiendo.db` (SQLite)
 
@@ -41,7 +42,7 @@ Thực tế sinh viên hay gặp các khó khăn:
 * **Quản lý Đồ án (Projects):** Thêm, sửa, xóa thông tin đồ án, người hướng dẫn, thời gian bắt đầu và hạn nộp; hiển thị tiến độ hoàn thành tự động tính toán dạng tỷ lệ phần trăm (%).
 * **Quản lý Nhiệm vụ (Tasks):** Chia nhỏ đồ án thành các đầu mục công việc, đặt hạn hoàn thành, đánh dấu nhanh trạng thái hoàn thành trực tiếp bằng checkbox.
 * **Quản lý Cuộc hẹn (Appointments):** Đặt lịch trao đổi với giảng viên kèm mốc thời gian (ngày, giờ), địa điểm và nội dung cần trao đổi; tự động phân loại cuộc hẹn "Sắp diễn ra" và "Đã qua".
-* **Bộ dữ liệu mẫu (Sample Data):** Tích hợp chức năng nạp dữ liệu mẫu thực tế chỉ với một thao tác, hỗ trợ minh họa và nghiệm thu sản phẩm thuận tiện.
+* **Bộ dữ liệu mẫu (Sample Data):** 25 bản ghi được nạp sẵn khi cài lần đầu và có thể nạp lại chỉ với một thao tác từ menu, hỗ trợ minh họa và nghiệm thu sản phẩm thuận tiện.
 
 ---
 
@@ -49,8 +50,9 @@ Thực tế sinh viên hay gặp các khó khăn:
 
 ### 2.1. Yêu cầu chức năng
 1. **Quản trị Đồ án:**
-   * Xem danh sách đồ án kèm thanh tiến độ trực quan, số đầu việc đã xong/tổng số.
-   * Thêm đồ án mới với ràng buộc: Hạn nộp phải sau hoặc bằng ngày bắt đầu.
+   * Xem danh sách đồ án kèm thanh tiến độ trực quan, số đầu việc đã xong/tổng số; chuyển đổi chế độ xem danh sách / lưới 2 cột.
+   * Xem chi tiết đồ án với 4 thẻ thống kê nhanh và dòng thời gian tổng hợp nhiệm vụ – lịch hẹn.
+   * Thêm đồ án mới với ràng buộc: Hạn nộp phải sau hoặc bằng ngày bắt đầu; khi sửa, hạn nộp không được sớm hơn hạn của nhiệm vụ muộn nhất.
    * Chỉnh sửa thông tin đồ án đã có.
    * Xóa đồ án kèm cảnh báo xóa xếp tầng (cascade) toàn bộ nhiệm vụ và cuộc hẹn trực thuộc.
 2. **Quản trị Nhiệm vụ:**
@@ -63,13 +65,14 @@ Thực tế sinh viên hay gặp các khó khăn:
    * Hiển thị trực quan nhãn trạng thái (Badge): màu xanh lá *"Sắp diễn ra"* đối với cuộc hẹn trong tương lai, màu xám *"Đã qua"* đối với cuộc hẹn trong quá khứ so với thời điểm hiện tại.
    * Thêm, sửa, xóa cuộc hẹn với bộ chọn ngày (DatePicker) và bộ chọn giờ (TimePicker).
 4. **Nạp dữ liệu mẫu:**
-   * Menu nạp dữ liệu mẫu từ thanh Toolbar.
-   * Hộp thoại xác nhận an toàn: Nếu CSDL đang có dữ liệu, hỏi người dùng muốn thêm tiếp hay hủy bỏ; không tự ý xóa hay ghi đè dữ liệu người dùng.
+   * Dữ liệu mẫu (4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn) được nạp tự động khi cài đặt lần đầu.
+   * Mục **"Nạp dữ liệu mẫu"** trong menu ⋮ của màn hình chính cho phép khôi phục lại bộ dữ liệu này bất cứ lúc nào.
+   * Vì thao tác thay thế toàn bộ dữ liệu hiện có, ứng dụng luôn hỏi xác nhận bằng hộp thoại trước khi thực hiện, và chạy trong Transaction để không bao giờ bị xóa dở dang.
 
 ### 2.2. Yêu cầu phi chức năng
 * **Độ tương thích:** Hỗ trợ từ Android 7.0 (API 24 - Nougat) đến Android 15/16 (API 35-37).
-* **Hiệu năng & Bộ nhớ:** Khởi động nhanh dưới 1 giây, cuộn danh sách mượt mà (60–120 fps) nhờ cơ chế tái sử dụng ViewHolder của RecyclerView và so sánh vi sai DiffUtil.
-* **Độ tin cậy & Toàn vẹn:** Dữ liệu không bị mất hoặc sai lệch khi xoay màn hình điện thoại (Configuration Change), thao tác CSDL hàng loạt thực hiện trong Transaction để đảm bảo tính nguyên tử.
+* **Hiệu năng & Bộ nhớ:** Cuộn danh sách mượt nhờ cơ chế tái sử dụng ViewHolder của RecyclerView; tiến độ của mọi đồ án được tính bằng một truy vấn duy nhất; cập nhật giao diện bằng `notifyItemInserted/Removed/Moved` thay vì vẽ lại toàn bộ.
+* **Độ tin cậy & Toàn vẹn:** Dữ liệu đang nhập không bị mất khi xoay màn hình; khóa ngoại `ON DELETE CASCADE` không để lại dữ liệu mồ côi; thao tác nạp lại dữ liệu mẫu chạy trong Transaction để đảm bảo tính nguyên tử.
 * **Trải nghiệm người dùng (UX):** Thiết kế theo hướng dẫn Material Design 3, màu sắc tương phản rõ ràng, hỗ trợ đầy đủ Chế độ Tối (Dark Theme).
 
 ### 2.3. Sơ đồ Use Case tổng quát
@@ -177,7 +180,7 @@ Theo nguyên lý chuẩn hóa cơ sở dữ liệu (đạt dạng chuẩn 3NF):
 
 #### 2. Khóa ngoại và ràng buộc `ON DELETE CASCADE`
 * **Vấn đề thực tế:** Khi một sinh viên hủy bỏ hoặc xóa một đồ án, tất cả nhiệm vụ và cuộc hẹn của đồ án đó sẽ trở thành "dữ liệu mồ côi" (orphaned records) nếu không được dọn dẹp, gây lãng phí dung lượng lưu trữ và sai lệch thống kê.
-* **Giải pháp:** Thiết lập khóa ngoại `REFERENCES DoAn(id) ON DELETE CASCADE` và bật ràng buộc này trong `DatabaseHelper.onConfigure(SQLiteDatabase db)` bằng `db.setForeignKeyConstraintsEnabled(true);`. Khi xóa một dòng trong bảng `DoAn`, hệ thống SQLite tự động xóa sạch toàn bộ các dòng liên quan trong `NhiemVu` và `CuocHen` ở cấp độ CSDL, không cần phải viết thủ công nhiều câu lệnh xóa phức tạp ở tầng ứng dụng.
+* **Giải pháp:** Thiết lập khóa ngoại `REFERENCES DoAn(id) ON DELETE CASCADE` và bật ràng buộc này trong `DBHelper.onConfigure(SQLiteDatabase db)` bằng `db.setForeignKeyConstraintsEnabled(true);`. Khi xóa một dòng trong bảng `DoAn`, hệ thống SQLite tự động xóa sạch toàn bộ các dòng liên quan trong `NhiemVu` và `CuocHen` ở cấp độ CSDL, không cần phải viết thủ công nhiều câu lệnh xóa phức tạp ở tầng ứng dụng.
 
 #### 3. Vì sao lưu trữ ngày giờ dạng `TEXT` (`yyyy-MM-dd` và `yyyy-MM-dd HH:mm`)?
 SQLite không có kiểu dữ liệu `DATE` hay `DATETIME` riêng mà sử dụng cơ chế Dynamic Typing với 5 kiểu cơ bản (NULL, INTEGER, REAL, TEXT, BLOB).
@@ -190,11 +193,11 @@ SQLite không có kiểu dữ liệu `DATE` hay `DATETIME` riêng mà sử dụn
 Nếu thêm cột `tien_do` (hoặc `phan_tram`) vào bảng `DoAn`:
 * Mỗi khi thêm một nhiệm vụ, xóa một nhiệm vụ, hoặc người dùng chạm Checkbox để đổi trạng thái một nhiệm vụ, ta bắt buộc phải nhớ cập nhật lại bảng `DoAn`.
 * Nếu có bất kỳ lỗi logic nào xảy ra khiến việc cập nhật bảng `DoAn` thất bại, dữ liệu giữa bảng `DoAn` và bảng `NhiemVu` sẽ bị **mất đồng bộ (inconsistent state)**.
-* **Giải pháp tối ưu:** Tiến độ là **dữ liệu phái sinh (derived data)**. Ứng dụng sử dụng câu truy vấn `LEFT JOIN` kết hợp hàm gom nhóm `COUNT` và `SUM(CASE WHEN da_hoan_thanh = 1 THEN 1 ELSE 0 END)` để tính toán động tại thời điểm truy vấn. Bằng cách này, tiến độ luôn phản ánh đúng 100% sự thật trạng thái của các nhiệm vụ trong CSDL mà không có nguy cơ lệch pha dữ liệu.
+* **Giải pháp tối ưu:** Tiến độ là **dữ liệu phái sinh (derived data)**. Ứng dụng sử dụng câu truy vấn `LEFT JOIN` kết hợp hàm gom nhóm `COUNT(n.id)` và `IFNULL(SUM(n.da_hoan_thanh), 0)` để tính toán động tại thời điểm truy vấn. Bằng cách này, tiến độ luôn phản ánh đúng 100% sự thật trạng thái của các nhiệm vụ trong CSDL mà không có nguy cơ lệch pha dữ liệu.
 
 #### 5. Vì sao chọn SQLite thuần (`SQLiteOpenHelper`) thay vì thư viện Room?
 Đồ án lựa chọn sử dụng SQLite thuần theo đúng định hướng môn học:
-1. **Nắm vững bản chất cốt lõi của Android OS:** Giúp sinh viên hiểu sâu sắc về kiến trúc CSDL nhúng, vòng đời của `SQLiteOpenHelper` (`onCreate`, `onUpgrade`, `onConfigure`), cách quản lý con trỏ `Cursor`, `ContentValues` và cú pháp SQL tiêu chuẩn mà không bị che khuất bởi các lớp trừu tượng (abstraction layer).
+1. **Nắm vững bản chất cốt lõi của Android OS:** Giúp sinh viên hiểu sâu sắc về kiến trúc CSDL nhúng, vòng đời của `SQLiteOpenHelper` (`onCreate`, `onUpgrade`, `onConfigure`), cách quản lý con trỏ `Cursor` và cú pháp SQL tiêu chuẩn mà không bị che khuất bởi các lớp trừu tượng (abstraction layer).
 2. **Không làm phình to dung lượng ứng dụng:** Thư viện Room yêu cầu Annotation Processor (KSP/kapt) và nhiều thư viện bổ trợ runtime, làm tăng thời gian build và kích thước file APK. Sử dụng SQLite thuần giữ cho dự án nhẹ, độc lập và dễ bảo trì trên mọi môi trường biên dịch.
 
 ---
@@ -202,348 +205,308 @@ Nếu thêm cột `tien_do` (hoặc `phan_tram`) vào bảng `DoAn`:
 ## 4. THIẾT KẾ GIAO DIỆN NGƯỜI DÙNG (UI/UX)
 
 ### 4.1. Danh sách màn hình và các thành phần giao diện
-1. **Màn hình chính (`MainActivity` - `activity_main.xml`):**
-   * Thanh AppBar: Hiển thị Toolbar với tiêu đề *"Theo dõi đồ án"* và nút menu 3 chấm (overflow menu) nạp dữ liệu mẫu.
-   * `RecyclerView` (`rvDoAn`): Hiển thị danh sách các đồ án theo chiều dọc. Mỗi item đồ án hiển thị tên, giảng viên hướng dẫn, thời hạn, thanh ProgressBar và nhãn phần trăm tiến độ kèm số việc đã hoàn thành/tổng số việc.
-   * `layoutEmpty`: Giao diện trạng thái rỗng (Empty State) với biểu tượng đồ họa và thông điệp hướng dẫn thân thiện khi CSDL chưa có đồ án.
-   * `FloatingActionButton` (`fabAddDoAn`): Nút tròn nổi ở góc dưới bên phải để kích hoạt hộp thoại thêm đồ án mới.
-2. **Hộp thoại Thêm/Sửa Đồ án (`AddEditDoAnDialogFragment` - `dialog_add_edit_do_an.xml`):**
-   * Chứa các ô nhập liệu `TextInputLayout` / `TextInputEditText` cho tên đồ án, giảng viên, mô tả.
-   * Hai ô chọn ngày bắt đầu và hạn nộp được gắn `MaterialDatePicker` chống lỗi nhập sai định dạng.
-   * Nút Lưu kiểm tra tính hợp lệ trước khi đóng dialog.
-3. **Màn hình Chi tiết Đồ án (`DoAnDetailActivity` - `activity_do_an_detail.xml`):**
-   * Toolbar có nút quay lại (Back arrow).
-   * Khối tổng quan phía trên (Header card): Tên đồ án, GVHD, ngày bắt đầu $\rightarrow$ hạn nộp, thanh tiến độ tổng thể cập nhật theo thời gian thực.
-   * Thanh điều hướng tab `TabLayout` kết hợp `ViewPager2` chia làm 2 tab con:
-     * **Tab 1: Nhiệm vụ (`NhiemVuFragment` - `fragment_nhiem_vu.xml`):** Danh sách việc, checkbox đánh dấu nhanh, nút FAB thêm nhiệm vụ.
-     * **Tab 2: Cuộc hẹn (`CuocHenFragment` - `fragment_cuoc_hen.xml`):** Danh sách lịch hẹn, badge trạng thái màu sắc, nút FAB thêm lịch hẹn.
-4. **Hộp thoại Thêm/Sửa Nhiệm vụ (`AddEditNhiemVuDialogFragment`):**
-   * Nhập tên việc, ghi chú, chọn ngày hoàn thành (`MaterialDatePicker`). Ràng buộc ngày không được vượt quá hạn nộp đồ án.
-5. **Hộp thoại Thêm/Sửa Cuộc hẹn (`AddEditCuocHenDialogFragment`):**
-   * Nhập tiêu đề, địa điểm, ghi chú. Chọn ngày và chọn giờ kết hợp giữa `MaterialDatePicker` và `TimePickerDialog`.
-6. **Hộp thoại Xác nhận Xóa (`ConfirmDeleteDialogFragment`):**
-   * Hộp thoại cảnh báo đồng nhất cho cả 3 đối tượng (Đồ án, Nhiệm vụ, Cuộc hẹn) sử dụng `Fragment Result API` để trả kết quả về màn hình gọi.
+Ứng dụng gồm **8 Activity**, mỗi Activity đảm nhận đúng một nhiệm vụ (thêm/sửa luôn mở sang một màn hình Form riêng).
+
+| STT | Activity | Layout | Chức năng chính |
+| :---: | :--- | :--- | :--- |
+| 1 | `MainActivity` | `activity_main.xml`, `row_do_an.xml` | Danh sách đồ án kèm thanh tiến độ; chuyển chế độ **Danh sách / Lưới 2 cột**; menu ⋮ **Nạp dữ liệu mẫu**; FAB thêm đồ án |
+| 2 | `DoAnFormActivity` | `activity_do_an_form.xml` | Thêm / sửa đồ án; chọn ngày bằng `DatePickerDialog` |
+| 3 | `DoAnDetailActivity` | `activity_do_an_detail.xml`, `row_thong_ke.xml` | Thông tin đồ án, thanh tiến độ tổng, **RecyclerView cuộn ngang** 4 thẻ thống kê; nút sang Nhiệm vụ / Cuộc hẹn / Dòng thời gian; sửa, xóa đồ án |
+| 4 | `NhiemVuListActivity` | `activity_nhiem_vu_list.xml`, `row_nhiem_vu.xml` | Danh sách nhiệm vụ (chưa xong lên trước), CheckBox đánh dấu hoàn thành, sửa / xóa |
+| 5 | `NhiemVuFormActivity` | `activity_nhiem_vu_form.xml` | Thêm / sửa nhiệm vụ, kiểm tra hạn không vượt hạn nộp đồ án |
+| 6 | `CuocHenListActivity` | `activity_cuoc_hen_list.xml`, `row_cuoc_hen.xml` | Danh sách cuộc hẹn theo thời gian tăng dần, nhãn *Sắp diễn ra* / *Đã qua* |
+| 7 | `CuocHenFormActivity` | `activity_cuoc_hen_form.xml` | Thêm / sửa cuộc hẹn; chọn liên tiếp `DatePickerDialog` → `TimePickerDialog` |
+| 8 | `TimelineActivity` | `activity_timeline.xml`, `row_header.xml`, `row_timeline_task.xml`, `row_timeline_meeting.xml` | Dòng thời gian gộp Nhiệm vụ và Lịch hẹn trong **một** RecyclerView nhiều kiểu dòng |
+
+Các thành phần dùng chung:
+* `Toolbar` có nút quay lại trên mọi màn hình con.
+* `layoutEmpty*`: giao diện trạng thái rỗng (Empty State) khi danh sách chưa có dữ liệu.
+* `AlertDialog.Builder`: hộp thoại xác nhận xóa và xác nhận nạp dữ liệu mẫu.
+* `Toast`: thông báo nhanh kết quả thao tác và lỗi kiểm tra dữ liệu.
+* Các Form được bọc trong `ScrollView` để không bị che khi xoay ngang hoặc khi bàn phím hiện lên.
 
 ### 4.2. Luồng điều hướng (Navigation Flow)
 
 ```mermaid
 flowchart TD
-    Start([Khởi động ứng dụng]) --> MainScreen[Màn hình chính: Danh sách Đồ án]
+    Start([Khởi động ứng dụng]) --> Main[MainActivity: Danh sách Đồ án]
 
-    MainScreen -->|Bấm Menu 3 chấm| MenuAction[Menu: Nạp dữ liệu mẫu]
-    MenuAction -->|Xác nhận| LoadSample[Chèn 4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn trong Transaction]
-    LoadSample -->|Cập nhật & Báo Snackbar| MainScreen
+    Main -->|Menu ⋮ → Nạp dữ liệu mẫu| Confirm[AlertDialog xác nhận]
+    Confirm -->|Đồng ý| Reload[DBHelper.napLaiDuLieuMau trong Transaction]
+    Reload --> Main
 
-    MainScreen -->|Bấm nút FAB +| DialogAddDoAn[Dialog: Thêm Đồ án mới]
-    DialogAddDoAn -->|Lưu thành công| MainScreen
+    Main -->|Nút lưới / danh sách| Main
+    Main -->|FAB + hoặc nút Sửa| DoAnForm[DoAnFormActivity]
+    DoAnForm -->|Lưu → finish| Main
+    Main -->|Nút Xóa| DelDoAn[AlertDialog → Xóa + CASCADE]
+    DelDoAn --> Main
 
-    MainScreen -->|Bấm nút Sửa trên card| DialogEditDoAn[Dialog: Sửa Đồ án]
-    DialogEditDoAn -->|Lưu thành công| MainScreen
+    Main -->|Chạm vào đồ án| Detail[DoAnDetailActivity]
+    Detail --> NVList[NhiemVuListActivity]
+    Detail --> CHList[CuocHenListActivity]
+    Detail --> Timeline[TimelineActivity]
+    Detail -->|Sửa| DoAnForm
 
-    MainScreen -->|Bấm nút Xóa trên card| DialogConfirmDeleteDoAn[Dialog: Xác nhận xóa Đồ án]
-    DialogConfirmDeleteDoAn -->|Đồng ý| DeleteDoAnCascade[Xóa Đồ án & Cascade Nhiệm vụ, Cuộc hẹn]
-    DeleteDoAnCascade --> MainScreen
-
-    MainScreen -->|Chạm vào card Đồ án| DetailScreen[Màn hình Chi tiết Đồ án: TabLayout + ViewPager2]
-
-    DetailScreen -->|Chọn Tab 1| TabNhiemVu[Tab: Danh sách Nhiệm vụ]
-    TabNhiemVu -->|Chạm Checkbox| ToggleTaskStatus[Cập nhật trạng thái & Làm mới ProgressBar trên Header]
-    TabNhiemVu -->|Bấm FAB +| DialogAddNV[Dialog: Thêm Nhiệm vụ]
-    TabNhiemVu -->|Bấm Sửa / Xóa| ActionNV[Sửa hoặc Xóa Nhiệm vụ]
-
-    DetailScreen -->|Chọn Tab 2| TabCuocHen[Tab: Lịch hẹn Giảng viên]
-    TabCuocHen -->|Bấm FAB +| DialogAddCH[Dialog: Thêm Cuộc hẹn]
-    TabCuocHen -->|Bấm Sửa / Xóa| ActionCH[Sửa hoặc Xóa Cuộc hẹn]
-
-    DetailScreen -->|Bấm nút Quay lại| MainScreen
+    NVList -->|Tick CheckBox| Toggle[Cập nhật SQLite + dòng trượt về đúng nhóm]
+    NVList -->|FAB + / Sửa| NVForm[NhiemVuFormActivity]
+    CHList -->|FAB + / Sửa| CHForm[CuocHenFormActivity]
+    Timeline -->|Chạm vào dòng| NVForm
+    Timeline -->|Chạm vào dòng| CHForm
 ```
 
 ### 4.3. Lý do lựa chọn các thành phần giao diện
 
-#### 1. Material Components (MDC-Android)
-* Đảm bảo tính nhất quán cao về mặt thị giác theo tiêu chuẩn thiết kế của Google.
-* Sử dụng `MaterialCardView` tạo độ nổi (elevation) và góc bo tròn hiện đại; `TextInputLayout` cung cấp hiệu ứng nhãn nổi (floating label) và hiển thị thông báo lỗi (helper text/error) mượt mà; `FloatingActionButton` định vị rõ ràng hành động chính của màn hình.
+#### 1. Mỗi chức năng một Activity, truyền dữ liệu bằng `Intent`
+* Luồng màn hình tuyến tính, dễ hiểu và bám sát bài giảng (tương tự bài mẫu "Quản lý sinh viên").
+* ID đối tượng được truyền qua `intent.putExtra(EXTRA_DO_AN_ID, id)`; tên khóa được khai báo bằng hằng số `public static final String` trong Activity nhận để phía gửi và phía nhận không bao giờ gõ lệch chuỗi.
+* Khi Form đóng (`finish()`), màn hình danh sách tự nạp lại dữ liệu mới trong `onResume()`.
 
-#### 2. `RecyclerView`
-* Khác với `ListView` thế hệ cũ, `RecyclerView` bắt buộc sử dụng mẫu thiết kế **ViewHolder Pattern** nhằm tái sử dụng các View đã cuộn khỏi màn hình, giúp giảm thiểu tối đa số lần gọi `findViewById` và cấp phát bộ nhớ.
-* Hỗ trợ diễn hoạt (animations) thêm, sửa, xóa phần tử mượt mà và khả năng tùy biến LayoutManager linh hoạt.
+#### 2. `RecyclerView` thay cho `ListView`
+* Bắt buộc dùng **ViewHolder Pattern**: tái sử dụng View đã cuộn khỏi màn hình, giảm số lần gọi `findViewById`.
+* `LayoutManager` linh hoạt: dự án dùng cả `LinearLayoutManager` dọc (danh sách), `GridLayoutManager` 2 cột (chế độ lưới ở màn hình chính, lựa chọn được lưu bằng `SharedPreferences`) và `LinearLayoutManager.HORIZONTAL` (thẻ thống kê).
+* `ItemAnimator` có sẵn hiệu ứng thêm / xóa / di chuyển dòng.
 
-#### 3. `TabLayout` kết hợp `ViewPager2`
-* Trong màn hình chi tiết đồ án, việc hiển thị đồng thời cả Nhiệm vụ và Cuộc hẹn trên cùng một danh sách cuộn dài sẽ gây rối mắt cho sinh viên.
-* Sử dụng `ViewPager2` (xây dựng trên nền RecyclerView) kết hợp `TabLayout` cho phép người dùng chuyển đổi qua lại giữa hai nhóm dữ liệu bằng cách chạm vào tiêu đề tab hoặc vuốt ngang màn hình một cách tự nhiên. Mỗi tab được quản lý bởi một `Fragment` riêng biệt, giúp phân tách logic giao diện rõ ràng.
+#### 3. Nhiều kiểu dòng (Multiple View Types) cho Dòng thời gian
+* `TimelineAdapter` nhận `List<Object>` gồm `String` (tiêu đề nhóm), `NhiemVu` và `CuocHen`; `getItemViewType()` dùng `instanceof` để chọn layout tương ứng.
+* Hiển thị hai loại dữ liệu khác nhau trên một danh sách liền mạch mà không cần lồng nhiều RecyclerView.
 
-#### 4. `DialogFragment`
-* Thay vì mở một `Activity` mới toàn màn hình chỉ để nhập vài trường thông tin, ứng dụng sử dụng `DialogFragment`.
-* Điều này giúp người dùng giữ được ngữ cảnh của màn hình hiện tại, thao tác nhanh gọn. Đồng thời, `DialogFragment` tự động quản lý vòng đời và khôi phục trạng thái nhập liệu khi xoay màn hình điện thoại mà `AlertDialog` thông thường không làm được.
+#### 4. `DatePickerDialog` / `TimePickerDialog`
+* Người dùng không phải tự gõ ngày, tránh sai định dạng. Giá trị trả về được định dạng ngay thành `yyyy-MM-dd` hoặc `yyyy-MM-dd HH:mm` bằng `String.format(Locale.US, ...)` (dùng `Locale.US` để chữ số luôn là 0–9 trên mọi ngôn ngữ máy, giữ đúng phép so sánh chuỗi).
 
-#### 5. `ViewBinding`
-* `ViewBinding` tự động tạo ra một lớp Binding tương ứng cho từng tệp layout XML, chứa các tham chiếu trực tiếp, an toàn kiểu (Type-safe) và an toàn rỗng (Null-safe) đến tất cả các View có đặt `android:id`.
-* Loại bỏ hoàn toàn nguy cơ ứng dụng bị sập do `NullPointerException` (khi gõ nhầm ID của View) hoặc `ClassCastException` (khi ép sai kiểu View), vượt trội hoàn toàn so với cú pháp `findViewById` truyền thống.
+#### 5. `findViewById` + `setOnClickListener`
+* Đúng kỹ thuật được dạy trên lớp, không cần bật thêm tính năng build, dễ giải thích từng dòng khi vấn đáp.
+
+#### 6. Material Components (Theme `Material3.DayNight`)
+* `MaterialCardView`, `FloatingActionButton`, `Toolbar` cho giao diện hiện đại, tự hỗ trợ chế độ tối (`values-night/themes.xml`).
 
 ---
 
 ## 5. THIẾT KẾ KIẾN TRÚC VÀ KỸ THUẬT LẬP TRÌNH
 
-### 5.1. Cấu trúc Package của dự án
+### 5.1. Cấu trúc mã nguồn
 
 ```
-app/src/main/java/com/example/app/
-├── MainActivity.java               // Màn hình khởi đầu: Danh sách đồ án, menu nạp dữ liệu mẫu
-├── adapter/                        // Các Adapter hiển thị danh sách cho RecyclerView
-│   ├── DoAnAdapter.java            // ListAdapter hiển thị danh sách đồ án kèm tiến độ
-│   ├── NhiemVuAdapter.java         // ListAdapter hiển thị danh sách nhiệm vụ & xử lý checkbox
-│   └── CuocHenAdapter.java         // ListAdapter hiển thị danh sách cuộc hẹn & gắn badge
-├── db/                             // Tầng Cơ sở dữ liệu
-│   ├── DatabaseHelper.java         // Quản lý tạo bảng, nâng cấp CSDL và bật Foreign Keys
-│   ├── DoAnDao.java                // Truy vấn CSDL cho bảng DoAn & tính toán tiến độ
-│   ├── NhiemVuDao.java             // Truy vấn CRUD & cập nhật nhanh trạng thái cho NhiemVu
-│   └── CuocHenDao.java             // Truy vấn CRUD & sắp xếp thời gian cho CuocHen
-├── model/                          // Lớp mô hình đối tượng (POJO / DTO)
-│   ├── DoAn.java                   // Thực thể Đồ án
-│   ├── NhiemVu.java                // Thực thể Nhiệm vụ
-│   ├── CuocHen.java                // Thực thể Cuộc hẹn
-│   ├── TienDoInfo.java             // Chứa số việc hoàn thành, tổng số việc, phần trăm
-│   └── DoAnWithTienDo.java         // Đối tượng kết hợp Đồ án và Tiến độ hiển thị
-├── ui/                             // Tầng Giao diện người dùng
-│   ├── DoAnDetailActivity.java     // Màn hình chi tiết đồ án chứa ViewPager2
-│   ├── NhiemVuFragment.java        // Fragment quản lý danh sách nhiệm vụ
-│   ├── CuocHenFragment.java        // Fragment quản lý danh sách cuộc hẹn
-│   ├── AddEditDoAnDialogFragment.java       // Hộp thoại thêm/sửa đồ án
-│   ├── AddEditNhiemVuDialogFragment.java     // Hộp thoại thêm/sửa nhiệm vụ
-│   ├── AddEditCuocHenDialogFragment.java    // Hộp thoại thêm/sửa cuộc hẹn
-│   └── ConfirmDeleteDialogFragment.java     // Hộp thoại xác nhận xóa dùng chung
-└── util/                           // Các tiện ích phụ trợ
-    ├── DateUtils.java              // Xử lý chuyển đổi định dạng ngày giờ, UTC, kiểm tra hợp lệ
-    └── SampleDataLoader.java       // Nạp bộ dữ liệu mẫu JSON vào CSDL an toàn trong Transaction
+app/src/main/java/com/example/app/      (package phẳng, không chia tầng)
+├── DBHelper.java              // SQLiteOpenHelper: tạo bảng, dữ liệu mẫu, CRUD 3 bảng, thống kê
+├── DoAn.java                  // Model Đồ án (+ tongNhiemVu, soNhiemVuXong để vẽ tiến độ)
+├── NhiemVu.java               // Model Nhiệm vụ
+├── CuocHen.java               // Model Cuộc hẹn
+├── ThongKeItem.java           // Model thẻ thống kê (tiêu đề, giá trị, icon)
+├── MainActivity.java          // Danh sách đồ án, chuyển list/grid, menu nạp dữ liệu mẫu
+├── DoAnAdapter.java
+├── DoAnFormActivity.java
+├── DoAnDetailActivity.java    // Chi tiết + RecyclerView ngang thống kê
+├── ThongKeAdapter.java
+├── NhiemVuListActivity.java
+├── NhiemVuAdapter.java        // CheckBox hoàn thành + gạch ngang
+├── NhiemVuFormActivity.java
+├── CuocHenListActivity.java
+├── CuocHenAdapter.java        // Nhãn Sắp diễn ra / Đã qua
+├── CuocHenFormActivity.java
+├── TimelineActivity.java
+└── TimelineAdapter.java       // 3 kiểu dòng: HEADER / TASK / MEETING
+
+app/src/main/res/
+├── layout/   8 layout màn hình + 7 layout dòng (row_*.xml)
+├── drawable/ icon vector, nền badge, progress drawable
+├── menu/menu_main.xml         // Nút chuyển list/grid + mục "Nạp dữ liệu mẫu"
+└── values/, values-night/     // colors, strings, themes (sáng / tối)
 ```
 
----
+**Lý do chọn cấu trúc phẳng:** dự án có quy mô vừa (18 lớp), một package duy nhất giúp người đọc thấy toàn bộ mã nguồn ngay lập tức, bám sát bài mẫu trên lớp và dễ trình bày khi bảo vệ. Toàn bộ truy cập CSDL tập trung trong một lớp `DBHelper`, nên các Activity không chứa câu SQL nào.
 
-### 5.2. Các kỹ thuật lập trình then chốt (kèm đoạn mã trích dẫn)
+### 5.2. Các kỹ thuật lập trình then chốt (trích mã nguồn thực tế)
 
-#### 1. Mẫu thiết kế Singleton cho `DatabaseHelper`
-Để đảm bảo toàn bộ ứng dụng chỉ sử dụng duy nhất một kết nối mở tới tệp `tiendo.db`, tránh tình trạng tranh chấp ghi (database lock) giữa nhiều luồng:
-
+#### 1. Bật khóa ngoại để `ON DELETE CASCADE` hoạt động
 ```java
-// Trích từ app/src/main/java/com/example/app/db/DatabaseHelper.java (dòng 41 - 48)
-private static DatabaseHelper instance;
-
-public static synchronized DatabaseHelper getInstance(Context context) {
-    if (instance == null) {
-        instance = new DatabaseHelper(context.getApplicationContext());
-    }
-    return instance;
+// DBHelper.java
+@Override
+public void onConfigure(SQLiteDatabase db) {
+    super.onConfigure(db);
+    db.setForeignKeyConstraintsEnabled(true);
 }
 ```
-*Lý do:* Sử dụng `context.getApplicationContext()` ngăn ngừa việc rò rỉ bộ nhớ (Memory Leak) khi Activity bị hủy. Từ khóa `synchronized` đảm bảo an toàn đa luồng (Thread-safe).
+SQLite mặc định **tắt** kiểm tra khóa ngoại; nếu không bật, xóa đồ án sẽ để lại nhiệm vụ và cuộc hẹn "mồ côi".
 
-#### 2. Kỹ thuật DAO và truy vấn tiến độ bằng `LEFT JOIN`
-Hàm `getAllWithTienDo()` trong `DoAnDao` thực hiện gom nhóm và tính toán tiến độ ngay trong SQL mà không cần duyệt vòng lặp ở Java:
-
+#### 2. Tính tiến độ của tất cả đồ án bằng một truy vấn `LEFT JOIN`
 ```java
-// Trích từ app/src/main/java/com/example/app/db/DoAnDao.java (dòng 108 - 120)
-String query = "SELECT "
-        + "d." + DatabaseHelper.COLUMN_ID + " AS d_id, "
-        + "d." + DatabaseHelper.COLUMN_DO_AN_TEN + " AS d_ten, "
-        + "d." + DatabaseHelper.COLUMN_DO_AN_MO_TA + " AS d_mo_ta, "
-        + "d." + DatabaseHelper.COLUMN_DO_AN_GIANG_VIEN + " AS d_giang_vien, "
-        + "d." + DatabaseHelper.COLUMN_DO_AN_NGAY_BAT_DAU + " AS d_ngay_bat_dau, "
-        + "d." + DatabaseHelper.COLUMN_DO_AN_HAN_NOP + " AS d_han_nop, "
-        + "COUNT(n." + DatabaseHelper.COLUMN_ID + ") AS total_tasks, "
-        + "COALESCE(SUM(CASE WHEN n." + DatabaseHelper.COLUMN_NHIEM_VU_DA_HOAN_THANH + " = 1 THEN 1 ELSE 0 END), 0) AS completed_tasks "
-        + "FROM " + DatabaseHelper.TABLE_DO_AN + " d "
-        + "LEFT JOIN " + DatabaseHelper.TABLE_NHIEM_VU + " n ON d." + DatabaseHelper.COLUMN_ID + " = n." + DatabaseHelper.COLUMN_NHIEM_VU_DO_AN_ID + " "
-        + "GROUP BY d." + DatabaseHelper.COLUMN_ID + " "
-        + "ORDER BY d." + DatabaseHelper.COLUMN_ID + " DESC";
+// DBHelper.getAllDoAn()
+String sql = "SELECT d.id, d.ten, d.mo_ta, d.giang_vien, d.ngay_bat_dau, d.han_nop, " +
+        "COUNT(n.id) AS tong, " +
+        "IFNULL(SUM(n.da_hoan_thanh), 0) AS xong " +
+        "FROM DoAn d " +
+        "LEFT JOIN NhiemVu n ON d.id = n.do_an_id " +
+        "GROUP BY d.id " +
+        "ORDER BY d.id DESC";
 ```
+* Một lần gọi CSDL cho toàn bộ danh sách (không lặp `N + 1` truy vấn).
+* `LEFT JOIN` giữ lại đồ án chưa có nhiệm vụ; `IFNULL(..., 0)` tránh giá trị `NULL` khi `SUM` trên tập rỗng.
 
-#### 3. Sử dụng `ListAdapter` và `DiffUtil`
-Thay vì kế thừa `RecyclerView.Adapter` và dùng hàm `notifyDataSetChanged()` gây vẽ lại toàn bộ danh sách, dự án sử dụng `ListAdapter` kết hợp thuật toán tính hiệu vi sai `DiffUtil`:
-
+#### 3. Sắp xếp nhiệm vụ: chưa xong lên trước, đã xong xuống dưới
 ```java
-// Trích từ app/src/main/java/com/example/app/adapter/NhiemVuAdapter.java (dòng 23 - 35)
-public class NhiemVuAdapter extends ListAdapter<NhiemVu, NhiemVuAdapter.ViewHolder> {
-
-    private static final DiffUtil.ItemCallback<NhiemVu> DIFF_CALLBACK = new DiffUtil.ItemCallback<NhiemVu>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull NhiemVu oldItem, @NonNull NhiemVu newItem) {
-            return oldItem.getId() == newItem.getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull NhiemVu oldItem, @NonNull NhiemVu newItem) {
-            return oldItem.equals(newItem);
-        }
-    };
+// DBHelper.getNhiemVuByDoAnId()
+"ORDER BY da_hoan_thanh ASC, " +
+"CASE WHEN han_hoan_thanh IS NULL OR han_hoan_thanh = '' THEN 1 ELSE 0 END, " +
+"han_hoan_thanh ASC, id ASC"
 ```
-*Lý do:* `DiffUtil` tự động tính toán chính xác phần tử nào bị đổi, thêm, hay xóa để chỉ cập nhật đúng item đó kèm hiệu ứng mượt mà, giúp tăng hiệu năng hiển thị đáng kể.
+* Trong mỗi nhóm, việc có hạn gần nhất đứng đầu; việc chưa đặt hạn xếp cuối nhóm.
+* Sắp xếp ngay trong SQL nên cả `NhiemVuListActivity` và `TimelineActivity` cùng dùng chung thứ tự này.
+* Khi người dùng tick CheckBox, `NhiemVuListActivity.onToggleStatus()` ghi CSDL, đọc lại danh sách đã sắp xếp, tìm vị trí mới của nhiệm vụ và gọi `notifyItemMoved(viTriCu, viTriMoi)`. Dòng trượt về đúng nhóm có hiệu ứng mà không phải vẽ lại toàn bộ danh sách.
 
-#### 4. Giao tiếp an toàn giữa Dialog và Activity bằng Fragment Result API
-Dự án sử dụng cơ chế hiện đại của Android Jetpack: `setFragmentResult` và `setFragmentResultListener` thay thế cho interface callback truyền thống (dễ bị văng ứng dụng khi Activity tái tạo):
-
+#### 4. Ràng buộc hạn hoàn thành nhiệm vụ ≤ hạn nộp đồ án (kiểm tra hai chiều)
 ```java
-// Trích từ app/src/main/java/com/example/app/MainActivity.java (dòng 49 - 65)
-getSupportFragmentManager().setFragmentResultListener(
-        ConfirmDeleteDialogFragment.REQUEST_KEY_DELETE,
-        this,
-        (requestKey, bundle) -> {
-            boolean confirmed = bundle.getBoolean(ConfirmDeleteDialogFragment.RESULT_KEY_CONFIRMED, false);
-            if (confirmed) {
-                long id = bundle.getLong(ConfirmDeleteDialogFragment.RESULT_KEY_ITEM_ID);
-                int rows = doAnDao.delete((int) id);
-                if (rows > 0) {
-                    Toast.makeText(this, R.string.action_success, Toast.LENGTH_SHORT).show();
-                    loadData();
-                }
-            }
-        }
-);
-```
-
-#### 5. Xử lý chuẩn múi giờ UTC khi tích hợp `MaterialDatePicker`
-Thành phần `MaterialDatePicker` của Google luôn trả về giá trị thời gian epoch millisecond tại mốc **00:00:00 theo giờ chuẩn UTC**. Nếu dùng trực tiếp định dạng giờ địa phương (ví dụ GMT+7 của Việt Nam), ngày hiển thị có thể bị lệch lùi lại 1 ngày do độ lệch múi giờ (lỗi off-by-one day kinh điển trên Android). Lớp `DateUtils` xử lý triệt để vấn đề này:
-
-```java
-// Trích từ app/src/main/java/com/example/app/util/DateUtils.java (dòng 46 - 65)
-public static synchronized String formatUtcDate(Long utcMillis) {
-    if (utcMillis == null) return "";
-    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
-    sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-    return sdf.format(new Date(utcMillis));
-}
-
-public static synchronized Long dateStringToUtcMillis(String dateStr) {
-    if (dateStr == null || dateStr.trim().isEmpty()) return null;
-    try {
-        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
-        sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-        Date date = sdf.parse(dateStr);
-        return date != null ? date.getTime() : null;
-    } catch (ParseException e) {
-        return null;
+// NhiemVuFormActivity.luuNhiemVu()
+if (!hanHoanThanh.isEmpty()) {
+    DoAn doAn = dbHelper.getDoAnById(doAnId);
+    String hanNopDoAn = (doAn != null && doAn.getHanNop() != null) ? doAn.getHanNop().trim() : "";
+    if (!hanNopDoAn.isEmpty() && hanHoanThanh.compareTo(hanNopDoAn) > 0) {
+        Toast.makeText(this, "Hạn hoàn thành không được sau hạn nộp đồ án (" + hanNopDoAn + ")!", Toast.LENGTH_LONG).show();
+        return;
     }
 }
 ```
-
-#### 6. Nạp dữ liệu mẫu an toàn trong CSDL bằng Transaction
-Toàn bộ thao tác đọc JSON và chèn dữ liệu mẫu được bao bọc trong Transaction. Nếu xảy ra bất kỳ lỗi ngoại lệ nào, lệnh `setTransactionSuccessful()` sẽ không được gọi và CSDL được khôi phục nguyên vẹn về trạng thái ban đầu:
-
 ```java
-// Trích từ app/src/main/java/com/example/app/util/SampleDataLoader.java (dòng 58 - 65 & 142 - 149)
+// DoAnFormActivity.luuDoAn() – khi sửa đồ án, không cho dời hạn nộp sớm hơn nhiệm vụ muộn nhất
+String hanNhiemVuMuonNhat = dbHelper.getHanNhiemVuMuonNhat(doAnId); // SELECT MAX(han_hoan_thanh) ...
+if (hanNhiemVuMuonNhat != null && hanNop.compareTo(hanNhiemVuMuonNhat) < 0) { ... return; }
+```
+Nếu chỉ kiểm tra ở Form nhiệm vụ, người dùng vẫn có thể phá vỡ ràng buộc bằng cách sửa hạn nộp của đồ án. Vì vậy ràng buộc được kiểm tra ở cả hai phía. Phép so sánh chuỗi `compareTo` hợp lệ nhờ định dạng `yyyy-MM-dd` (mục 3.3.3).
+
+#### 5. Nạp lại dữ liệu mẫu an toàn bằng Transaction
+```java
+// DBHelper.napLaiDuLieuMau()
+SQLiteDatabase db = this.getWritableDatabase();
 db.beginTransaction();
 try {
-    String jsonContent = readAssetFile(context, "du_lieu_mau.json");
-    JSONObject root = new JSONObject(jsonContent);
-    JSONArray doAnArray = root.getJSONArray("do_an");
-    // ... Chèn DoAn, NhiemVu và CuocHen ...
+    db.execSQL("DELETE FROM CuocHen");
+    db.execSQL("DELETE FROM NhiemVu");
+    db.execSQL("DELETE FROM DoAn");
+    db.execSQL("DELETE FROM sqlite_sequence WHERE name IN ('DoAn', 'NhiemVu', 'CuocHen')");
+    chenDuLieuMau(db);
     db.setTransactionSuccessful();
-    return new ImportResult(true, insertedProjects, insertedTasks, insertedMeetings, null);
-} catch (Exception e) {
-    return new ImportResult(false, 0, 0, 0, e.getMessage());
 } finally {
     db.endTransaction();
 }
 ```
+* Hàm `chenDuLieuMau(db)` được dùng chung cho `onCreate` (lần cài đầu tiên) và cho menu, nên chỉ có **một** nguồn dữ liệu mẫu trong mã.
+* Nếu có lỗi giữa chừng, `setTransactionSuccessful()` không được gọi và CSDL quay về trạng thái cũ, không bao giờ bị "xóa một nửa".
+* Vì thao tác này xóa dữ liệu người dùng, `MainActivity` luôn hỏi xác nhận bằng `AlertDialog` trước khi thực hiện.
+* Xóa `sqlite_sequence` để bộ đếm `AUTOINCREMENT` bắt đầu lại sau id của dữ liệu mẫu.
+
+#### 6. Truyền tham số bằng dấu `?` (chống SQL Injection)
+```java
+db.execSQL("UPDATE NhiemVu SET da_hoan_thanh = ? WHERE id = ?", new Object[]{daHoanThanh, id});
+db.rawQuery("SELECT ... FROM NhiemVu WHERE do_an_id = ?", new String[]{String.valueOf(doAnId)});
+```
+Dữ liệu người dùng nhập có dấu nháy `'` (ví dụ "Báo cáo 'giữa kỳ'") vẫn được lưu đúng, không gây lỗi cú pháp SQL.
+
+#### 7. Hàm dùng chung xác định cuộc hẹn đã qua
+```java
+private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
+
+public static boolean laDaQua(String thoiGian) {
+    if (thoiGian == null || thoiGian.trim().isEmpty()) return false;
+    String currentDateTime = DATE_TIME_FORMAT.format(new Date());
+    return thoiGian.trim().compareTo(currentDateTime) < 0;
+}
+```
+`CuocHenAdapter` và `TimelineAdapter` cùng gọi hàm này nên nhãn *Sắp diễn ra* / *Đã qua* luôn thống nhất giữa các màn hình.
+
+#### 8. Lấy vị trí an toàn trong ViewHolder
+```java
+int position = getAdapterPosition();
+if (position == RecyclerView.NO_POSITION) return;
+```
+Khi dòng đang chạy hiệu ứng xóa, vị trí có thể là `-1`; việc kiểm tra giúp tránh `IndexOutOfBoundsException`.
 
 ---
 
 ## 6. KIỂM THỬ VÀ ĐÁNH GIÁ
 
-### 6.1. Danh sách Unit Test đã chạy thực tế (`LogicUnitTest`)
-Các kiểm thử đơn vị độc lập chạy trên máy trạm (Host JVM) bằng lệnh Gradle đã vượt qua 100% (5/5 tests):
+### 6.1. Kiểm tra truy vấn trên bộ dữ liệu mẫu
+Các truy vấn mới được chạy thử trên SQLite với đúng bộ dữ liệu mẫu (4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn):
 
-| Tên bài test | Mục đích kiểm thử | Kết quả thực tế |
-| :--- | :--- | :---: |
-| `testTienDoInfoCalculation` | Kiểm tra tính toán tỷ lệ % hoàn thành, xử lý phép chia cho 0 khi đồ án có 0 nhiệm vụ (trả về 0%, không bị sập). | **PASS** |
-| `testDateUtilsValidation` | Kiểm tra tính hợp lệ của khoảng thời gian (Hạn nộp $\ge$ Ngày bắt đầu), kiểm tra định dạng ngày giờ và kiểm tra hàm xác định mốc thời gian đã qua hay chưa. | **PASS** |
-| `testDoAnWithTienDoModel` | Kiểm tra hàm `equals` và tính toàn vẹn của DTO `DoAnWithTienDo` dùng cho `DiffUtil`. | **PASS** |
-| `testUtcConversionFixedValueAndMultipleTimeZones` | Giả lập chạy trên nhiều múi giờ khác nhau (`Asia/Ho_Chi_Minh`, `America/Los_Angeles`, `UTC`), khẳng định không bị lệch ngày khi chuyển đổi UTC. | **PASS** |
-| `testSampleDataIntegrity` | Kiểm tra cấu trúc tệp dữ liệu mẫu `du_lieu_mau.json`, xác minh đủ 4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn, các mốc thời gian hợp lệ. | **PASS** |
+| Kiểm tra | Kết quả |
+| :--- | :--- |
+| Số bản ghi nạp được | 4 / 14 / 7, khớp tệp `du_lieu_mau.sql` |
+| Nhiệm vụ mẫu vi phạm hạn nộp đồ án | Không có |
+| Thứ tự nhiệm vụ Đồ án 1 (id) | `3, 4, 1, 2` (2 việc chưa xong theo hạn, rồi 2 việc đã xong) |
+| Thứ tự nhiệm vụ Đồ án 2 (id) | `6, 7, 5` |
+| Tiến độ 4 đồ án | 50%, 33%, 100%, 0% |
 
-### 6.2. Kiểm thử CSDL và Tích hợp trên thiết bị thật / máy ảo (`DatabaseTest`)
-Mã nguồn kiểm thử CSDL hoàn chỉnh đã được lập trình sẵn tại `app/src/androidTest/java/com/example/app/DatabaseTest.java`.
-* **Trạng thái thực tế:** Biên dịch mã kiểm thử thành công (`compileDebugAndroidTestSources` BUILD SUCCESSFUL).
-* **Kết quả chạy:** `[bổ sung kết quả sau khi chạy trên emulator / thiết bị thật qua lệnh ./gradlew connectedAndroidTest]`
-
-### 6.3. Bảng kiểm tra thao tác bằng tay (Manual Testing Checklist)
+### 6.2. Bảng kiểm thử thao tác (Manual Testing Checklist)
 
 | STT | Kịch bản kiểm thử | Thao tác thực hiện | Kết quả mong đợi | Đánh giá |
 | :---: | :--- | :--- | :--- | :---: |
-| 1 | Khởi động lần đầu | Mở ứng dụng sau khi cài mới | Hiển thị giao diện Empty State thân thiện | Đạt |
-| 2 | Nạp dữ liệu mẫu | Bấm Menu $\rightarrow$ "Nạp dữ liệu mẫu" $\rightarrow$ Đồng ý | Nạp thành công 4 đồ án, hiển thị Snackbar | Đạt |
-| 3 | Thêm đồ án mới | Bấm FAB + $\rightarrow$ Nhập ngày kết thúc < ngày bắt đầu | Báo lỗi đỏ tại ô nhập liệu, không cho lưu | Đạt |
-| 4 | Cập nhật tiến độ | Vào chi tiết đồ án $\rightarrow$ Tick chọn checkbox nhiệm vụ | Thanh tiến độ trên Header cập nhật % ngay lập tức | Đạt |
-| 5 | Ràng buộc hạn nhiệm vụ | Thêm nhiệm vụ có hạn sau ngày nộp của đồ án | Báo lỗi không cho lưu | Đạt |
-| 6 | Phân loại cuộc hẹn | Xem tab cuộc hẹn | Cuộc hẹn quá khứ hiện nhãn xám, tương lai hiện nhãn xanh | Đạt |
-| 7 | Xóa xếp tầng (Cascade) | Xóa một đồ án | Toàn bộ nhiệm vụ và cuộc hẹn của đồ án đó tự động biến mất | Đạt |
-| 8 | Xoay màn hình | Xoay ngang điện thoại tại màn hình chi tiết | Dữ liệu giữ nguyên, tab hiện tại không bị nhảy về tab đầu | `[bổ sung kết quả sau khi chạy trên emulator]` |
+| 1 | Khởi động lần đầu | Cài mới và mở ứng dụng | Hiển thị sẵn 4 đồ án mẫu với tiến độ 50%, 33%, 100%, 0% | `[ ]` |
+| 2 | Nạp lại dữ liệu mẫu | Menu ⋮ → "Nạp dữ liệu mẫu" → "Nạp dữ liệu" | Hỏi xác nhận; dữ liệu cũ bị thay bằng 4 đồ án mẫu | `[ ]` |
+| 3 | Hủy nạp dữ liệu mẫu | Menu ⋮ → "Nạp dữ liệu mẫu" → "Hủy" | Dữ liệu hiện tại giữ nguyên | `[ ]` |
+| 4 | Ràng buộc ngày đồ án | Thêm đồ án có hạn nộp trước ngày bắt đầu | Báo lỗi, không cho lưu | `[ ]` |
+| 5 | Ràng buộc hạn nhiệm vụ | Đồ án 2 (hạn 2026-11-20) → thêm nhiệm vụ hạn 2026-12-01 | Báo lỗi "Hạn hoàn thành không được sau hạn nộp đồ án", không lưu | `[ ]` |
+| 6 | Ràng buộc chiều ngược | Sửa Đồ án 1, đổi hạn nộp thành 2026-12-01 (nhiệm vụ muộn nhất 2026-12-25) | Báo lỗi, không cho lưu | `[ ]` |
+| 7 | Sắp xếp nhiệm vụ | Mở nhiệm vụ Đồ án 1 | Hai việc chưa xong ở trên, hai việc đã xong (gạch ngang) ở dưới | `[ ]` |
+| 8 | Tick hoàn thành | Tick một việc chưa xong | Dòng gạch ngang và trượt xuống nhóm đã xong; quay lại chi tiết thấy % tăng | `[ ]` |
+| 9 | Phân loại cuộc hẹn | Mở danh sách cuộc hẹn Đồ án 1 | Cuộc hẹn quá khứ nhãn "Đã qua", tương lai nhãn "Sắp diễn ra" | `[ ]` |
+| 10 | Xóa xếp tầng | Xóa một đồ án | Nhiệm vụ và cuộc hẹn của đồ án đó biến mất | `[ ]` |
+| 11 | Chuyển lưới / danh sách | Bấm nút trên Toolbar, thoát và mở lại app | Chế độ xem được giữ nguyên | `[ ]` |
+| 12 | Xoay màn hình | Đang nhập dở Form → xoay ngang | Dữ liệu đang nhập không mất | `[ ]` |
+
+*(Đánh dấu kết quả sau khi chạy APK trên máy ảo hoặc điện thoại thật.)*
 
 ---
 
 ## 7. KẾT QUẢ ĐẠT ĐƯỢC, HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
 
 ### 7.1. Kết quả đạt được
-* Xây dựng thành công ứng dụng Android quản lý đồ án hoàn chỉnh, tuân thủ chặt chẽ các ràng buộc kỹ thuật của đề bài (chỉ dùng Java thuần, SQLiteOpenHelper, ViewBinding, không phát sinh thư viện ngoài).
-* Giao diện hiện đại, dễ thao tác theo chuẩn Material Design 3, hỗ trợ Dark Mode.
-* Tách biệt kiến trúc rõ ràng theo các tầng Model – DAO – UI – Adapter – Util, mã nguồn sạch sẽ, không có file thừa.
-* Đóng gói sản phẩm đầy đủ gồm mã nguồn thiết kế, bộ dữ liệu mẫu độc lập và tệp cài đặt APK hoàn chỉnh.
+* Ứng dụng Android hoàn chỉnh viết bằng Java, dùng SQLite thuần qua `SQLiteOpenHelper`, không dùng thư viện ngoài ngoài AndroidX/Material.
+* Đủ CRUD cho 3 bảng có quan hệ 1–N, xóa xếp tầng, tiến độ tính động, ràng buộc ngày tháng hai chiều.
+* Ứng dụng nhiều kỹ thuật RecyclerView: danh sách dọc, lưới, cuộn ngang, nhiều kiểu dòng, `notifyItemInserted/Removed/Moved`.
+* Bộ dữ liệu mẫu 25 bản ghi có sẵn khi cài và nạp lại được bất cứ lúc nào để minh họa.
 
-### 7.2. Các hạn chế đã biết (Known Limitations)
-1. **Cơ chế nâng cấp CSDL (`onUpgrade`):** Hiện tại trong `DatabaseHelper`, khi tăng phiên bản `DATABASE_VERSION`, phương thức `onUpgrade` đang dùng lệnh `DROP TABLE IF EXISTS`, làm mất dữ liệu người dùng cũ nếu nâng cấp. Trong môi trường thương mại, cần viết các câu lệnh `ALTER TABLE` hoặc migration script.
-2. **Cập nhật nhãn trạng thái cuộc hẹn:** Nhãn "Sắp diễn ra" / "Đã qua" được tính toán tại thời điểm tải dữ liệu vào RecyclerView. Nếu người dùng để màn hình mở liên tục qua thời điểm hẹn mà không vuốt hoặc tải lại màn hình, nhãn sẽ không tự động nhảy sang "Đã qua".
-3. **Mã hóa CSDL:** CSDL SQLite được lưu ở dạng tệp tin cục bộ tiêu chuẩn, chưa áp dụng mã hóa bảo mật cấp cao (như SQLCipher).
+### 7.2. Các hạn chế đã biết
+1. **`onUpgrade` xóa bảng rồi tạo lại:** tiện cho giai đoạn phát triển nhưng sẽ mất dữ liệu nếu tăng `DATABASE_VERSION`. Sản phẩm thực tế cần migration bằng `ALTER TABLE`.
+2. **Xoay màn hình bằng `android:configChanges`:** Activity không bị tạo lại nên dữ liệu đang nhập được giữ, nhưng đây là cách làm tắt. Cách chuẩn hơn là lưu trạng thái bằng `onSaveInstanceState` hoặc `ViewModel`.
+3. **Truy vấn CSDL chạy trên luồng giao diện:** chấp nhận được với dữ liệu nhỏ; nếu dữ liệu lớn cần chuyển sang luồng nền (`ExecutorService`).
+4. **Nhãn trạng thái cuộc hẹn** chỉ được tính lại khi danh sách được nạp lại hoặc cuộn, không tự đổi khi để màn hình mở qua giờ hẹn.
+5. **Chưa có kiểm thử tự động** cho CSDL và giao diện; các ca kiểm thử ở mục 6.2 được thực hiện thủ công.
 
-### 7.3. Hướng phát triển trong tương lai
-* **Thông báo nhắc hẹn (Push Notifications & AlarmManager):** Tích hợp dịch vụ chạy nền để thông báo nhắc nhở sinh viên trước mỗi cuộc hẹn với giảng viên 1 ngày hoặc 2 giờ.
-* **Tìm kiếm và Bộ lọc nâng cao:** Thêm thanh tìm kiếm (SearchView) theo tên đồ án, lọc nhiệm vụ theo mức độ ưu tiên hoặc hạn chót.
-* **Sao lưu và Phục hồi:** Cho phép xuất dữ liệu ra tệp JSON hoặc lưu trữ đồng bộ lên Google Drive để sinh viên dễ dàng chuyển dữ liệu khi đổi thiết bị.
+### 7.3. Hướng phát triển
+* Nhắc lịch hẹn bằng thông báo (`AlarmManager` / `WorkManager`).
+* Tìm kiếm đồ án (`SearchView`) và lọc nhiệm vụ theo trạng thái / hạn chót.
+* Sao lưu / phục hồi dữ liệu ra tệp JSON.
 
 ---
 
 ## 8. PHỤ LỤC
 
-### 8.1. Hướng dẫn cài đặt và chạy tệp APK
-1. **Vị trí tệp APK:**
-   * Tệp đóng gói nộp bài: `deliverables/ung_dung_theo_doi_do_an.apk`
-   * Tệp biên dịch gốc: `app/build/outputs/apk/debug/app-debug.apk`
-2. **Cài đặt vào máy ảo hoặc điện thoại Android thật:**
-   * **Cách 1 (Qua ADB):** Kết nối điện thoại hoặc mở máy ảo, mở Terminal và chạy lệnh:
-     ```bash
-     adb install deliverables/ung_dung_theo_doi_do_an.apk
-     ```
-   * **Cách 2 (Cài trực tiếp):** Sao chép tệp `ung_dung_theo_doi_do_an.apk` vào bộ nhớ điện thoại (qua Zalo, Google Drive hoặc cáp USB), mở Trình quản lý tệp trên điện thoại, bấm vào tệp APK, chọn *"Cho phép cài đặt ứng dụng từ nguồn này"* và bấm *"Cài đặt"*.
+### 8.1. Hướng dẫn cài đặt APK
+1. Tệp nộp bài: `deliverables/ung_dung_theo_doi_do_an.apk` (bản debug, cài được ngay).
+2. **Cách 1 (ADB):** `adb install -r deliverables/ung_dung_theo_doi_do_an.apk`
+3. **Cách 2 (trực tiếp):** chép tệp APK vào điện thoại, mở bằng Trình quản lý tệp, cho phép "Cài đặt từ nguồn không xác định" rồi bấm *Cài đặt*.
+4. Nếu máy đã cài bản cũ, chọn menu ⋮ → **Nạp dữ liệu mẫu** để có đúng bộ dữ liệu minh họa mới nhất.
 
-### 8.2. Hướng dẫn tạo Keystore và Ký APK Release (Nếu yêu cầu nộp bản Release)
-*Lưu ý: Theo đúng quy định an toàn của dự án, nhà phát triển không tự tạo trước keystore hay lưu mật khẩu vào mã nguồn. Khi cần tạo bản ký chính thức, thực hiện các bước sau:*
-1. Mở terminal tại thư mục dự án và dùng công cụ `keytool` có sẵn của JDK:
-   ```bash
-   keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-alias
-   ```
-   *(Nhập mật khẩu và thông tin cá nhân theo lời nhắc).*
-2. Ký APK bằng công cụ `apksigner` trong Android SDK:
-   ```bash
-   apksigner sign --ks my-release-key.jks --out deliverables/ung_dung_theo_doi_do_an_release.apk deliverables/ung_dung_theo_doi_do_an.apk
-   ```
-
-### 8.3. Cấu trúc thư mục bàn giao sản phẩm (`deliverables/`)
+### 8.2. Cấu trúc thư mục bàn giao (`deliverables/`)
 ```
 deliverables/
-├── ung_dung_theo_doi_do_an.apk        // Tệp APK debug cài đặt được ngay
-├── du_lieu_mau/                       // Bộ tệp dữ liệu mẫu độc lập
-│   ├── du_lieu_mau.sql               // Kịch bản INSERT chạy trên DB Browser for SQLite
-│   └── du_lieu_mau.json              // Dữ liệu JSON dùng cho ứng dụng
-├── thiet_ke/                          // Bản sao mã nguồn và giao diện thiết kế
-│   ├── AndroidManifest.xml           // Tệp khai báo cấu hình ứng dụng
-│   ├── java/                         // Toàn bộ mã nguồn Java
-│   └── res/                          // Toàn bộ tài nguyên layout XML, values, drawable, menu
+├── ung_dung_theo_doi_do_an.apk      // Tệp cài đặt
+├── du_lieu_mau/
+│   ├── du_lieu_mau.sql             // 25 bản ghi, trùng khớp DBHelper.chenDuLieuMau()
+│   └── du_lieu_mau.json            // Cùng dữ liệu ở dạng JSON lồng nhau
+├── thiet_ke/                        // Tệp thiết kế
+│   ├── AndroidManifest.xml
+│   ├── java/com/example/app/       // 18 tệp .java
+│   └── res/                        // layout, drawable, menu, values (.xml)
 └── bao_cao/
-    └── bao_cao.md                    // Toàn bộ nội dung báo cáo kỹ thuật này
+    ├── bao_cao.md                  // Báo cáo này
+    ├── GIAI_THICH_THIET_KE.md      // Giải thích lý do chọn từng quyết định thiết kế
+    └── giai_thich_don_gian.md      // Giải thích mã nguồn bằng ngôn ngữ đơn giản
 ```
 
-### 8.4. Vị trí ảnh chụp màn hình minh họa (Dành cho việc xuất ra Word/PDF)
-* [Chèn ảnh: Màn hình chính khi chưa có dữ liệu - Empty State]
-* [Chèn ảnh: Menu nạp dữ liệu mẫu và hộp thoại xác nhận]
-* [Chèn ảnh: Màn hình chính sau khi nạp dữ liệu mẫu với các mức tiến độ 50%, 33%, 100%, 0%]
-* [Chèn ảnh: Màn hình chi tiết đồ án - Tab Danh sách Nhiệm vụ]
-* [Chèn ảnh: Màn hình chi tiết đồ án - Tab Lịch hẹn Giảng viên với các nhãn Sắp diễn ra / Đã qua]
-* [Chèn ảnh: Hộp thoại thêm mới / chỉnh sửa với bộ chọn ngày MaterialDatePicker]
+### 8.3. Vị trí ảnh chụp màn hình minh họa
+* [Chèn ảnh: Màn hình chính chế độ danh sách và chế độ lưới]
+* [Chèn ảnh: Menu ⋮ "Nạp dữ liệu mẫu" và hộp thoại xác nhận]
+* [Chèn ảnh: Chi tiết đồ án với thẻ thống kê cuộn ngang]
+* [Chèn ảnh: Danh sách nhiệm vụ – việc chưa xong ở trên, đã xong ở dưới]
+* [Chèn ảnh: Thông báo lỗi khi hạn nhiệm vụ vượt hạn nộp đồ án]
+* [Chèn ảnh: Danh sách cuộc hẹn với nhãn Sắp diễn ra / Đã qua]
+* [Chèn ảnh: Dòng thời gian (Timeline)]

@@ -83,7 +83,13 @@ public class DBHelper extends SQLiteOpenHelper {
                 ");";
         db.execSQL(sqlCreateCuocHen);
 
-        // 4. Chèn dữ liệu mẫu cho bảng DoAn (4 đồ án)
+        // 4. Nạp dữ liệu mẫu ban đầu
+        chenDuLieuMau(db);
+    }
+
+    // Chèn bộ dữ liệu mẫu: 4 Đồ án, 14 Nhiệm vụ, 7 Cuộc hẹn (dùng chung cho onCreate và napLaiDuLieuMau)
+    private void chenDuLieuMau(SQLiteDatabase db) {
+        // 1. Chèn dữ liệu mẫu cho bảng DoAn (4 đồ án)
         db.execSQL("INSERT INTO DoAn (id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop) VALUES " +
                 "(1, 'Xây dựng ứng dụng quản lý tiến độ đồ án trên Android', 'Hệ thống hỗ trợ sinh viên lập kế hoạch và theo dõi lịch hẹn trao đổi với GVHD.', 'TS. Nguyễn Văn A', '2026-09-01', '2026-12-30');");
         db.execSQL("INSERT INTO DoAn (id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop) VALUES " +
@@ -93,7 +99,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO DoAn (id, ten, mo_ta, giang_vien, ngay_bat_dau, han_nop) VALUES " +
                 "(4, 'Ứng dụng kết nối gia sư và học sinh TutorNow', 'Nền tảng tìm kiếm và đặt lịch học kèm tại nhà cho học sinh các cấp.', 'ThS. Phạm Thanh Tùng', '2026-10-01', '2027-01-15');");
 
-        // 5. Chèn dữ liệu mẫu cho bảng NhiemVu (14 nhiệm vụ)
+        // 2. Chèn dữ liệu mẫu cho bảng NhiemVu (14 nhiệm vụ)
         // Nhiệm vụ Đồ án 1
         db.execSQL("INSERT INTO NhiemVu (id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh) VALUES (1, 1, 'Khảo sát yêu cầu và viết đề cương chi tiết', 'Lấy ý kiến định hướng từ GVHD', '2026-09-20', 1);");
         db.execSQL("INSERT INTO NhiemVu (id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh) VALUES (2, 1, 'Thiết kế kiến trúc hệ thống và CSDL SQLite', 'Thiết kế 3 bảng DoAn, NhiemVu, CuocHen', '2026-10-15', 1);");
@@ -116,7 +122,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO NhiemVu (id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh) VALUES (13, 4, 'Xây dựng Business Model Canvas (BMC)', 'Hoàn thiện mô hình kinh doanh', '2026-12-01', 0);");
         db.execSQL("INSERT INTO NhiemVu (id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh) VALUES (14, 4, 'Thiết kế bản mẫu Wireframe trên Figma', 'Thiết kế luồng đặt lịch học kèm', '2027-01-05', 0);");
 
-        // 6. Chèn dữ liệu mẫu cho bảng CuocHen (7 cuộc hẹn)
+        // 3. Chèn dữ liệu mẫu cho bảng CuocHen (7 cuộc hẹn)
         // Cuộc hẹn Đồ án 1
         db.execSQL("INSERT INTO CuocHen (id, do_an_id, tieu_de, thoi_gian, dia_diem, ghi_chu) VALUES (1, 1, 'Báo cáo đề cương chi tiết', '2026-09-15 09:00', 'Văn phòng Bộ môn KHMT - Phòng 402-A1', 'Thầy duyệt đề cương và phân công lịch báo cáo');");
         db.execSQL("INSERT INTO CuocHen (id, do_an_id, tieu_de, thoi_gian, dia_diem, ghi_chu) VALUES (2, 1, 'Góp ý thiết kế CSDL và giao diện', '2026-10-20 14:30', 'Phòng nghiên cứu Lab 501', 'Chuẩn bị bản vẽ kiến trúc ERD trước khi gặp');");
@@ -131,6 +137,24 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // Cuộc hẹn Đồ án 4
         db.execSQL("INSERT INTO CuocHen (id, do_an_id, tieu_de, thoi_gian, dia_diem, ghi_chu) VALUES (7, 4, 'Tư vấn cố vấn đề án khởi nghiệp', '2026-12-05 09:30', 'Phòng họp Tòa A', 'Gặp ban cố vấn để xin ý kiến định hướng');");
+    }
+
+    // Xóa toàn bộ dữ liệu hiện có và nạp lại bộ dữ liệu mẫu (gọi từ menu "Nạp dữ liệu mẫu")
+    // Chạy trong transaction: nếu có lỗi giữa chừng thì CSDL giữ nguyên như cũ
+    public void napLaiDuLieuMau() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL("DELETE FROM CuocHen");
+            db.execSQL("DELETE FROM NhiemVu");
+            db.execSQL("DELETE FROM DoAn");
+            // Đặt lại bộ đếm AUTOINCREMENT để bản ghi thêm mới sau đó bắt đầu lại từ id kế tiếp
+            db.execSQL("DELETE FROM sqlite_sequence WHERE name IN ('DoAn', 'NhiemVu', 'CuocHen')");
+            chenDuLieuMau(db);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // Nâng cấp CSDL khi tăng DATABASE_VERSION
@@ -228,14 +252,14 @@ public class DBHelper extends SQLiteOpenHelper {
     // Tính tiến độ đồ án (số nhiệm vụ hoàn thành / tổng số nhiệm vụ)
     public String getTienDoDoAn(int doAnId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "SELECT COUNT(*), SUM(da_hoan_thanh) FROM NhiemVu WHERE do_an_id = ?";
+        String sql = "SELECT COUNT(*), IFNULL(SUM(da_hoan_thanh), 0) FROM NhiemVu WHERE do_an_id = ?";
         Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(doAnId)});
 
         int tong = 0;
         int daHoanThanh = 0;
         if (cursor.moveToNext()) {
             tong = cursor.getInt(0);
-            daHoanThanh = cursor.getInt(1); // Nếu không có bản ghi nào thì trả về 0
+            daHoanThanh = cursor.getInt(1);
         }
         cursor.close();
 
@@ -255,7 +279,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         // 1. Thống kê nhiệm vụ (tổng số, đã xong, chưa xong)
-        Cursor c1 = db.rawQuery("SELECT COUNT(*), SUM(da_hoan_thanh) FROM NhiemVu WHERE do_an_id = ?", new String[]{String.valueOf(doAnId)});
+        Cursor c1 = db.rawQuery("SELECT COUNT(*), IFNULL(SUM(da_hoan_thanh), 0) FROM NhiemVu WHERE do_an_id = ?", new String[]{String.valueOf(doAnId)});
         if (c1.moveToNext()) {
             stats[0] = c1.getInt(0);
             stats[1] = c1.getInt(1);
@@ -278,11 +302,18 @@ public class DBHelper extends SQLiteOpenHelper {
     // CÁC HÀM XỬ LÝ DỮ LIỆU BẢNG NHIỆM VỤ (NhiemVu)
     // ==========================================
 
-    // Lấy danh sách nhiệm vụ của một đồ án
+    // Lấy danh sách nhiệm vụ của một đồ án, sắp xếp:
+    //   1. Việc chưa hoàn thành lên trước, việc đã hoàn thành xuống dưới (da_hoan_thanh ASC)
+    //   2. Trong mỗi nhóm: hạn gần nhất lên trước, nhiệm vụ chưa đặt hạn xếp cuối nhóm
+    //   3. Cùng hạn thì theo thứ tự tạo (id ASC)
     public ArrayList<NhiemVu> getNhiemVuByDoAnId(int doAnId) {
         ArrayList<NhiemVu> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "SELECT id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh FROM NhiemVu WHERE do_an_id = ? ORDER BY id ASC";
+        String sql = "SELECT id, do_an_id, ten, ghi_chu, han_hoan_thanh, da_hoan_thanh FROM NhiemVu " +
+                "WHERE do_an_id = ? " +
+                "ORDER BY da_hoan_thanh ASC, " +
+                "CASE WHEN han_hoan_thanh IS NULL OR han_hoan_thanh = '' THEN 1 ELSE 0 END, " +
+                "han_hoan_thanh ASC, id ASC";
         Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(doAnId)});
 
         while (cursor.moveToNext()) {
@@ -318,6 +349,19 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return nv;
+    }
+
+    // Lấy hạn hoàn thành muộn nhất trong các nhiệm vụ của đồ án (null nếu chưa nhiệm vụ nào đặt hạn)
+    public String getHanNhiemVuMuonNhat(int doAnId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT MAX(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''";
+        Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(doAnId)});
+        String han = null;
+        if (cursor.moveToNext()) {
+            han = cursor.getString(0);
+        }
+        cursor.close();
+        return han;
     }
 
     // Thêm nhiệm vụ mới vào đồ án

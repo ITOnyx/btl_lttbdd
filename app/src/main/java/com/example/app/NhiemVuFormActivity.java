@@ -94,7 +94,7 @@ public class NhiemVuFormActivity extends AppCompatActivity {
         int ngay = cal.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            String dateStr = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            String dateStr = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             edtHanHoanThanh.setText(dateStr);
         }, nam, thang, ngay);
 
@@ -111,6 +111,17 @@ public class NhiemVuFormActivity extends AppCompatActivity {
             edtTenNhiemVu.setError("Vui lòng nhập tên nhiệm vụ!");
             edtTenNhiemVu.requestFocus();
             return;
+        }
+
+        // Ràng buộc: hạn hoàn thành nhiệm vụ không được vượt quá hạn nộp của đồ án
+        // (so sánh chuỗi yyyy-MM-dd theo thứ tự từ điển trùng với thứ tự thời gian)
+        if (!hanHoanThanh.isEmpty()) {
+            DoAn doAn = dbHelper.getDoAnById(doAnId);
+            String hanNopDoAn = (doAn != null && doAn.getHanNop() != null) ? doAn.getHanNop().trim() : "";
+            if (!hanNopDoAn.isEmpty() && hanHoanThanh.compareTo(hanNopDoAn) > 0) {
+                Toast.makeText(this, "Hạn hoàn thành không được sau hạn nộp đồ án (" + hanNopDoAn + ")!", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
 
         if (nhiemVuId == -1) {

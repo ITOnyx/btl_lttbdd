@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Menu chuyển đổi chế độ xem Danh sách / Lưới cho màn hình chính -->
+<!-- Menu màn hình chính: chuyển chế độ xem Danh sách / Lưới và nạp lại dữ liệu mẫu -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
@@ -7,4 +7,10 @@
         android:icon="@drawable/ic_grid"
         android:title="Chuyển chế độ xem"
         app:showAsAction="always" />
+
+    <!-- Nạp lại bộ dữ liệu mẫu (nằm trong menu tràn ⋮) -->
+    <item
+        android:id="@+id/action_nap_du_lieu_mau"
+        android:title="Nạp dữ liệu mẫu"
+        app:showAsAction="never" />
 </menu>

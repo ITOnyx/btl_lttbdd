@@ -11,9 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App">
+
+        <!-- configChanges giúp Activity không bị hủy và tạo lại khi xoay màn hình ngang/dọc, giữ nguyên dữ liệu đang nhập -->
+
+        <!-- Màn hình chính: Danh sách đồ án -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,10 +27,55 @@
             </intent-filter>
         </activity>
 
+        <!-- Màn hình thêm / sửa đồ án -->
         <activity
-            android:name=".ui.DoAnDetailActivity"
+            android:name=".DoAnFormActivity"
             android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình chi tiết đồ án -->
+        <activity
+            android:name=".DoAnDetailActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình danh sách nhiệm vụ -->
+        <activity
+            android:name=".NhiemVuListActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình thêm / sửa nhiệm vụ -->
+        <activity
+            android:name=".NhiemVuFormActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình danh sách cuộc hẹn -->
+        <activity
+            android:name=".CuocHenListActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình thêm / sửa cuộc hẹn -->
+        <activity
+            android:name=".CuocHenFormActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình Dòng thời gian (Timeline: Multiple View Type) -->
+        <activity
+            android:name=".TimelineActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

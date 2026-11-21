@@ -106,7 +106,7 @@ public class DoAnFormActivity extends AppCompatActivity {
 
         DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             // Định dạng chuỗi ngày chuẩn yyyy-MM-dd
-            String dateStr = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            String dateStr = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             targetEdt.setText(dateStr);
         }, nam, thang, ngay);
 
@@ -132,6 +132,15 @@ public class DoAnFormActivity extends AppCompatActivity {
         if (!ngayBatDau.isEmpty() && !hanNop.isEmpty()) {
             if (hanNop.compareTo(ngayBatDau) < 0) {
                 Toast.makeText(this, "Hạn nộp không được trước ngày bắt đầu!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        // Khi sửa đồ án: hạn nộp mới không được sớm hơn hạn của nhiệm vụ muộn nhất đã có
+        if (doAnId != -1 && !hanNop.isEmpty()) {
+            String hanNhiemVuMuonNhat = dbHelper.getHanNhiemVuMuonNhat(doAnId);
+            if (hanNhiemVuMuonNhat != null && hanNop.compareTo(hanNhiemVuMuonNhat) < 0) {
+                Toast.makeText(this, "Hạn nộp không được trước hạn của nhiệm vụ muộn nhất (" + hanNhiemVuMuonNhat + ")!", Toast.LENGTH_LONG).show();
                 return;
             }
         }

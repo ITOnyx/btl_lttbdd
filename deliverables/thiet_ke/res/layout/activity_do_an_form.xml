@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- Thanh tiêu đề Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:title="Thông tin đồ án"
+        app:titleTextColor="@color/white" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Tên đồ án -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên đồ án (*)"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtTen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_circle_icon"
+                android:backgroundTint="@color/surface"
+                android:hint="Nhập tên đồ án..."
+                android:padding="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <!-- Giảng viên hướng dẫn -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giảng viên hướng dẫn"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtGiangVien"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_circle_icon"
+                android:backgroundTint="@color/surface"
+                android:hint="VD: TS. Nguyễn Văn A..."
+                android:padding="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <!-- Mô tả -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mô tả đề tài"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/edtMoTa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_circle_icon"
+                android:backgroundTint="@color/surface"
+                android:gravity="top"
+                android:hint="Nhập mô tả tóm tắt..."
+                android:lines="3"
+                android:padding="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp" />
+
+            <!-- Ngày bắt đầu -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày bắt đầu (yyyy-MM-dd)"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="14dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtNgayBatDau"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_circle_icon"
+                    android:backgroundTint="@color/surface"
+                    android:focusable="false"
+                    android:hint="Chọn ngày bắt đầu..."
+                    android:padding="12dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnChonNgayBatDau"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Chọn" />
+            </LinearLayout>
+
+            <!-- Hạn nộp -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hạn nộp (yyyy-MM-dd)"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="24dp"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtHanNop"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_circle_icon"
+                    android:backgroundTint="@color/surface"
+                    android:focusable="false"
+                    android:hint="Chọn hạn nộp..."
+                    android:padding="12dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnChonHanNop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Chọn" />
+            </LinearLayout>
+
+            <!-- Các nút hành động -->
+            <Button
+                android:id="@+id/btnLuu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/primary"
+                android:padding="14dp"
+                android:text="Lưu đồ án"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnQuayLai"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="14dp"
+                android:text="Quay lại"
+                android:textColor="@color/primary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
