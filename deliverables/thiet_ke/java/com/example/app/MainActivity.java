@@ -1,133 +1,148 @@
 package com.example.app;
 
-import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.app.adapter.DoAnAdapter;
-import com.example.app.databinding.ActivityMainBinding;
-import com.example.app.databinding.DialogAddEditDoAnBinding;
-import com.example.app.db.DoAnDao;
-import com.example.app.model.DoAn;
-import com.example.app.model.DoAnWithTienDo;
-import com.example.app.util.DateUtils;
-import com.example.app.util.SampleDataLoader;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoAnActionListener {
+// Màn hình danh sách Đồ án
+public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoAnClickListener {
 
-    private ActivityMainBinding binding;
-    private DoAnDao doAnDao;
-    private DoAnAdapter adapter;
+    private RecyclerView rvDoAn;
+    private DoAnAdapter mDoAnAdapter;
+    private List<DoAn> mDoAns;
+
+    private Toolbar mToolbar;
+    private LinearLayout mLayoutEmpty;
+    private FloatingActionButton mFabAddDoAn;
+    private DBHelper mDbHelper;
+
+    // Chuyển đổi chế độ xem Danh sách / Lưới
+    private boolean mIsGridMode = false;
+    private SharedPreferences mPrefs;
+    private MenuItem mMenuToggleLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_main);
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
+        // 2. Ánh xạ RecyclerView
+        rvDoAn = (RecyclerView) findViewById(R.id.rv_do_an);
+        mLayoutEmpty = findViewById(R.id.layoutEmpty);
+        mFabAddDoAn = findViewById(R.id.fabAddDoAn);
+
+        // 3. Khởi tạo DBHelper và nạp dữ liệu danh sách
+        mDbHelper = new DBHelper(this);
+        mDoAns = new ArrayList<>();
+        mDoAns.addAll(mDbHelper.getAllDoAn());
+
+        // 4. Khởi tạo Adapter
+        mDoAnAdapter = new DoAnAdapter(this, mDoAns, this);
+
+        // 5. Gắn Adapter vào RecyclerView
+        rvDoAn.setAdapter(mDoAnAdapter);
+
+        // 6. Cài đặt LayoutManager
+        mPrefs = getSharedPreferences("app_settings", MODE_PRIVATE);
+        mIsGridMode = mPrefs.getBoolean("is_grid_mode", false);
+        if (mIsGridMode) {
+            rvDoAn.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            rvDoAn.setLayoutManager(linearLayoutManager);
+        }
+
+        // 7. Cài đặt ItemAnimator
+        rvDoAn.setItemAnimator(new DefaultItemAnimator());
+
+        // Bấm nút thêm mới đồ án -> mở form
+        mFabAddDoAn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DoAnFormActivity.class);
+                startActivity(intent);
+            }
         });
-
-        doAnDao = new DoAnDao(this);
-
-        getSupportFragmentManager().setFragmentResultListener(
-                com.example.app.ui.ConfirmDeleteDialogFragment.REQUEST_KEY_DELETE,
-                this,
-                (requestKey, bundle) -> {
-                    boolean confirmed = bundle.getBoolean(com.example.app.ui.ConfirmDeleteDialogFragment.RESULT_KEY_CONFIRMED, false);
-                    if (confirmed) {
-                        long id = bundle.getLong(com.example.app.ui.ConfirmDeleteDialogFragment.RESULT_KEY_ITEM_ID);
-                        int rows = doAnDao.delete((int) id);
-                        if (rows > 0) {
-                            Toast.makeText(this, R.string.action_success, Toast.LENGTH_SHORT).show();
-                            loadData();
-                        } else {
-                            Toast.makeText(this, R.string.action_failed, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-        );
-
-        initViews();
     }
 
-    private void initViews() {
-        setSupportActionBar(binding.toolbar);
-        adapter = new DoAnAdapter(this);
-        binding.rvDoAn.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvDoAn.setAdapter(adapter);
-
-        binding.fabAddDoAn.setOnClickListener(v -> showAddEditDialog(null));
-    }
-
+    // Menu chuyển đổi chế độ xem danh sách / lưới
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        mMenuToggleLayout = menu.findItem(R.id.action_toggle_layout);
+        updateMenuIcon();
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_load_sample_data) {
-            onLoadSampleDataRequested();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_toggle_layout) {
+            mIsGridMode = !mIsGridMode;
+            mPrefs.edit().putBoolean("is_grid_mode", mIsGridMode).apply();
+
+            if (mIsGridMode) {
+                rvDoAn.setLayoutManager(new GridLayoutManager(this, 2));
+            } else {
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                rvDoAn.setLayoutManager(linearLayoutManager);
+            }
+            updateMenuIcon();
+            mDoAnAdapter.notifyDataSetChanged();
+            Toast.makeText(this, mIsGridMode ? "Chế độ lưới 2 cột" : "Chế độ danh sách", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_nap_du_lieu_mau) {
+            xacNhanNapDuLieuMau();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void onLoadSampleDataRequested() {
-        boolean hasData = doAnDao.hasData();
-        if (hasData) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.dialog_sample_data_exists_title)
-                    .setMessage(R.string.dialog_sample_data_exists_message)
-                    .setPositiveButton(R.string.action_add_more, (dialog, which) -> importSampleData())
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-        } else {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(R.string.dialog_sample_data_title)
-                    .setMessage(R.string.dialog_sample_data_message)
-                    .setPositiveButton(R.string.confirm, (dialog, which) -> importSampleData())
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-        }
+    // Hỏi xác nhận trước khi nạp lại dữ liệu mẫu vì thao tác này xóa toàn bộ dữ liệu hiện có
+    private void xacNhanNapDuLieuMau() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Nạp dữ liệu mẫu");
+        builder.setMessage("Toàn bộ đồ án, nhiệm vụ và cuộc hẹn hiện có sẽ bị xóa và thay bằng bộ dữ liệu mẫu "
+                + "(4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn).\n\nBạn có chắc chắn muốn tiếp tục?");
+        builder.setPositiveButton("Nạp dữ liệu", (dialog, which) -> {
+            mDbHelper.napLaiDuLieuMau();
+            loadData();
+            Toast.makeText(MainActivity.this, "Đã nạp dữ liệu mẫu thành công!", Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
     }
 
-    private void importSampleData() {
-        SampleDataLoader.ImportResult result = SampleDataLoader.importFromAssets(this);
-        if (result.isSuccess()) {
-            loadData();
-            String msg = getString(
-                    R.string.sample_data_success_format,
-                    result.getProjectsCount(),
-                    result.getTasksCount(),
-                    result.getMeetingsCount()
-            );
-            Snackbar.make(binding.getRoot(), msg, Snackbar.LENGTH_LONG).show();
-        } else {
-            Snackbar.make(binding.getRoot(), R.string.sample_data_failed, Snackbar.LENGTH_LONG).show();
+    private void updateMenuIcon() {
+        if (mMenuToggleLayout != null) {
+            if (mIsGridMode) {
+                mMenuToggleLayout.setIcon(R.drawable.ic_list);
+                mMenuToggleLayout.setTitle("Chế độ danh sách");
+            } else {
+                mMenuToggleLayout.setIcon(R.drawable.ic_grid);
+                mMenuToggleLayout.setTitle("Chế độ lưới");
+            }
         }
     }
 
@@ -137,50 +152,56 @@ public class MainActivity extends AppCompatActivity implements DoAnAdapter.OnDoA
         loadData();
     }
 
+    // Nạp lại dữ liệu từ SQLite
     private void loadData() {
-        List<DoAnWithTienDo> list = doAnDao.getAllWithTienDo();
-        adapter.submitList(list);
+        mDoAns.clear();
+        mDoAns.addAll(mDbHelper.getAllDoAn());
 
-        if (list.isEmpty()) {
-            binding.layoutEmpty.setVisibility(View.VISIBLE);
-            binding.rvDoAn.setVisibility(View.GONE);
+        // Dùng notifyDataSetChanged() khi tải lại toàn bộ từ CSDL
+        mDoAnAdapter.notifyDataSetChanged();
+
+        checkEmptyState();
+    }
+
+    private void checkEmptyState() {
+        if (mDoAnAdapter.getItemCount() == 0) {
+            mLayoutEmpty.setVisibility(View.VISIBLE);
+            rvDoAn.setVisibility(View.GONE);
         } else {
-            binding.layoutEmpty.setVisibility(View.GONE);
-            binding.rvDoAn.setVisibility(View.VISIBLE);
+            mLayoutEmpty.setVisibility(View.GONE);
+            rvDoAn.setVisibility(View.VISIBLE);
         }
     }
 
+    // Mở chi tiết đồ án
     @Override
-    public void onItemClick(DoAnWithTienDo item) {
-        android.content.Intent intent = new android.content.Intent(this, com.example.app.ui.DoAnDetailActivity.class);
-        intent.putExtra(com.example.app.ui.DoAnDetailActivity.EXTRA_DO_AN_ID, item.getDoAn().getId());
+    public void onItemClick(DoAn doAn, int position) {
+        Intent intent = new Intent(MainActivity.this, DoAnDetailActivity.class);
+        intent.putExtra(DoAnDetailActivity.EXTRA_DO_AN_ID, doAn.getId());
         startActivity(intent);
     }
 
+    // Mở form sửa
     @Override
-    public void onEditClick(DoAnWithTienDo item) {
-        showAddEditDialog(item.getDoAn());
+    public void onEditClick(DoAn doAn, int position) {
+        Intent intent = new Intent(MainActivity.this, DoAnFormActivity.class);
+        intent.putExtra(DoAnFormActivity.EXTRA_DO_AN_ID, doAn.getId());
+        startActivity(intent);
     }
 
+    // Xóa đồ án bằng removeItem(position)
     @Override
-    public void onDeleteClick(DoAnWithTienDo item) {
-        DoAn doAn = item.getDoAn();
-        String message = String.format(getString(R.string.delete_project_confirm), doAn.getTen());
-
-        com.example.app.ui.ConfirmDeleteDialogFragment dialog =
-                com.example.app.ui.ConfirmDeleteDialogFragment.newInstance(
-                        com.example.app.ui.ConfirmDeleteDialogFragment.REQUEST_KEY_DELETE,
-                        getString(R.string.delete_project_title),
-                        message,
-                        com.example.app.ui.ConfirmDeleteDialogFragment.TYPE_DO_AN,
-                        doAn.getId()
-                );
-        dialog.show(getSupportFragmentManager(), com.example.app.ui.ConfirmDeleteDialogFragment.TAG);
-    }
-
-    private void showAddEditDialog(DoAn existing) {
-        com.example.app.ui.AddEditDoAnDialogFragment dialog = com.example.app.ui.AddEditDoAnDialogFragment.newInstance(existing);
-        dialog.setOnDoAnSavedListener(this::loadData);
-        dialog.show(getSupportFragmentManager(), "AddEditDoAnDialogFragment");
+    public void onDeleteClick(DoAn doAn, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Xác nhận xóa đồ án");
+        builder.setMessage("Bạn có chắc chắn muốn xóa đồ án: \"" + doAn.getTen() + "\" không?\n\nCác nhiệm vụ và cuộc hẹn liên quan sẽ tự động bị xóa.");
+        builder.setPositiveButton("Xóa", (dialog, which) -> {
+            mDbHelper.deleteDoAn(doAn.getId());
+            mDoAnAdapter.removeItem(position);
+            checkEmptyState();
+            Toast.makeText(MainActivity.this, "Đã xóa đồ án thành công!", Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
     }
 }

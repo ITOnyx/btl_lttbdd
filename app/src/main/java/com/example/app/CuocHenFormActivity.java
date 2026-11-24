@@ -92,7 +92,8 @@ public class CuocHenFormActivity extends AppCompatActivity {
 
     // Mở liên tiếp DatePickerDialog và TimePickerDialog để chọn ngày giờ định dạng yyyy-MM-dd HH:mm
     private void moHopThoaiChonNgayGio() {
-        Calendar cal = Calendar.getInstance();
+        // Mở sẵn đúng ngày giờ đang có trong ô (khi sửa); ô trống thì mở thời điểm hiện tại
+        Calendar cal = DBHelper.chuoiSangLich(edtThoiGian.getText().toString());
         int nam = cal.get(Calendar.YEAR);
         int thang = cal.get(Calendar.MONTH);
         int ngay = cal.get(Calendar.DAY_OF_MONTH);
@@ -101,11 +102,11 @@ public class CuocHenFormActivity extends AppCompatActivity {
 
         // 1. Mở DatePickerDialog chọn ngày
         DatePickerDialog dateDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            String selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            String selectedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
 
             // 2. Mở tiếp TimePickerDialog chọn giờ và phút
             TimePickerDialog timeDialog = new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
-                String fullDateTime = String.format(Locale.getDefault(), "%s %02d:%02d", selectedDate, hourOfDay, minute);
+                String fullDateTime = String.format(Locale.US, "%s %02d:%02d", selectedDate, hourOfDay, minute);
                 edtThoiGian.setText(fullDateTime);
             }, gio, phut, true);
 

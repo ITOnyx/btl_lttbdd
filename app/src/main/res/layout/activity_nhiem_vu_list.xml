@@ -23,7 +23,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <!-- Vùng nội dung: ConstraintLayout nằm dưới AppBar nhờ layout_behavior của CoordinatorLayout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -31,8 +32,12 @@
         <!-- RecyclerView hiển thị danh sách nhiệm vụ (Bước 2: id dạng rv_nhiem_vu) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_nhiem_vu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             android:paddingBottom="88dp"
@@ -43,11 +48,14 @@
             android:id="@+id/layoutEmptyNhiemVu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="32dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
                 android:layout_width="80dp"
@@ -72,7 +80,7 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Nút thêm nhiệm vụ mới -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

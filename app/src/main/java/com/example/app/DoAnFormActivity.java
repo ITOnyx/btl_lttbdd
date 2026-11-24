@@ -99,14 +99,15 @@ public class DoAnFormActivity extends AppCompatActivity {
 
     // Mở DatePickerDialog để người dùng chọn ngày và điền vào ô EditText theo định dạng yyyy-MM-dd
     private void moHopThoaiChonNgay(EditText targetEdt) {
-        Calendar cal = Calendar.getInstance();
+        // Mở sẵn đúng ngày đang có trong ô (khi sửa); ô trống thì mở ngày hôm nay
+        Calendar cal = DBHelper.chuoiSangLich(targetEdt.getText().toString());
         int nam = cal.get(Calendar.YEAR);
         int thang = cal.get(Calendar.MONTH);
         int ngay = cal.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             // Định dạng chuỗi ngày chuẩn yyyy-MM-dd
-            String dateStr = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth);
+            String dateStr = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, dayOfMonth);
             targetEdt.setText(dateStr);
         }, nam, thang, ngay);
 
@@ -132,6 +133,24 @@ public class DoAnFormActivity extends AppCompatActivity {
         if (!ngayBatDau.isEmpty() && !hanNop.isEmpty()) {
             if (hanNop.compareTo(ngayBatDau) < 0) {
                 Toast.makeText(this, "Hạn nộp không được trước ngày bắt đầu!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        // Khi sửa đồ án: hạn nộp mới không được sớm hơn hạn của nhiệm vụ muộn nhất đã có
+        if (doAnId != -1 && !hanNop.isEmpty()) {
+            String hanNhiemVuMuonNhat = dbHelper.getHanNhiemVuMuonNhat(doAnId);
+            if (hanNhiemVuMuonNhat != null && hanNop.compareTo(hanNhiemVuMuonNhat) < 0) {
+                Toast.makeText(this, "Hạn nộp không được trước hạn của nhiệm vụ muộn nhất (" + hanNhiemVuMuonNhat + ")!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        // Khi sửa đồ án: ngày bắt đầu mới không được sau hạn của nhiệm vụ sớm nhất đã có
+        if (doAnId != -1 && !ngayBatDau.isEmpty()) {
+            String hanNhiemVuSomNhat = dbHelper.getHanNhiemVuSomNhat(doAnId);
+            if (hanNhiemVuSomNhat != null && ngayBatDau.compareTo(hanNhiemVuSomNhat) > 0) {
+                Toast.makeText(this, "Ngày bắt đầu không được sau hạn của nhiệm vụ sớm nhất (" + hanNhiemVuSomNhat + ")!", Toast.LENGTH_LONG).show();
                 return;
             }
         }

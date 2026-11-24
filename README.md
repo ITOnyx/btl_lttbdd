@@ -28,32 +28,40 @@ Mã nguồn được viết lại theo đúng **phong cách bài giảng của t
 ## 2. CẤU TRÚC FILE MÃ NGUỒN
 
 ### Mã nguồn Java (`app/src/main/java/com/example/app/`):
-1. **DBHelper.java**: Quản lý tạo bảng, nạp dữ liệu mẫu ban đầu, toàn bộ hàm CRUD cho 3 bảng và hàm tính tiến độ đồ án.
-2. **DoAn.java**: Lớp thực thể đồ án (id, ten, moTa, giangVien, ngayBatDau, hanNop).
+1. **DBHelper.java**: Tạo bảng, nạp dữ liệu mẫu (`chenDuLieuMau`, `napLaiDuLieuMau`), toàn bộ hàm CRUD cho 3 bảng, tính tiến độ và thống kê đồ án.
+2. **DoAn.java**: Lớp thực thể đồ án (id, ten, moTa, giangVien, ngayBatDau, hanNop + tongNhiemVu, soNhiemVuXong).
 3. **NhiemVu.java**: Lớp thực thể nhiệm vụ (id, doAnId, ten, ghiChu, hanHoanThanh, daHoanThanh).
 4. **CuocHen.java**: Lớp thực thể cuộc hẹn (id, doAnId, tieuDe, thoiGian, diaDiem, ghiChu).
-5. **MainActivity.java**: Màn hình chính hiển thị danh sách đồ án.
-6. **DoAnAdapter.java**: Adapter RecyclerView hiển thị các dòng đồ án và tiến độ.
-7. **DoAnFormActivity.java**: Màn hình thêm mới / cập nhật đồ án.
-8. **DoAnDetailActivity.java**: Màn hình xem chi tiết đồ án và điều hướng sang nhiệm vụ / cuộc hẹn.
-9. **NhiemVuListActivity.java**: Màn hình danh sách nhiệm vụ của đồ án.
-10. **NhiemVuAdapter.java**: Adapter RecyclerView hiển thị nhiệm vụ với CheckBox hoàn thành.
-11. **NhiemVuFormActivity.java**: Màn hình thêm mới / cập nhật nhiệm vụ.
-12. **CuocHenListActivity.java**: Màn hình danh sách lịch hẹn của đồ án.
-13. **CuocHenAdapter.java**: Adapter RecyclerView hiển thị cuộc hẹn với nhãn "Đã qua" / "Sắp tới".
-14. **CuocHenFormActivity.java**: Màn hình thêm mới / cập nhật cuộc hẹn.
+5. **ThongKeItem.java**: Lớp dữ liệu cho thẻ thống kê (tiêu đề, giá trị, icon).
+6. **MainActivity.java**: Danh sách đồ án; chuyển chế độ Danh sách / Lưới; menu ⋮ "Nạp dữ liệu mẫu".
+7. **DoAnAdapter.java**: Adapter hiển thị các dòng đồ án và tiến độ.
+8. **DoAnFormActivity.java**: Thêm / cập nhật đồ án (hạn nộp ≥ ngày bắt đầu và ≥ hạn nhiệm vụ muộn nhất).
+9. **DoAnDetailActivity.java**: Chi tiết đồ án, thẻ thống kê cuộn ngang, điều hướng sang Nhiệm vụ / Cuộc hẹn / Dòng thời gian.
+10. **ThongKeAdapter.java**: Adapter cho RecyclerView ngang 4 thẻ thống kê.
+11. **NhiemVuListActivity.java**: Danh sách nhiệm vụ (chưa xong lên trước); tick xong thì dòng trượt về đúng nhóm.
+12. **NhiemVuAdapter.java**: Adapter hiển thị nhiệm vụ với CheckBox hoàn thành và gạch ngang chữ.
+13. **NhiemVuFormActivity.java**: Thêm / cập nhật nhiệm vụ (hạn hoàn thành không được sau hạn nộp đồ án).
+14. **CuocHenListActivity.java**: Danh sách lịch hẹn của đồ án.
+15. **CuocHenAdapter.java**: Adapter hiển thị cuộc hẹn với nhãn "Đã qua" / "Sắp tới".
+16. **CuocHenFormActivity.java**: Thêm / cập nhật cuộc hẹn (chọn ngày & giờ).
+17. **TimelineActivity.java**: Dòng thời gian gộp nhiệm vụ và lịch hẹn.
+18. **TimelineAdapter.java**: Adapter nhiều kiểu dòng (HEADER / TASK / MEETING).
 
-### Giao diện XML (`app/src/main/res/layout/`):
-- `activity_main.xml`: Danh sách đồ án + nút FAB thêm.
-- `item_do_an.xml`: Dòng hiển thị đồ án, giảng viên, thời gian, thanh tiến độ.
-- `activity_do_an_form.xml`: Form nhập liệu đồ án.
-- `activity_do_an_detail.xml`: Thông tin chi tiết đồ án + 2 nút mở Nhiệm vụ / Lịch hẹn.
-- `activity_nhiem_vu_list.xml`: Danh sách nhiệm vụ + nút FAB thêm.
-- `item_nhiem_vu.xml`: Dòng nhiệm vụ có CheckBox hoàn thành, gạch ngang chữ khi xong.
-- `activity_nhiem_vu_form.xml`: Form nhập liệu nhiệm vụ.
-- `activity_cuoc_hen_list.xml`: Danh sách cuộc hẹn + nút FAB thêm.
-- `item_cuoc_hen.xml`: Dòng cuộc hẹn có nhãn badge "Đã qua" / "Sắp tới".
-- `activity_cuoc_hen_form.xml`: Form nhập liệu cuộc hẹn (chọn ngày & giờ).
+### Giao diện XML (`app/src/main/res/`):
+- `layout/activity_main.xml` + `row_do_an.xml`: Danh sách đồ án, thanh tiến độ, nút FAB thêm.
+- `layout/activity_do_an_form.xml`: Form nhập liệu đồ án.
+- `layout/activity_do_an_detail.xml` + `row_thong_ke.xml`: Chi tiết đồ án, thẻ thống kê, các nút điều hướng.
+- `layout/activity_nhiem_vu_list.xml` + `row_nhiem_vu.xml`: Danh sách nhiệm vụ có CheckBox, gạch ngang chữ khi xong.
+- `layout/activity_nhiem_vu_form.xml`: Form nhập liệu nhiệm vụ.
+- `layout/activity_cuoc_hen_list.xml` + `row_cuoc_hen.xml`: Danh sách cuộc hẹn có nhãn "Đã qua" / "Sắp tới".
+- `layout/activity_cuoc_hen_form.xml`: Form nhập liệu cuộc hẹn (chọn ngày & giờ).
+- `layout/activity_timeline.xml` + `row_header.xml`, `row_timeline_task.xml`, `row_timeline_meeting.xml`: Dòng thời gian.
+- `menu/menu_main.xml`: Nút chuyển Danh sách / Lưới và mục "Nạp dữ liệu mẫu".
+
+### Dữ liệu mẫu:
+- Có sẵn khi cài lần đầu: 4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn (25 bản ghi).
+- Nạp lại bất cứ lúc nào: màn hình chính → menu ⋮ → **Nạp dữ liệu mẫu** (có hộp thoại xác nhận vì sẽ thay thế toàn bộ dữ liệu hiện có).
+- Bản SQL / JSON độc lập: `docs/du_lieu_mau.sql`, `deliverables/du_lieu_mau/`.
 
 ---
 
@@ -94,7 +102,7 @@ CREATE TABLE CuocHen (
 ### Cách tính tiến độ đồ án:
 Được tính trực tiếp trong hàm `dbHelper.getTienDoDoAn(doAnId)`:
 ```sql
-SELECT COUNT(*), SUM(da_hoan_thanh) FROM NhiemVu WHERE do_an_id = ?
+SELECT COUNT(*), IFNULL(SUM(da_hoan_thanh), 0) FROM NhiemVu WHERE do_an_id = ?
 ```
 - Kết quả trả về chuỗi trực quan: `"x/y (z%)"` (ví dụ `"3/5 (60%)"`).
 - Nếu chưa có nhiệm vụ nào (`y == 0`), trả về an toàn `"0/0 (0%)"`.

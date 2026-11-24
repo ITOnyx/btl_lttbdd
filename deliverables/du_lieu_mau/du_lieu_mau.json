@@ -2,32 +2,32 @@
   "do_an": [
     {
       "ten": "Xây dựng ứng dụng quản lý tiến độ đồ án trên Android",
-      "mo_ta": "Hệ thống hỗ trợ sinh viên lập kế hoạch, chia nhỏ đầu việc và theo dõi lịch hẹn trao đổi với giảng viên hướng dẫn theo thời gian thực.",
+      "mo_ta": "Hệ thống hỗ trợ sinh viên lập kế hoạch và theo dõi lịch hẹn trao đổi với GVHD.",
       "giang_vien": "TS. Nguyễn Văn A",
       "ngay_bat_dau": "2026-09-01",
       "han_nop": "2026-12-30",
       "nhiem_vu": [
         {
           "ten": "Khảo sát yêu cầu và viết đề cương chi tiết",
-          "ghi_chu": "Tổng hợp tài liệu tham khảo và lấy ý kiến định hướng từ GVHD",
+          "ghi_chu": "Lấy ý kiến định hướng từ GVHD",
           "han_hoan_thanh": "2026-09-20",
           "da_hoan_thanh": 1
         },
         {
           "ten": "Thiết kế kiến trúc hệ thống và CSDL SQLite",
-          "ghi_chu": "Thiết kế các bảng DoAn, NhiemVu, CuocHen với khóa ngoại ON DELETE CASCADE",
+          "ghi_chu": "Thiết kế 3 bảng DoAn, NhiemVu, CuocHen",
           "han_hoan_thanh": "2026-10-15",
           "da_hoan_thanh": 1
         },
         {
           "ten": "Lập trình giao diện và hoàn thiện RecyclerView CRUD",
-          "ghi_chu": "Sử dụng Material Components, DialogFragment, ViewBinding",
+          "ghi_chu": "Hoàn thiện các màn hình Activity",
           "han_hoan_thanh": "2026-11-25",
           "da_hoan_thanh": 0
         },
         {
           "ten": "Viết báo cáo kỹ thuật và chuẩn bị slide thuyết minh",
-          "ghi_chu": null,
+          "ghi_chu": "Chuẩn bị nội dung báo cáo nghiệm thu",
           "han_hoan_thanh": "2026-12-25",
           "da_hoan_thanh": 0
         }
@@ -37,13 +37,13 @@
           "tieu_de": "Báo cáo đề cương chi tiết",
           "thoi_gian": "2026-09-15 09:00",
           "dia_diem": "Văn phòng Bộ môn KHMT - Phòng 402-A1",
-          "ghi_chu": "Thầy duyệt đề cương và phân công lịch báo cáo định kỳ"
+          "ghi_chu": "Thầy duyệt đề cương và phân công lịch báo cáo"
         },
         {
           "tieu_de": "Góp ý thiết kế CSDL và giao diện",
           "thoi_gian": "2026-10-20 14:30",
           "dia_diem": "Phòng nghiên cứu Lab 501",
-          "ghi_chu": "Cần chuẩn bị bản vẽ kiến trúc ERD trước khi gặp"
+          "ghi_chu": "Chuẩn bị bản vẽ kiến trúc ERD trước khi gặp"
         },
         {
           "tieu_de": "Kiểm tra tiến độ hoàn thiện ứng dụng",
@@ -55,26 +55,26 @@
     },
     {
       "ten": "Nghiên cứu và triển khai hệ thống nhận diện khuôn mặt",
-      "mo_ta": "Xây dựng mô hình trí tuệ nhân tạo nhận diện khuôn mặt điểm danh sinh viên trong lớp học.",
+      "mo_ta": "Mô hình AI nhận diện khuôn mặt phục vụ điểm danh sinh viên trong lớp học.",
       "giang_vien": "ThS. Trần Thị Mai",
       "ngay_bat_dau": "2026-08-15",
       "han_nop": "2026-11-20",
       "nhiem_vu": [
         {
           "ten": "Tìm hiểu thuật toán RetinaFace và ArcFace",
-          "ghi_chu": "Đọc bài báo khoa học và thử nghiệm source code mẫu trên PyTorch",
+          "ghi_chu": "Đọc bài báo khoa học và thử nghiệm mô hình",
           "han_hoan_thanh": "2026-09-10",
           "da_hoan_thanh": 1
         },
         {
-          "ten": "Thu thập và tiền xử lý tập dữ liệu ảnh sinh viên",
-          "ghi_chu": "Chụp tối thiểu 500 ảnh trong các điều kiện ánh sáng khác nhau",
+          "ten": "Thu thập và tiền xử lý tập dữ liệu ảnh",
+          "ghi_chu": "Thu thập tối thiểu 500 ảnh mẫu",
           "han_hoan_thanh": "2026-10-25",
           "da_hoan_thanh": 0
         },
         {
           "ten": "Đánh giá độ chính xác mô hình trên tập kiểm thử",
-          "ghi_chu": null,
+          "ghi_chu": "Đo đạc độ chính xác và độ trễ nhận diện",
           "han_hoan_thanh": "2026-11-15",
           "da_hoan_thanh": 0
         }
@@ -84,19 +84,19 @@
           "tieu_de": "Thống nhất yêu cầu thực tập và mô hình AI",
           "thoi_gian": "2026-08-25 10:00",
           "dia_diem": "Văn phòng Khoa CNTT - Bàn số 3",
-          "ghi_chu": null
+          "ghi_chu": "Gặp mặt cô hướng dẫn lần đầu"
         },
         {
           "tieu_de": "Báo cáo kết quả huấn luyện mô hình",
           "thoi_gian": "2026-11-19 15:00",
           "dia_diem": "Google Meet (meet.google.com/xyz-abcd-efg)",
-          "ghi_chu": "Trình bày biểu đồ Loss/Accuracy và độ trễ trên thiết bị di động"
+          "ghi_chu": "Trình bày biểu đồ Loss/Accuracy và độ trễ"
         }
       ]
     },
     {
       "ten": "Xây dựng website bán sách trực tuyến BookStore",
-      "mo_ta": "Phát triển trang web thương mại điện tử phục vụ mua bán sách với tính năng thanh toán trực tuyến và gợi ý sách.",
+      "mo_ta": "Trang web thương mại điện tử với tính năng thanh toán trực tuyến và gợi ý sách.",
       "giang_vien": "TS. Lê Hoàng Nam",
       "ngay_bat_dau": "2026-08-01",
       "han_nop": "2026-10-15",
@@ -109,19 +109,19 @@
         },
         {
           "ten": "Xây dựng RESTful API cho quản lý sách và giỏ hàng",
-          "ghi_chu": "Sử dụng Spring Boot và bảo mật bằng JWT",
+          "ghi_chu": "Viết backend Spring Boot",
           "han_hoan_thanh": "2026-09-15",
           "da_hoan_thanh": 1
         },
         {
           "ten": "Thiết kế giao diện người dùng Responsive bằng React",
-          "ghi_chu": null,
+          "ghi_chu": "Giao diện thân thiện người dùng",
           "han_hoan_thanh": "2026-10-01",
           "da_hoan_thanh": 1
         },
         {
           "ten": "Kiểm thử chức năng thanh toán trực tuyến và nộp bài",
-          "ghi_chu": "Đã tích hợp cổng thanh toán giả lập VnPay",
+          "ghi_chu": "Tích hợp cổng giả lập VnPay",
           "han_hoan_thanh": "2026-10-12",
           "da_hoan_thanh": 1
         }
@@ -137,26 +137,26 @@
     },
     {
       "ten": "Ứng dụng kết nối gia sư và học sinh TutorNow",
-      "mo_ta": null,
+      "mo_ta": "Nền tảng tìm kiếm và đặt lịch học kèm tại nhà cho học sinh các cấp.",
       "giang_vien": "ThS. Phạm Thanh Tùng",
       "ngay_bat_dau": "2026-10-01",
       "han_nop": "2027-01-15",
       "nhiem_vu": [
         {
           "ten": "Nghiên cứu thị trường và khảo sát nhu cầu người dùng",
-          "ghi_chu": "Khảo sát nhu cầu tìm gia sư của 200 phụ huynh học sinh",
+          "ghi_chu": "Khảo sát 200 phụ huynh học sinh",
           "han_hoan_thanh": "2026-11-05",
           "da_hoan_thanh": 0
         },
         {
           "ten": "Xây dựng Business Model Canvas (BMC)",
-          "ghi_chu": null,
+          "ghi_chu": "Hoàn thiện mô hình kinh doanh",
           "han_hoan_thanh": "2026-12-01",
           "da_hoan_thanh": 0
         },
         {
           "ten": "Thiết kế bản mẫu Wireframe trên Figma",
-          "ghi_chu": "Tập trung vào luồng đặt lịch học và đánh giá gia sư",
+          "ghi_chu": "Thiết kế luồng đặt lịch học kèm",
           "han_hoan_thanh": "2027-01-05",
           "da_hoan_thanh": 0
         }
@@ -165,8 +165,8 @@
         {
           "tieu_de": "Tư vấn cố vấn đề án khởi nghiệp",
           "thoi_gian": "2026-12-05 09:30",
-          "dia_diem": null,
-          "ghi_chu": "Gặp ban cố vấn để xin ý kiến về chiến lược tiếp cận thị trường"
+          "dia_diem": "Phòng họp Tòa A",
+          "ghi_chu": "Gặp ban cố vấn để xin ý kiến định hướng"
         }
       ]
     }

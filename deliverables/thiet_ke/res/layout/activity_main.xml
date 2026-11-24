@@ -23,31 +23,41 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <!-- Vùng nội dung: ConstraintLayout nằm dưới AppBar nhờ layout_behavior của CoordinatorLayout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- RecyclerView danh sách đồ án -->
+        <!-- RecyclerView danh sách đồ án (Bước 2: id dạng rv_do_an) -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvDoAn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/rv_do_an"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:clipToPadding="false"
-            android:paddingTop="8dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="6dp"
             android:paddingBottom="88dp"
-            tools:listitem="@layout/item_do_an" />
+            tools:listitem="@layout/row_do_an" />
 
         <!-- Giao diện khi chưa có dữ liệu (Empty state) -->
         <LinearLayout
             android:id="@+id/layoutEmpty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="32dp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible">
 
             <FrameLayout
@@ -75,7 +85,7 @@
                 android:textSize="15sp" />
         </LinearLayout>
 
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Nút thêm đồ án mới -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
