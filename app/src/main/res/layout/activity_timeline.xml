@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Giao diện màn hình Dòng thời gian đồ án (Timeline) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-    <!-- AppBar & Toolbar -->
+    <!-- AppBar & Toolbar: neo trên cùng -->
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
+        android:id="@+id/appBarTimeline"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_timeline"
@@ -25,53 +28,55 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!-- RecyclerView Multiple View Type gộp Header, Nhiệm vụ và Cuộc hẹn: lấp đầy phần dưới AppBar -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_timeline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarTimeline" />
 
-        <!-- RecyclerView Multiple View Type gộp Header, Nhiệm vụ và Cuộc hẹn -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_timeline"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="8dp"
-            android:paddingBottom="24dp" />
+    <!-- Giao diện khi chưa có dữ liệu: căn giữa vùng dưới AppBar (ràng buộc 4 phía) -->
+    <LinearLayout
+        android:id="@+id/layout_empty_timeline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarTimeline"
+        tools:visibility="visible">
 
-        <!-- Giao diện khi chưa có dữ liệu nào -->
-        <LinearLayout
-            android:id="@+id/layout_empty_timeline"
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_circle_icon">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_empty_state"
+                app:tint="@color/primary" />
+        </FrameLayout>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="32dp"
-            android:visibility="gone">
+            android:layout_marginTop="16dp"
+            android:text="Chưa có dữ liệu dòng thời gian"
+            android:textColor="@color/text_secondary"
+            android:textSize="15sp" />
+    </LinearLayout>
 
-            <FrameLayout
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/bg_circle_icon">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_empty_state"
-                    app:tint="@color/primary" />
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Chưa có dữ liệu dòng thời gian"
-                android:textColor="@color/text_secondary"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-    </FrameLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

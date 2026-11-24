@@ -1,125 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-    <!-- Thanh tiêu đề Toolbar -->
+    <!-- Thanh tiêu đề Toolbar: neo trên cùng -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarCuocHenForm"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Thông tin cuộc hẹn"
         app:titleTextColor="@color/white" />
 
+    <!-- ScrollView chiếm phần còn lại dưới Toolbar -->
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarCuocHenForm">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <!-- Tiêu đề cuộc hẹn -->
             <TextView
+                android:id="@+id/lblTieuDe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tiêu đề cuộc hẹn (*)"
+                android:text="Tiêu đề cuộc hẹn"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/edtTieuDe"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_marginBottom="14dp"
                 android:background="@drawable/bg_circle_icon"
                 android:backgroundTint="@color/surface"
                 android:hint="VD: Báo cáo tiến độ tuần 3..."
                 android:padding="12dp"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblTieuDe" />
 
-            <!-- Thời gian (ngày & giờ) -->
+            <!-- Thời gian (ngày & giờ): ô nhập co giãn, nút "Chọn Lịch" neo mép phải -->
             <TextView
+                android:id="@+id/lblThoiGian"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thời gian gặp (* yyyy-MM-dd HH:mm)"
+                android:layout_marginTop="14dp"
+                android:text="Thời gian gặp "
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtTieuDe" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <EditText
+                android:id="@+id/edtThoiGian"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_marginBottom="14dp"
-                android:orientation="horizontal">
+                android:background="@drawable/bg_circle_icon"
+                android:backgroundTint="@color/surface"
+                android:focusable="false"
+                android:hint="Chọn ngày và giờ..."
+                android:padding="12dp"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@id/btnChonThoiGian"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblThoiGian" />
 
-                <EditText
-                    android:id="@+id/edtThoiGian"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_circle_icon"
-                    android:backgroundTint="@color/surface"
-                    android:focusable="false"
-                    android:hint="Chọn ngày và giờ..."
-                    android:padding="12dp"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp" />
+            <Button
+                android:id="@+id/btnChonThoiGian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Chọn Lịch"
+                app:layout_constraintBottom_toBottomOf="@id/edtThoiGian"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtThoiGian" />
 
-                <Button
-                    android:id="@+id/btnChonThoiGian"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Chọn Lịch" />
-            </LinearLayout>
+            <!-- Barrier: lấy mép dưới của view thấp nhất trong hàng (ô nhập hoặc nút) -->
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrierThoiGian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="edtThoiGian,btnChonThoiGian" />
 
             <!-- Địa điểm -->
             <TextView
+                android:id="@+id/lblDiaDiem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:text="Địa điểm cuộc hẹn"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrierThoiGian" />
 
             <EditText
                 android:id="@+id/edtDiaDiem"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_marginBottom="14dp"
                 android:background="@drawable/bg_circle_icon"
                 android:backgroundTint="@color/surface"
                 android:hint="VD: Phòng Lab 501 / Google Meet..."
                 android:padding="12dp"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblDiaDiem" />
 
             <!-- Ghi chú chi tiết -->
             <TextView
+                android:id="@+id/lblGhiChu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:text="Ghi chú / Nội dung trao đổi"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtDiaDiem" />
 
             <EditText
                 android:id="@+id/edtGhiChu"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:layout_marginBottom="24dp"
                 android:background="@drawable/bg_circle_icon"
                 android:backgroundTint="@color/surface"
                 android:gravity="top"
@@ -127,31 +156,41 @@
                 android:lines="3"
                 android:padding="12dp"
                 android:textColor="@color/text_primary"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblGhiChu" />
 
             <!-- Nút Lưu & Quay lại -->
             <Button
                 android:id="@+id/btnLuuCuocHen"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:backgroundTint="@color/primary"
                 android:padding="14dp"
                 android:text="Lưu cuộc hẹn"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtGhiChu" />
 
             <Button
                 android:id="@+id/btnQuayLaiCuocHen"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:padding="14dp"
                 android:text="Quay lại"
                 android:textColor="@color/primary"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnLuuCuocHen" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

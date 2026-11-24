@@ -1,210 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-    <!-- Thanh tiêu đề Toolbar -->
+    <!-- Thanh tiêu đề Toolbar: neo trên cùng -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarDetail"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="Chi tiết Đồ án"
         app:titleTextColor="@color/white" />
 
+    <!-- ScrollView chiếm phần còn lại dưới Toolbar -->
     <ScrollView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbarDetail">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <!-- Card hiển thị thông tin đồ án -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+                android:id="@+id/cardDetail"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:strokeColor="@color/card_stroke"
                 app:strokeWidth="1dp">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:padding="16dp">
 
                     <TextView
                         android:id="@+id/tvDetailTen"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
                         tools:text="Xây dựng App Quản lý Tiến độ" />
 
                     <TextView
                         android:id="@+id/tvDetailMoTa"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvDetailTen"
                         tools:text="Mô tả đề tài nghiên cứu chi tiết..." />
 
-                    <!-- Giảng viên -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Giảng viên: icon căn giữa theo dòng chữ -->
+                    <ImageView
+                        android:id="@+id/ivDetailGiangVien"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_person"
+                        app:layout_constraintBottom_toBottomOf="@id/tvDetailGiangVien"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvDetailGiangVien"
+                        app:tint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tvDetailGiangVien"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="12dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_person"
-                            app:tint="@color/primary" />
-
-                        <TextView
-                            android:id="@+id/tvDetailGiangVien"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13.5sp"
-                            tools:text="GVHD: TS. Nguyễn Văn A" />
-                    </LinearLayout>
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13.5sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivDetailGiangVien"
+                        app:layout_constraintTop_toBottomOf="@id/tvDetailMoTa"
+                        tools:text="GVHD: TS. Nguyễn Văn A" />
 
                     <!-- Thời gian -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <ImageView
+                        android:id="@+id/ivDetailThoiGian"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_calendar"
+                        app:layout_constraintBottom_toBottomOf="@id/tvDetailThoiGian"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/tvDetailThoiGian"
+                        app:tint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tvDetailThoiGian"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="6dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_calendar"
-                            app:tint="@color/primary" />
-
-                        <TextView
-                            android:id="@+id/tvDetailThoiGian"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13.5sp"
-                            tools:text="2026-09-01 đến 2026-12-30" />
-                    </LinearLayout>
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13.5sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ivDetailThoiGian"
+                        app:layout_constraintTop_toBottomOf="@id/tvDetailGiangVien"
+                        tools:text="2026-09-01 đến 2026-12-30" />
 
                     <!-- Đường phân cách -->
                     <View
-                        android:layout_width="match_parent"
+                        android:id="@+id/dividerDetail"
+                        android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_marginTop="14dp"
-                        android:layout_marginBottom="12dp"
-                        android:background="@color/divider" />
+                        android:background="@color/divider"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvDetailThoiGian" />
 
-                    <!-- Tiến độ hoàn thành -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <!-- Tiến độ hoàn thành: nhãn bên trái, giá trị bên phải, căn theo baseline -->
+                    <TextView
+                        android:id="@+id/lblDetailTienDo"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Tiến độ thực hiện:"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13.5sp"
+                        app:layout_constraintEnd_toStartOf="@id/tvDetailTienDo"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/dividerDetail" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="sans-serif-medium"
-                            android:text="Tiến độ thực hiện:"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13.5sp" />
-
-                        <TextView
-                            android:id="@+id/tvDetailTienDo"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="sans-serif-medium"
-                            android:textColor="@color/primary"
-                            android:textSize="14sp"
-                            tools:text="2/4 (50%)" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvDetailTienDo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/primary"
+                        android:textSize="14sp"
+                        app:layout_constraintBaseline_toBaselineOf="@id/lblDetailTienDo"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        tools:text="2/4 (50%)" />
 
                     <ProgressBar
                         android:id="@+id/progressBarDetail"
                         style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="10dp"
                         android:layout_marginTop="8dp"
                         android:max="100"
                         android:progressDrawable="@drawable/custom_progress_drawable"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/lblDetailTienDo"
                         tools:progress="50" />
 
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Mục C2: RecyclerView cuộn ngang hiển thị thẻ thống kê nhanh -->
             <TextView
+                android:id="@+id/lblThongKe"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Thống kê nhanh:"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cardDetail" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_thong_ke"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblThongKe"
                 tools:listitem="@layout/row_thong_ke" />
 
-            <!-- 2 Nút lớn xem Nhiệm vụ và Lịch hẹn -->
+            <!-- 3 nút lớn xem Nhiệm vụ, Lịch hẹn và Timeline -->
             <TextView
+                android:id="@+id/lblQuanLy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Quản lý chi tiết:"
                 android:textColor="@color/text_primary"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_thong_ke" />
 
             <!-- Nút mở danh sách Nhiệm vụ -->
             <Button
                 android:id="@+id/btnXemNhiemVu"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="@color/primary"
                 android:drawableStart="@drawable/ic_clock"
                 android:drawableTint="@color/white"
                 android:padding="14dp"
                 android:text="  Danh sách Nhiệm vụ"
                 android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lblQuanLy" />
 
             <!-- Nút mở danh sách Lịch hẹn -->
             <Button
                 android:id="@+id/btnXemCuocHen"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/primary"
@@ -213,68 +244,80 @@
                 android:padding="14dp"
                 android:text="  Lịch hẹn trao đổi với GVHD"
                 android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnXemNhiemVu" />
 
             <!-- Nút mở Dòng thời gian tổng hợp (Mục D1: Multiple View Type) -->
             <Button
                 android:id="@+id/btnXemDongThoiGian"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:drawableStart="@drawable/ic_calendar"
                 android:padding="14dp"
                 android:text="  Dòng thời gian tổng hợp (Timeline)"
                 android:textColor="@color/primary"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnXemCuocHen" />
 
             <!-- Đường phân cách -->
             <View
-                android:layout_width="match_parent"
+                android:id="@+id/dividerActions"
+                android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/divider" />
+                android:background="@color/divider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnXemDongThoiGian" />
 
-            <!-- Các nút Thao tác: Sửa, Xóa, Quay lại -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Nút Sửa / Xóa: chuỗi ngang (horizontal chain) chia đều 2 cột -->
+            <Button
+                android:id="@+id/btnSuaDoAn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="6dp"
+                android:padding="12dp"
+                android:text="Sửa đồ án"
+                android:textColor="@color/primary"
+                app:layout_constraintEnd_toStartOf="@id/btnXoaDoAn"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dividerActions" />
 
-                <Button
-                    android:id="@+id/btnSuaDoAn"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:text="Sửa đồ án"
-                    android:textColor="@color/primary" />
-
-                <Button
-                    android:id="@+id/btnXoaDoAn"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:padding="12dp"
-                    android:text="Xóa đồ án"
-                    android:textColor="@color/status_expired" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/btnXoaDoAn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:padding="12dp"
+                android:text="Xóa đồ án"
+                android:textColor="@color/status_expired"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnSuaDoAn"
+                app:layout_constraintTop_toTopOf="@id/btnSuaDoAn" />
 
             <Button
                 android:id="@+id/btnQuayLaiDetail"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Quay lại danh sách"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_secondary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnSuaDoAn" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
