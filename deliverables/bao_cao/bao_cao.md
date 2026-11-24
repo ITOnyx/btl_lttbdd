@@ -52,18 +52,18 @@ Thực tế sinh viên hay gặp các khó khăn:
 1. **Quản trị Đồ án:**
    * Xem danh sách đồ án kèm thanh tiến độ trực quan, số đầu việc đã xong/tổng số; chuyển đổi chế độ xem danh sách / lưới 2 cột.
    * Xem chi tiết đồ án với 4 thẻ thống kê nhanh và dòng thời gian tổng hợp nhiệm vụ – lịch hẹn.
-   * Thêm đồ án mới với ràng buộc: Hạn nộp phải sau hoặc bằng ngày bắt đầu; khi sửa, hạn nộp không được sớm hơn hạn của nhiệm vụ muộn nhất.
+   * Thêm đồ án mới với ràng buộc: Hạn nộp phải sau hoặc bằng ngày bắt đầu; khi sửa, hạn nộp không được sớm hơn hạn của nhiệm vụ muộn nhất và ngày bắt đầu không được muộn hơn hạn của nhiệm vụ sớm nhất.
    * Chỉnh sửa thông tin đồ án đã có.
    * Xóa đồ án kèm cảnh báo xóa xếp tầng (cascade) toàn bộ nhiệm vụ và cuộc hẹn trực thuộc.
 2. **Quản trị Nhiệm vụ:**
    * Xem danh sách nhiệm vụ của từng đồ án, tự động phân nhóm/sắp xếp: việc chưa hoàn thành lên trước, việc đã hoàn thành xuống dưới.
-   * Thêm nhiệm vụ với ràng buộc: Hạn hoàn thành của nhiệm vụ không được vượt quá hạn nộp của đồ án.
+   * Thêm nhiệm vụ với ràng buộc: Hạn hoàn thành của nhiệm vụ phải nằm trong khoảng từ ngày bắt đầu đến hạn nộp của đồ án.
    * Chỉnh sửa và xóa từng nhiệm vụ.
    * Chạm vào Checkbox để đảo trạng thái (hoàn thành / chưa xong); thanh tiến độ đồ án cập nhật tức thì.
 3. **Quản trị Cuộc hẹn:**
    * Xem danh sách cuộc hẹn sắp xếp theo thứ tự thời gian tăng dần.
    * Hiển thị trực quan nhãn trạng thái (Badge): màu xanh lá *"Sắp diễn ra"* đối với cuộc hẹn trong tương lai, màu xám *"Đã qua"* đối với cuộc hẹn trong quá khứ so với thời điểm hiện tại.
-   * Thêm, sửa, xóa cuộc hẹn với bộ chọn ngày (DatePicker) và bộ chọn giờ (TimePicker).
+   * Thêm, sửa, xóa cuộc hẹn với bộ chọn ngày (DatePicker) và bộ chọn giờ (TimePicker); khi sửa, bộ chọn mở sẵn đúng ngày giờ đã lưu.
 4. **Nạp dữ liệu mẫu:**
    * Dữ liệu mẫu (4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn) được nạp tự động khi cài đặt lần đầu.
    * Mục **"Nạp dữ liệu mẫu"** trong menu ⋮ của màn hình chính cho phép khôi phục lại bộ dữ liệu này bất cứ lúc nào.
@@ -213,7 +213,7 @@ Nếu thêm cột `tien_do` (hoặc `phan_tram`) vào bảng `DoAn`:
 | 2 | `DoAnFormActivity` | `activity_do_an_form.xml` | Thêm / sửa đồ án; chọn ngày bằng `DatePickerDialog` |
 | 3 | `DoAnDetailActivity` | `activity_do_an_detail.xml`, `row_thong_ke.xml` | Thông tin đồ án, thanh tiến độ tổng, **RecyclerView cuộn ngang** 4 thẻ thống kê; nút sang Nhiệm vụ / Cuộc hẹn / Dòng thời gian; sửa, xóa đồ án |
 | 4 | `NhiemVuListActivity` | `activity_nhiem_vu_list.xml`, `row_nhiem_vu.xml` | Danh sách nhiệm vụ (chưa xong lên trước), CheckBox đánh dấu hoàn thành, sửa / xóa |
-| 5 | `NhiemVuFormActivity` | `activity_nhiem_vu_form.xml` | Thêm / sửa nhiệm vụ, kiểm tra hạn không vượt hạn nộp đồ án |
+| 5 | `NhiemVuFormActivity` | `activity_nhiem_vu_form.xml` | Thêm / sửa nhiệm vụ, kiểm tra hạn nằm trong khoảng ngày bắt đầu – hạn nộp của đồ án |
 | 6 | `CuocHenListActivity` | `activity_cuoc_hen_list.xml`, `row_cuoc_hen.xml` | Danh sách cuộc hẹn theo thời gian tăng dần, nhãn *Sắp diễn ra* / *Đã qua* |
 | 7 | `CuocHenFormActivity` | `activity_cuoc_hen_form.xml` | Thêm / sửa cuộc hẹn; chọn liên tiếp `DatePickerDialog` → `TimePickerDialog` |
 | 8 | `TimelineActivity` | `activity_timeline.xml`, `row_header.xml`, `row_timeline_task.xml`, `row_timeline_meeting.xml` | Dòng thời gian gộp Nhiệm vụ và Lịch hẹn trong **một** RecyclerView nhiều kiểu dòng |
@@ -272,6 +272,7 @@ flowchart TD
 
 #### 4. `DatePickerDialog` / `TimePickerDialog`
 * Người dùng không phải tự gõ ngày, tránh sai định dạng. Giá trị trả về được định dạng ngay thành `yyyy-MM-dd` hoặc `yyyy-MM-dd HH:mm` bằng `String.format(Locale.US, ...)` (dùng `Locale.US` để chữ số luôn là 0–9 trên mọi ngôn ngữ máy, giữ đúng phép so sánh chuỗi).
+* Khi sửa, hàm dùng chung `DBHelper.chuoiSangLich()` đổi chuỗi ngày giờ đang lưu thành `Calendar`, nên bộ chọn mở sẵn đúng ngày giờ cũ thay vì ngày hôm nay; người dùng chỉ cần chỉnh phần muốn đổi.
 
 #### 5. `findViewById` + `setOnClickListener`
 * Đúng kỹ thuật được dạy trên lớp, không cần bật thêm tính năng build, dễ giải thích từng dòng khi vấn đáp.
@@ -353,12 +354,17 @@ String sql = "SELECT d.id, d.ten, d.mo_ta, d.giang_vien, d.ngay_bat_dau, d.han_n
 * Sắp xếp ngay trong SQL nên cả `NhiemVuListActivity` và `TimelineActivity` cùng dùng chung thứ tự này.
 * Khi người dùng tick CheckBox, `NhiemVuListActivity.onToggleStatus()` ghi CSDL, đọc lại danh sách đã sắp xếp, tìm vị trí mới của nhiệm vụ và gọi `notifyItemMoved(viTriCu, viTriMoi)`. Dòng trượt về đúng nhóm có hiệu ứng mà không phải vẽ lại toàn bộ danh sách.
 
-#### 4. Ràng buộc hạn hoàn thành nhiệm vụ ≤ hạn nộp đồ án (kiểm tra hai chiều)
+#### 4. Ràng buộc ngày bắt đầu ≤ hạn nhiệm vụ ≤ hạn nộp đồ án (kiểm tra hai chiều)
 ```java
 // NhiemVuFormActivity.luuNhiemVu()
 if (!hanHoanThanh.isEmpty()) {
     DoAn doAn = dbHelper.getDoAnById(doAnId);
-    String hanNopDoAn = (doAn != null && doAn.getHanNop() != null) ? doAn.getHanNop().trim() : "";
+    String ngayBatDauDoAn = ...; // doAn.getNgayBatDau()
+    String hanNopDoAn = ...;     // doAn.getHanNop()
+    if (!ngayBatDauDoAn.isEmpty() && hanHoanThanh.compareTo(ngayBatDauDoAn) < 0) {
+        Toast.makeText(this, "Hạn hoàn thành không được trước ngày bắt đầu đồ án (" + ngayBatDauDoAn + ")!", Toast.LENGTH_LONG).show();
+        return;
+    }
     if (!hanNopDoAn.isEmpty() && hanHoanThanh.compareTo(hanNopDoAn) > 0) {
         Toast.makeText(this, "Hạn hoàn thành không được sau hạn nộp đồ án (" + hanNopDoAn + ")!", Toast.LENGTH_LONG).show();
         return;
@@ -366,11 +372,13 @@ if (!hanHoanThanh.isEmpty()) {
 }
 ```
 ```java
-// DoAnFormActivity.luuDoAn() – khi sửa đồ án, không cho dời hạn nộp sớm hơn nhiệm vụ muộn nhất
+// DoAnFormActivity.luuDoAn() – khi sửa đồ án, không cho dời hai đầu mốc vượt qua các nhiệm vụ đã có
 String hanNhiemVuMuonNhat = dbHelper.getHanNhiemVuMuonNhat(doAnId); // SELECT MAX(han_hoan_thanh) ...
 if (hanNhiemVuMuonNhat != null && hanNop.compareTo(hanNhiemVuMuonNhat) < 0) { ... return; }
+String hanNhiemVuSomNhat = dbHelper.getHanNhiemVuSomNhat(doAnId);   // SELECT MIN(han_hoan_thanh) ...
+if (hanNhiemVuSomNhat != null && ngayBatDau.compareTo(hanNhiemVuSomNhat) > 0) { ... return; }
 ```
-Nếu chỉ kiểm tra ở Form nhiệm vụ, người dùng vẫn có thể phá vỡ ràng buộc bằng cách sửa hạn nộp của đồ án. Vì vậy ràng buộc được kiểm tra ở cả hai phía. Phép so sánh chuỗi `compareTo` hợp lệ nhờ định dạng `yyyy-MM-dd` (mục 3.3.3).
+Nếu chỉ kiểm tra ở Form nhiệm vụ, người dùng vẫn có thể phá vỡ ràng buộc bằng cách sửa ngày bắt đầu hoặc hạn nộp của đồ án. Vì vậy ràng buộc được kiểm tra ở cả hai phía. Phép so sánh chuỗi `compareTo` hợp lệ nhờ định dạng `yyyy-MM-dd` (mục 3.3.3).
 
 #### 5. Nạp lại dữ liệu mẫu an toàn bằng Transaction
 ```java
@@ -421,20 +429,130 @@ Khi dòng đang chạy hiệu ứng xóa, vị trí có thể là `-1`; việc k
 
 ---
 
-## 6. KIỂM THỬ VÀ ĐÁNH GIÁ
+## 6. GIẢI THÍCH LÝ DO LỰA CHỌN CÁCH PHÂN TÍCH, THIẾT KẾ VÀ LẬP TRÌNH
 
-### 6.1. Kiểm tra truy vấn trên bộ dữ liệu mẫu
+Chương này tổng hợp lại toàn bộ các quyết định quan trọng của đồ án theo ba giai đoạn: phân tích, thiết kế và lập trình. Với mỗi quyết định, báo cáo nêu phương án đã chọn, các phương án khác đã cân nhắc và lý do lựa chọn, để người đọc thấy mỗi chi tiết trong sản phẩm đều có chủ đích chứ không phải ngẫu nhiên.
+
+### 6.1. Lý do chọn cách phân tích bài toán
+
+#### 1. Xuất phát từ nhu cầu thực tế của chính sinh viên
+Đề tài được chọn từ khó khăn mà sinh viên gặp hằng ngày: làm nhiều đồ án song song, nhiều hạn chót trung gian và nhiều buổi gặp giảng viên hướng dẫn. Vì người viết cũng là người dùng, các yêu cầu được rút ra trực tiếp từ trải nghiệm thật (quên hạn, nhầm lịch hẹn, không biết mình đã làm được bao nhiêu phần trăm), nhờ đó phạm vi chức năng vừa đủ, không thừa, không thiếu.
+
+#### 2. Chỉ có một tác nhân (Actor) và không cần đăng nhập
+* Ứng dụng là công cụ **cá nhân**, dữ liệu nằm trên chính điện thoại của sinh viên nên không cần phân quyền hay tài khoản.
+* Bỏ đăng nhập giúp người dùng mở ứng dụng là dùng được ngay, đồng thời giữ cho đồ án tập trung vào trọng tâm môn học: SQLite, Activity, Intent và RecyclerView.
+* Phương án có máy chủ và đồng bộ đám mây đã được cân nhắc nhưng bị loại vì vượt phạm vi học phần và cần kết nối mạng, trái với mục tiêu hoạt động ngoại tuyến (offline-first).
+
+#### 3. Phân rã bài toán thành ba thực thể Đồ án – Nhiệm vụ – Cuộc hẹn
+* Khi mô tả bài toán bằng lời, ba danh từ xuất hiện lặp lại là **đồ án**, **việc cần làm** và **buổi hẹn với giảng viên**. Mỗi danh từ có thuộc tính riêng nên trở thành một thực thể.
+* Nhiệm vụ và Cuộc hẹn đều "thuộc về" một Đồ án, do đó quan hệ tự nhiên là 1 – N. Không tách Cuộc hẹn thành một loại Nhiệm vụ vì cuộc hẹn có thuộc tính khác hẳn (giờ hẹn, địa điểm) và không có trạng thái "hoàn thành".
+
+#### 4. Các ràng buộc nghiệp vụ được rút ra từ logic thời gian
+* Hạn nộp đồ án phải sau hoặc bằng ngày bắt đầu (một đồ án không thể kết thúc trước khi bắt đầu).
+* Hạn của từng nhiệm vụ phải nằm trong khoảng từ ngày bắt đầu đến hạn nộp của đồ án (việc con không thể đến hạn trước khi đồ án bắt đầu, và phải xong trước khi nộp). Ràng buộc này được kiểm tra **hai chiều**, vì người dùng có thể phá vỡ nó từ cả phía nhiệm vụ lẫn phía đồ án.
+* Cuộc hẹn được phân loại "Sắp diễn ra" / "Đã qua" bằng cách so sánh với thời điểm hiện tại, vì đó là thông tin sinh viên cần nhất khi mở danh sách lịch hẹn.
+
+#### 5. Tiến độ là dữ liệu phái sinh, không phải dữ liệu nhập
+Trong bước phân tích, tiến độ được xác định là kết quả tính ra từ trạng thái các nhiệm vụ chứ không phải thông tin người dùng tự nhập. Quyết định này dẫn thẳng tới thiết kế "tính bằng truy vấn" ở mục 3.3.
+
+#### 6. Có bộ dữ liệu mẫu ngay từ đầu
+Một ứng dụng quản lý mà mở ra trống trơn thì rất khó đánh giá. Vì vậy yêu cầu "nạp sẵn dữ liệu mẫu và nạp lại được từ menu" được đưa vào ngay từ giai đoạn phân tích để phục vụ việc minh họa, kiểm thử và chấm bài.
+
+### 6.2. Lý do chọn cách thiết kế cơ sở dữ liệu
+
+| Quyết định | Phương án khác đã cân nhắc | Lý do chọn |
+| :--- | :--- | :--- |
+| 3 bảng `DoAn`, `NhiemVu`, `CuocHen` | Một bảng phẳng gộp tất cả | Đạt chuẩn 3NF, tránh lặp thông tin đồ án trên từng dòng, tránh bất thường khi thêm/sửa/xóa |
+| Khóa ngoại `ON DELETE CASCADE` + `setForeignKeyConstraintsEnabled(true)` | Tự viết 3 lệnh `DELETE` trong Java | CSDL tự đảm bảo toàn vẹn, không để lại dữ liệu mồ côi, ít mã hơn, không thể quên |
+| Ngày giờ lưu `TEXT` dạng `yyyy-MM-dd` / `yyyy-MM-dd HH:mm` | Lưu `INTEGER` epoch mili-giây | So sánh chuỗi trùng thứ tự thời gian, dùng được `ORDER BY`, `MAX`, `<`, `>`; dễ đọc khi gỡ lỗi |
+| Tiến độ tính bằng `LEFT JOIN` + `COUNT` + `IFNULL(SUM)` | Thêm cột `tien_do` vào bảng `DoAn` | Không bao giờ lệch dữ liệu; một truy vấn cho cả danh sách, tránh N + 1 truy vấn |
+| Sắp xếp nhiệm vụ ngay trong SQL (`ORDER BY da_hoan_thanh, ...`) | Sắp xếp bằng `Comparator` trong Java | Một nguồn sắp xếp duy nhất dùng chung cho 2 màn hình, mã Java gọn hơn |
+| SQLite thuần qua `SQLiteOpenHelper` | Thư viện Room | Đúng nội dung môn học, hiểu rõ `onCreate`/`onUpgrade`/`Cursor`, không cần thư viện sinh mã |
+| Tham số `?` trong mọi câu SQL | Cộng chuỗi trực tiếp | Chống SQL Injection, không lỗi cú pháp khi dữ liệu có dấu nháy `'` |
+| Nạp dữ liệu mẫu trong Transaction | Xóa rồi chèn từng lệnh rời | Tính nguyên tử: hoặc thành công hết, hoặc giữ nguyên dữ liệu cũ |
+
+Chi tiết lập luận cho từng quyết định đã được trình bày ở mục 3.3; bảng trên giúp người đọc thấy rõ phương án bị loại và lý do loại.
+
+### 6.3. Lý do chọn cách thiết kế giao diện
+
+| Quyết định | Phương án khác đã cân nhắc | Lý do chọn |
+| :--- | :--- | :--- |
+| Mỗi chức năng một Activity, thêm/sửa mở Form riêng | Fragment, hoặc hộp thoại nhập liệu | Luồng tuyến tính dễ hiểu, đúng bài giảng; Form có đủ chỗ cho DatePicker và nhiều trường nhập |
+| Dùng chung một Form cho Thêm và Sửa | Hai màn hình riêng | Không lặp layout và mã kiểm tra; phân biệt chế độ bằng ID truyền qua `Intent` (−1 là thêm mới) |
+| `RecyclerView` cho mọi danh sách | `ListView` | Bắt buộc ViewHolder, đổi bố cục bằng `LayoutManager`, có sẵn hiệu ứng thêm/xóa/di chuyển |
+| Chế độ Danh sách / Lưới 2 cột, nhớ bằng `SharedPreferences` | Chỉ một kiểu danh sách | Minh họa `GridLayoutManager`; người dùng chọn kiểu xem hợp với mình và không phải chọn lại |
+| Thẻ thống kê cuộn ngang | 4 ô xếp dọc | Tiết kiệm chiều cao màn hình chi tiết, minh họa `LinearLayoutManager.HORIZONTAL` |
+| Dòng thời gian nhiều kiểu dòng | Lồng 2 RecyclerView | Một danh sách liền mạch, cuộn mượt, đúng kỹ thuật Multiple View Type trong bài giảng |
+| `DatePickerDialog` / `TimePickerDialog` | Ô nhập ngày bằng bàn phím | Người dùng không thể gõ sai định dạng, dữ liệu luôn so sánh được |
+| Nhãn màu "Sắp diễn ra" / "Đã qua" | Chỉ hiển thị giờ hẹn | Nhận biết trạng thái bằng mắt ngay lập tức, không phải tự so sánh với ngày hôm nay |
+| Hộp thoại xác nhận trước khi xóa và nạp dữ liệu mẫu | Xóa ngay | Thao tác không hoàn tác được nên phải hỏi lại, tránh mất dữ liệu do chạm nhầm |
+| Giao diện trạng thái rỗng (Empty State) | Để màn hình trắng | Người dùng hiểu là "chưa có dữ liệu" chứ không phải ứng dụng bị lỗi |
+| Material 3 `DayNight` | Theme mặc định | Giao diện hiện đại, tự hỗ trợ chế độ tối |
+
+### 6.4. Lý do chọn kiến trúc và cách tổ chức mã nguồn
+
+#### 1. Cấu trúc package phẳng
+* Toàn bộ 18 lớp nằm trong `com.example.app`. Với quy mô này, chia nhiều tầng (MVVM, Repository, DAO) chỉ làm tăng số tệp và lớp trung gian mà không đem lại lợi ích tương xứng.
+* Cấu trúc phẳng bám sát bài mẫu trên lớp, người chấm mở thư mục là thấy toàn bộ mã nguồn, sinh viên giải thích được từng tệp.
+
+#### 2. Tập trung mọi câu SQL trong `DBHelper`
+* Các Activity chỉ gọi hàm như `getAllDoAn()`, `insertNhiemVu(...)`, không chứa câu SQL nào. Khi cần sửa truy vấn chỉ sửa ở một nơi.
+* Đây là cách tách lớp dữ liệu đơn giản nhất mà vẫn giữ được ưu điểm chính của kiến trúc nhiều tầng.
+
+#### 3. Model `implements Serializable` và trường phụ trợ hiển thị
+* Các lớp `DoAn`, `NhiemVu`, `CuocHen`, `ThongKeItem` cài đặt `Serializable` theo đúng bước 1 của bài giảng RecyclerView, có thể đưa vào `Intent` hoặc `Bundle` khi cần.
+* `DoAn` có thêm `tongNhiemVu` và `soNhiemVuXong` lấy sẵn từ truy vấn `LEFT JOIN`, nên `DoAnAdapter` vẽ thanh tiến độ mà không phải truy vấn CSDL trong lúc cuộn.
+
+#### 4. Truyền ID qua `Intent` thay vì truyền cả đối tượng
+* Màn hình nhận luôn đọc lại bản ghi mới nhất từ CSDL theo ID, tránh hiển thị dữ liệu cũ khi đối tượng đã bị sửa ở màn hình khác.
+* Tên khóa là hằng số `public static final String EXTRA_...` nên phía gửi và phía nhận không thể gõ lệch chuỗi.
+
+#### 5. Làm mới dữ liệu trong `onResume()`
+Khi Form gọi `finish()`, màn hình danh sách không chạy lại `onCreate()` mà chạy `onResume()`. Nạp lại dữ liệu ở đây giúp danh sách luôn đúng sau khi thêm/sửa mà không cần cơ chế trả kết quả phức tạp như `startActivityForResult`.
+
+#### 6. Giao tiếp Adapter → Activity bằng interface
+Adapter chỉ lo hiển thị; khi người dùng bấm, Adapter gọi interface (ví dụ `OnDoAnClickListener`) để Activity xử lý (mở màn hình, xóa CSDL). Nhờ vậy Adapter không phụ thuộc vào `DBHelper` hay `Intent`, đúng nguyên tắc mỗi lớp một trách nhiệm.
+
+### 6.5. Lý do chọn các kỹ thuật lập trình chi tiết
+
+| Vấn đề | Cách xử lý trong dự án | Lý do |
+| :--- | :--- | :--- |
+| Lấy vị trí dòng khi bấm | `getAdapterPosition()` kèm kiểm tra `NO_POSITION` | Khi dòng đang chạy hiệu ứng xóa, vị trí có thể là −1; kiểm tra để không bị `IndexOutOfBoundsException` |
+| Nhấn giữ một dòng | `onLongClick` trả về `true` | Báo hệ thống sự kiện đã được xử lý, tránh vừa hiện hộp thoại xóa vừa mở màn hình chi tiết |
+| Kiểu dòng không hợp lệ | Ném `IllegalArgumentException` thay vì `return null` | RecyclerView không chấp nhận ViewHolder `null`; lỗi rõ ràng giúp phát hiện sai sót sớm |
+| Tick hoàn thành nhiệm vụ | Ghi CSDL, đọc lại danh sách đã sắp xếp, gọi `notifyItemMoved` | Dòng trượt mượt về đúng nhóm, không vẽ lại toàn bộ; tắt `setSupportsChangeAnimations` để không nhấp nháy |
+| Xóa một dòng | Xóa CSDL rồi `removeItem(position)` → `notifyItemRemoved` | Có hiệu ứng xóa của `DefaultItemAnimator`, chỉ vẽ lại phần thay đổi |
+| Xác định cuộc hẹn đã qua | Hàm tĩnh dùng chung `DBHelper.laDaQua()`, một `SimpleDateFormat` dùng lại | Hai Adapter cho kết quả thống nhất; không tạo đối tượng định dạng mới ở mỗi dòng |
+| Mở bộ chọn ngày khi sửa | Hàm dùng chung `DBHelper.chuoiSangLich()` đổi chuỗi đang lưu thành `Calendar` | Bộ chọn mở đúng ngày giờ cũ; tránh việc người dùng lỡ bấm OK làm ngày bị đổi thành hôm nay |
+| Định dạng ngày | `String.format(Locale.US, "%04d-%02d-%02d", ...)` | Luôn ra chữ số 0–9 với số 0 đệm đầu, giữ đúng phép so sánh và sắp xếp chuỗi trên mọi ngôn ngữ máy |
+| Làm tròn phần trăm tiến độ | `Math.round(xong * 100.0 / tong)` ở cả `DoAnAdapter` và `DBHelper.getTienDoDoAn()` | Danh sách và màn hình chi tiết luôn hiện cùng một con số (2/3 là 67% ở cả hai nơi) |
+| Tiến độ khi chưa có nhiệm vụ | `IFNULL(SUM(...), 0)` và trả về `0/0 (0%)` | `SUM` trên tập rỗng trả `NULL`; xử lý để không lỗi và không chia cho 0 |
+| Chuỗi giao diện | Đặt trong `res/values/strings.xml` | Sửa tập trung, sẵn sàng đa ngôn ngữ |
+| Xoay màn hình | `android:configChanges` + bọc Form trong `ScrollView` | Không mất dữ liệu đang nhập, giao diện không bị che khi màn hình thấp |
+| Nạp lại dữ liệu mẫu | Transaction + dùng chung `chenDuLieuMau(db)` với `onCreate` | Không bao giờ "xóa một nửa"; chỉ có một nguồn dữ liệu mẫu trong mã |
+
+### 6.6. Hai điểm cố ý làm khác so với mã mẫu trong bài giảng
+1. **`onCreateViewHolder` của `TimelineAdapter`:** mã mẫu kết thúc bằng `return null;`. Nếu chạy tới nhánh này, RecyclerView sẽ văng lỗi khó truy vết. Dự án thay bằng `throw new IllegalArgumentException("Kiểu dòng không hợp lệ: " + viewType);` để báo lỗi rõ ràng.
+2. **Giá trị trả về của `onLongClick`:** mã mẫu trả về `false`, khiến sự kiện `onClick` vẫn chạy sau khi nhấc tay. Dự án trả về `true` để tiêu thụ hẳn sự kiện nhấn giữ.
+
+Cả hai thay đổi đều nhỏ nhưng thể hiện việc hiểu cơ chế bên trong của RecyclerView và hệ thống sự kiện chạm của Android, thay vì chép nguyên mã mẫu.
+
+---
+
+## 7. KIỂM THỬ VÀ ĐÁNH GIÁ
+
+### 7.1. Kiểm tra truy vấn trên bộ dữ liệu mẫu
 Các truy vấn mới được chạy thử trên SQLite với đúng bộ dữ liệu mẫu (4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn):
 
 | Kiểm tra | Kết quả |
 | :--- | :--- |
 | Số bản ghi nạp được | 4 / 14 / 7, khớp tệp `du_lieu_mau.sql` |
-| Nhiệm vụ mẫu vi phạm hạn nộp đồ án | Không có |
+| Nhiệm vụ mẫu có hạn nằm ngoài khoảng ngày bắt đầu – hạn nộp của đồ án | Không có |
 | Thứ tự nhiệm vụ Đồ án 1 (id) | `3, 4, 1, 2` (2 việc chưa xong theo hạn, rồi 2 việc đã xong) |
 | Thứ tự nhiệm vụ Đồ án 2 (id) | `6, 7, 5` |
 | Tiến độ 4 đồ án | 50%, 33%, 100%, 0% |
 
-### 6.2. Bảng kiểm thử thao tác (Manual Testing Checklist)
+### 7.2. Bảng kiểm thử thao tác (Manual Testing Checklist)
 
 | STT | Kịch bản kiểm thử | Thao tác thực hiện | Kết quả mong đợi | Đánh giá |
 | :---: | :--- | :--- | :--- | :---: |
@@ -443,49 +561,52 @@ Các truy vấn mới được chạy thử trên SQLite với đúng bộ dữ 
 | 3 | Hủy nạp dữ liệu mẫu | Menu ⋮ → "Nạp dữ liệu mẫu" → "Hủy" | Dữ liệu hiện tại giữ nguyên | `[ ]` |
 | 4 | Ràng buộc ngày đồ án | Thêm đồ án có hạn nộp trước ngày bắt đầu | Báo lỗi, không cho lưu | `[ ]` |
 | 5 | Ràng buộc hạn nhiệm vụ | Đồ án 2 (hạn 2026-11-20) → thêm nhiệm vụ hạn 2026-12-01 | Báo lỗi "Hạn hoàn thành không được sau hạn nộp đồ án", không lưu | `[ ]` |
-| 6 | Ràng buộc chiều ngược | Sửa Đồ án 1, đổi hạn nộp thành 2026-12-01 (nhiệm vụ muộn nhất 2026-12-25) | Báo lỗi, không cho lưu | `[ ]` |
-| 7 | Sắp xếp nhiệm vụ | Mở nhiệm vụ Đồ án 1 | Hai việc chưa xong ở trên, hai việc đã xong (gạch ngang) ở dưới | `[ ]` |
-| 8 | Tick hoàn thành | Tick một việc chưa xong | Dòng gạch ngang và trượt xuống nhóm đã xong; quay lại chi tiết thấy % tăng | `[ ]` |
-| 9 | Phân loại cuộc hẹn | Mở danh sách cuộc hẹn Đồ án 1 | Cuộc hẹn quá khứ nhãn "Đã qua", tương lai nhãn "Sắp diễn ra" | `[ ]` |
-| 10 | Xóa xếp tầng | Xóa một đồ án | Nhiệm vụ và cuộc hẹn của đồ án đó biến mất | `[ ]` |
-| 11 | Chuyển lưới / danh sách | Bấm nút trên Toolbar, thoát và mở lại app | Chế độ xem được giữ nguyên | `[ ]` |
-| 12 | Xoay màn hình | Đang nhập dở Form → xoay ngang | Dữ liệu đang nhập không mất | `[ ]` |
+| 6 | Ràng buộc chiều ngược (hạn nộp) | Sửa Đồ án 1, đổi hạn nộp thành 2026-12-01 (nhiệm vụ muộn nhất 2026-12-25) | Báo lỗi, không cho lưu | `[ ]` |
+| 7 | Hạn nhiệm vụ trước ngày bắt đầu | Đồ án 2 (bắt đầu 2026-08-15) → thêm nhiệm vụ hạn 2026-08-01 | Báo lỗi "Hạn hoàn thành không được trước ngày bắt đầu đồ án", không lưu | `[ ]` |
+| 8 | Ràng buộc chiều ngược (ngày bắt đầu) | Sửa Đồ án 1, đổi ngày bắt đầu thành 2026-10-01 (nhiệm vụ sớm nhất 2026-09-20) | Báo lỗi, không cho lưu | `[ ]` |
+| 9 | Sắp xếp nhiệm vụ | Mở nhiệm vụ Đồ án 1 | Hai việc chưa xong ở trên, hai việc đã xong (gạch ngang) ở dưới | `[ ]` |
+| 10 | Tick hoàn thành | Tick một việc chưa xong | Dòng gạch ngang và trượt xuống nhóm đã xong; quay lại chi tiết thấy % tăng, cùng con số với danh sách | `[ ]` |
+| 11 | Phân loại cuộc hẹn | Mở danh sách cuộc hẹn Đồ án 1 | Cuộc hẹn quá khứ nhãn "Đã qua", tương lai nhãn "Sắp diễn ra" | `[ ]` |
+| 12 | Bộ chọn ngày khi sửa | Sửa một cuộc hẹn đã có → bấm chọn ngày giờ | Hộp chọn mở sẵn đúng ngày giờ đã lưu, không phải hôm nay | `[ ]` |
+| 13 | Xóa xếp tầng | Xóa một đồ án | Nhiệm vụ và cuộc hẹn của đồ án đó biến mất | `[ ]` |
+| 14 | Chuyển lưới / danh sách | Bấm nút trên Toolbar, thoát và mở lại app | Chế độ xem được giữ nguyên | `[ ]` |
+| 15 | Xoay màn hình | Đang nhập dở Form → xoay ngang | Dữ liệu đang nhập không mất | `[ ]` |
 
 *(Đánh dấu kết quả sau khi chạy APK trên máy ảo hoặc điện thoại thật.)*
 
 ---
 
-## 7. KẾT QUẢ ĐẠT ĐƯỢC, HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
+## 8. KẾT QUẢ ĐẠT ĐƯỢC, HẠN CHẾ VÀ HƯỚNG PHÁT TRIỂN
 
-### 7.1. Kết quả đạt được
+### 8.1. Kết quả đạt được
 * Ứng dụng Android hoàn chỉnh viết bằng Java, dùng SQLite thuần qua `SQLiteOpenHelper`, không dùng thư viện ngoài ngoài AndroidX/Material.
 * Đủ CRUD cho 3 bảng có quan hệ 1–N, xóa xếp tầng, tiến độ tính động, ràng buộc ngày tháng hai chiều.
 * Ứng dụng nhiều kỹ thuật RecyclerView: danh sách dọc, lưới, cuộn ngang, nhiều kiểu dòng, `notifyItemInserted/Removed/Moved`.
 * Bộ dữ liệu mẫu 25 bản ghi có sẵn khi cài và nạp lại được bất cứ lúc nào để minh họa.
 
-### 7.2. Các hạn chế đã biết
+### 8.2. Các hạn chế đã biết
 1. **`onUpgrade` xóa bảng rồi tạo lại:** tiện cho giai đoạn phát triển nhưng sẽ mất dữ liệu nếu tăng `DATABASE_VERSION`. Sản phẩm thực tế cần migration bằng `ALTER TABLE`.
 2. **Xoay màn hình bằng `android:configChanges`:** Activity không bị tạo lại nên dữ liệu đang nhập được giữ, nhưng đây là cách làm tắt. Cách chuẩn hơn là lưu trạng thái bằng `onSaveInstanceState` hoặc `ViewModel`.
 3. **Truy vấn CSDL chạy trên luồng giao diện:** chấp nhận được với dữ liệu nhỏ; nếu dữ liệu lớn cần chuyển sang luồng nền (`ExecutorService`).
 4. **Nhãn trạng thái cuộc hẹn** chỉ được tính lại khi danh sách được nạp lại hoặc cuộn, không tự đổi khi để màn hình mở qua giờ hẹn.
-5. **Chưa có kiểm thử tự động** cho CSDL và giao diện; các ca kiểm thử ở mục 6.2 được thực hiện thủ công.
+5. **Chưa có kiểm thử tự động** cho CSDL và giao diện; các ca kiểm thử ở mục 7.2 được thực hiện thủ công.
 
-### 7.3. Hướng phát triển
+### 8.3. Hướng phát triển
 * Nhắc lịch hẹn bằng thông báo (`AlarmManager` / `WorkManager`).
 * Tìm kiếm đồ án (`SearchView`) và lọc nhiệm vụ theo trạng thái / hạn chót.
 * Sao lưu / phục hồi dữ liệu ra tệp JSON.
 
 ---
 
-## 8. PHỤ LỤC
+## 9. PHỤ LỤC
 
-### 8.1. Hướng dẫn cài đặt APK
+### 9.1. Hướng dẫn cài đặt APK
 1. Tệp nộp bài: `deliverables/ung_dung_theo_doi_do_an.apk` (bản debug, cài được ngay).
 2. **Cách 1 (ADB):** `adb install -r deliverables/ung_dung_theo_doi_do_an.apk`
 3. **Cách 2 (trực tiếp):** chép tệp APK vào điện thoại, mở bằng Trình quản lý tệp, cho phép "Cài đặt từ nguồn không xác định" rồi bấm *Cài đặt*.
 4. Nếu máy đã cài bản cũ, chọn menu ⋮ → **Nạp dữ liệu mẫu** để có đúng bộ dữ liệu minh họa mới nhất.
 
-### 8.2. Cấu trúc thư mục bàn giao (`deliverables/`)
+### 9.2. Cấu trúc thư mục bàn giao (`deliverables/`)
 ```
 deliverables/
 ├── ung_dung_theo_doi_do_an.apk      // Tệp cài đặt
@@ -497,16 +618,18 @@ deliverables/
 │   ├── java/com/example/app/       // 18 tệp .java
 │   └── res/                        // layout, drawable, menu, values (.xml)
 └── bao_cao/
-    ├── bao_cao.md                  // Báo cáo này
+    ├── bao_cao.docx                // Báo cáo này (Word)
+    ├── bao_cao.md                  // Báo cáo dạng Markdown
+    ├── cau_hoi_van_dap.docx        // Bộ câu hỏi vấn đáp và gợi ý trả lời
     ├── GIAI_THICH_THIET_KE.md      // Giải thích lý do chọn từng quyết định thiết kế
     └── giai_thich_don_gian.md      // Giải thích mã nguồn bằng ngôn ngữ đơn giản
 ```
 
-### 8.3. Vị trí ảnh chụp màn hình minh họa
+### 9.3. Vị trí ảnh chụp màn hình minh họa
 * [Chèn ảnh: Màn hình chính chế độ danh sách và chế độ lưới]
 * [Chèn ảnh: Menu ⋮ "Nạp dữ liệu mẫu" và hộp thoại xác nhận]
 * [Chèn ảnh: Chi tiết đồ án với thẻ thống kê cuộn ngang]
 * [Chèn ảnh: Danh sách nhiệm vụ – việc chưa xong ở trên, đã xong ở dưới]
-* [Chèn ảnh: Thông báo lỗi khi hạn nhiệm vụ vượt hạn nộp đồ án]
+* [Chèn ảnh: Thông báo lỗi khi hạn nhiệm vụ nằm ngoài khoảng ngày bắt đầu – hạn nộp đồ án]
 * [Chèn ảnh: Danh sách cuộc hẹn với nhãn Sắp diễn ra / Đã qua]
 * [Chèn ảnh: Dòng thời gian (Timeline)]

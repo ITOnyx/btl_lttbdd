@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -31,6 +32,31 @@ public class DBHelper extends SQLiteOpenHelper {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    // Đổi chuỗi "yyyy-MM-dd" hoặc "yyyy-MM-dd HH:mm" thành Calendar để mở sẵn DatePicker/TimePicker
+    // đúng ngày giờ đã lưu (dùng chung cho 3 Form). Chuỗi rỗng hoặc sai định dạng thì trả về thời điểm hiện tại.
+    public static Calendar chuoiSangLich(String chuoi) {
+        Calendar cal = Calendar.getInstance();
+        if (chuoi == null) {
+            return cal;
+        }
+        String s = chuoi.trim();
+        try {
+            if (s.length() >= 10) {
+                int nam = Integer.parseInt(s.substring(0, 4));
+                int thang = Integer.parseInt(s.substring(5, 7));
+                int ngay = Integer.parseInt(s.substring(8, 10));
+                cal.set(nam, thang - 1, ngay); // Calendar đánh số tháng từ 0
+                if (s.length() >= 16) {
+                    cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(s.substring(11, 13)));
+                    cal.set(Calendar.MINUTE, Integer.parseInt(s.substring(14, 16)));
+                }
+            }
+        } catch (NumberFormatException e) {
+            return Calendar.getInstance();
+        }
+        return cal;
     }
 
     // Khởi tạo DBHelper với context của ứng dụng
@@ -355,6 +381,20 @@ public class DBHelper extends SQLiteOpenHelper {
     public String getHanNhiemVuMuonNhat(int doAnId) {
         SQLiteDatabase db = this.getReadableDatabase();
         String sql = "SELECT MAX(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''";
+        Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(doAnId)});
+        String han = null;
+        if (cursor.moveToNext()) {
+            han = cursor.getString(0);
+        }
+        cursor.close();
+        return han;
+    }
+
+    // Lấy hạn hoàn thành sớm nhất trong các nhiệm vụ của đồ án (null nếu không có nhiệm vụ nào đặt hạn).
+    // Dùng khi sửa đồ án để không cho dời ngày bắt đầu ra sau hạn của nhiệm vụ đã có.
+    public String getHanNhiemVuSomNhat(int doAnId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT MIN(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''";
         Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(doAnId)});
         String han = null;
         if (cursor.moveToNext()) {

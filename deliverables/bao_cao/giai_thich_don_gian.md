@@ -58,6 +58,13 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - *Làm gì*: Trả về hạn hoàn thành muộn nhất trong các nhiệm vụ của đồ án (hoặc `null`).
     - *Khi nào gọi*: Gọi trong `DoAnFormActivity.luuDoAn()` khi sửa đồ án, để không cho dời hạn nộp sớm hơn nhiệm vụ đã có.
     - *Câu SQL*: `SELECT MAX(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''`
+  - `getHanNhiemVuSomNhat(int doAnId)`:
+    - *Làm gì*: Trả về hạn hoàn thành sớm nhất trong các nhiệm vụ của đồ án (hoặc `null`).
+    - *Khi nào gọi*: Gọi trong `DoAnFormActivity.luuDoAn()` khi sửa đồ án, để không cho dời ngày bắt đầu ra sau hạn của nhiệm vụ đã có.
+    - *Câu SQL*: `SELECT MIN(han_hoan_thanh) FROM NhiemVu WHERE do_an_id = ? AND han_hoan_thanh IS NOT NULL AND han_hoan_thanh != ''`
+  - `chuoiSangLich(String chuoi)` (hàm tĩnh):
+    - *Làm gì*: Đổi chuỗi `yyyy-MM-dd` hoặc `yyyy-MM-dd HH:mm` thành `Calendar`; chuỗi rỗng hoặc sai định dạng thì trả về thời điểm hiện tại.
+    - *Khi nào gọi*: Trong cả 3 Form trước khi mở `DatePickerDialog`/`TimePickerDialog`, để khi sửa thì hộp chọn mở sẵn đúng ngày giờ đã lưu.
   - `napLaiDuLieuMau()`:
     - *Làm gì*: Trong một Transaction: xóa toàn bộ dữ liệu 3 bảng, đặt lại bộ đếm `AUTOINCREMENT`, rồi gọi `chenDuLieuMau(db)` (cùng hàm mà `onCreate` dùng) để chèn lại 4 đồ án, 14 nhiệm vụ, 7 cuộc hẹn.
     - *Khi nào gọi*: Khi người dùng chọn menu ⋮ → "Nạp dữ liệu mẫu" và bấm xác nhận trong `MainActivity`.
@@ -145,8 +152,8 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
   - *Các hàm*:
     - `onCreate(...)`: Ánh xạ View, kiểm tra `do_an_id` từ Intent. Nếu `do_an_id != -1` thì gọi `loadDoAnData` để nạp dữ liệu cũ; gắn sự kiện chọn ngày và lưu.
     - `loadDoAnData(int id)`: Đọc đồ án từ `dbHelper.getDoAnById(id)` và điền dữ liệu vào các ô EditText.
-    - `moHopThoaiChonNgay(EditText targetEdt)`: Mở `DatePickerDialog` nguyên bản của Android, khi người dùng chọn xong sẽ format thành chuỗi `yyyy-MM-dd` và gán vào ô EditText.
-    - `luuDoAn()`: Kiểm tra tên không được rỗng (`setError`), kiểm tra hạn nộp không trước ngày bắt đầu (`hanNop.compareTo(ngayBatDau) < 0`), khi sửa thì kiểm tra hạn nộp không sớm hơn nhiệm vụ muộn nhất (`getHanNhiemVuMuonNhat`), gọi `dbHelper.insertDoAn` hoặc `dbHelper.updateDoAn`, sau đó gọi `finish()` để đóng màn hình.
+    - `moHopThoaiChonNgay(EditText targetEdt)`: Mở `DatePickerDialog` nguyên bản của Android (mở sẵn ngày đang có trong ô nhờ `DBHelper.chuoiSangLich`), khi người dùng chọn xong sẽ format thành chuỗi `yyyy-MM-dd` và gán vào ô EditText.
+    - `luuDoAn()`: Kiểm tra tên không được rỗng (`setError`), kiểm tra hạn nộp không trước ngày bắt đầu (`hanNop.compareTo(ngayBatDau) < 0`), khi sửa thì kiểm tra hạn nộp không sớm hơn nhiệm vụ muộn nhất (`getHanNhiemVuMuonNhat`) và ngày bắt đầu không muộn hơn nhiệm vụ sớm nhất (`getHanNhiemVuSomNhat`), gọi `dbHelper.insertDoAn` hoặc `dbHelper.updateDoAn`, sau đó gọi `finish()` để đóng màn hình.
 - **DoAnDetailActivity.java**:
   - *Vai trò*: Màn hình xem chi tiết đồ án, xem tiến độ thực tế, cung cấp 2 nút điều hướng lớn tới danh sách Nhiệm vụ và Lịch hẹn.
   - *Các hàm*:
@@ -173,7 +180,7 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
     - `onBindViewHolder(...)`: Đổ dữ liệu tên, ghi chú, hạn; kiểm tra trạng thái `daHoanThanh == 1` để tick CheckBox và bật cờ gạch ngang chữ (`STRIKE_THRU_TEXT_FLAG`); dùng `cbHoanThanh.setOnClickListener` để xử lý tick trạng thái an toàn.
 - **NhiemVuFormActivity.java**:
   - *Vai trò*: Màn hình thêm mới / cập nhật nhiệm vụ.
-  - *Các hàm*: `onCreate`, `loadNhiemVuData`, `moHopThoaiChonNgay` (mở `DatePickerDialog`), `luuNhiemVu` (kiểm tra tên không rỗng, kiểm tra hạn hoàn thành không sau hạn nộp của đồ án, gọi `insertNhiemVu` hoặc `updateNhiemVu`, kết thúc bằng `finish()`).
+  - *Các hàm*: `onCreate`, `loadNhiemVuData`, `moHopThoaiChonNgay` (mở `DatePickerDialog`), `luuNhiemVu` (kiểm tra tên không rỗng, kiểm tra hạn hoàn thành nằm trong khoảng từ ngày bắt đầu đến hạn nộp của đồ án, gọi `insertNhiemVu` hoặc `updateNhiemVu`, kết thúc bằng `finish()`).
 
 ---
 
@@ -192,7 +199,7 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 - **CuocHenFormActivity.java**:
   - *Vai trò*: Màn hình thêm mới / cập nhật cuộc hẹn.
   - *Các hàm*:
-    - `moHopThoaiChonNgayGio()`: Mở liên tiếp `DatePickerDialog` (chọn ngày) và `TimePickerDialog` (chọn giờ) để ghép thành chuỗi định dạng chuẩn `yyyy-MM-dd HH:mm`.
+    - `moHopThoaiChonNgayGio()`: Mở liên tiếp `DatePickerDialog` (chọn ngày) và `TimePickerDialog` (chọn giờ) để ghép thành chuỗi định dạng chuẩn `yyyy-MM-dd HH:mm`; khi sửa, cả hai hộp chọn mở sẵn đúng ngày giờ đã lưu.
     - `luuCuocHen()`: Kiểm tra tiêu đề và thời gian không được để trống, gọi `dbHelper.insertCuocHen` hoặc `updateCuocHen`, kết thúc bằng `finish()`.
 
 ---
@@ -305,32 +312,32 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 ### A. Nhóm Slide 184–194 (5 bước cơ bản, Adapter & Chọn Item)
 | Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
 | :--- | :--- | :--- | :--- |
-| **184** | Cấu trúc Adapter: `onCreateViewHolder`, `onBindViewHolder`, `getItemCount` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% chữ ký hàm và kiểu trả về. |
-| **185, 192** | `LayoutManager` (Linear dọc/ngang, Grid 2 cột) | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`applyLayoutManager`), [DoAnDetailActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnDetailActivity.java) (`rv_thong_ke`) | Dùng cả `LinearLayoutManager` (dọc, ngang) và `GridLayoutManager` (lưới 2 cột). |
-| **186** | Bước 1 & 2: Model Serializable & khai báo thẻ RecyclerView trong Activity | [DoAn.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAn.java), [NhiemVu.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVu.java), [CuocHen.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHen.java), [activity_main.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_main.xml) (`@+id/rv_do_an`) | Model chuẩn JavaBean `implements Serializable`. |
-| **187** | Bước 3: Layout 1 dòng (`row_do_an.xml`, `row_nhiem_vu.xml`, `row_cuoc_hen.xml`) | [row_do_an.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_do_an.xml), [row_nhiem_vu.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_nhiem_vu.xml), [row_cuoc_hen.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_cuoc_hen.xml) | ID dạng `tv_title`, `tv_...`, có `android:ellipsize="end"`. |
-| **188–191** | Bước 4: Viết Adapter chi tiết theo khung slide (TAG, mDatas, mContext, mLayoutInflater) | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% khung mẫu slide 190–191. |
-| **193** | Bước 5: Viết Activity theo đúng thứ tự `onCreate` (setContentView $\rightarrow$ findViewById $\rightarrow$ List $\rightarrow$ Adapter $\rightarrow$ setAdapter $\rightarrow$ setLayoutManager $\rightarrow$ setItemAnimator) | `onCreate()` trong [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java), [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java), [CuocHenListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenListActivity.java) | Tuân thủ chính xác thứ tự gọi hàm slide 193. |
+| **184, 191** | Cấu trúc Adapter: `onCreateViewHolder`, `onBindViewHolder` (slide 184), `getItemCount` (slide 191) | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% chữ ký hàm và kiểu trả về. |
+| **185, 193** | `LayoutManager` (Linear dọc/ngang, Grid, StaggeredGrid) | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`onCreate`, `onOptionsItemSelected`), [DoAnDetailActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnDetailActivity.java) (`rv_thong_ke`) | Dùng cả `LinearLayoutManager` (dọc, ngang) và `GridLayoutManager` (lưới 2 cột). |
+| **186–188** | 5 bước (slide 186); Bước 1: Model Serializable (slide 187); Bước 2: khai báo thẻ RecyclerView trong layout (slide 188) | [DoAn.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAn.java), [NhiemVu.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVu.java), [CuocHen.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHen.java), [activity_main.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/activity_main.xml) (`@+id/rv_do_an`) | Model chuẩn JavaBean `implements Serializable`. |
+| **189** | Bước 3: Layout 1 dòng (`row_do_an.xml`, `row_nhiem_vu.xml`, `row_cuoc_hen.xml`) | [row_do_an.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_do_an.xml), [row_nhiem_vu.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_nhiem_vu.xml), [row_cuoc_hen.xml](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/res/layout/row_cuoc_hen.xml) | ID dạng `tv_title`, `tv_...`, có `android:ellipsize="end"`. |
+| **190–191** | Bước 4: Viết Adapter chi tiết theo khung slide (TAG, mSongs, mContext, mLayoutInflater) | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% khung mẫu slide 190–191. |
+| **192–193, 223** | Bước 5: Viết Activity theo đúng thứ tự `onCreate` (setContentView $\rightarrow$ findViewById $\rightarrow$ List $\rightarrow$ Adapter $\rightarrow$ setAdapter $\rightarrow$ setLayoutManager; `setItemAnimator` lấy theo slide 223) | `onCreate()` trong [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java), [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java), [CuocHenListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenListActivity.java) | Tuân thủ thứ tự gọi hàm slide 193, bổ sung `setItemAnimator` như slide 223. |
 | **194** | Chọn item trong constructor ViewHolder: `getAdapterPosition()`, mở màn hình chi tiết | Constructor `DoAnViewHolder` trong [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java) | Kiểm tra `position == NO_POSITION return;` an toàn. |
 
 ### B. Nhóm Slide 195–210 (Kỹ thuật Nhiều kiểu dòng - Multiple View Type)
 | Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
 | :--- | :--- | :--- | :--- |
-| **198** | Khai báo hằng số ViewType (`HEADER`, `TASK`, `MEETING`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 24–26) | `public static final int HEADER = 0, TASK = 1, MEETING = 2;` |
-| **199** | Khai báo `List<Object> mObjects` và `Context mContext` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 29–30) | Chứa lẫn `String`, `NhiemVu`, `CuocHen`. |
-| **200, 204** | 3 lớp lồng ViewHolder (`HeaderViewHolder`, `TaskViewHolder`, `MeetingViewHolder`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 155–250) | Mỗi ViewHolder có `setOnClickListener` trong constructor theo slide 203. |
-| **201** | `getItemViewType(int position)` dùng `instanceof` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`getItemViewType`) | Trả về `HEADER`, `TASK`, `MEETING` hoặc `-1`. |
-| **202** | `onCreateViewHolder`: `switch(viewType)` inflate layout tương ứng | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onCreateViewHolder`) | **[KHÁC SLIDE]**: Ném `IllegalArgumentException` thay vì `return null`. |
-| **203** | `onBindViewHolder`: `switch(getItemViewType(position))` ép kiểu và gán dữ liệu | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onBindViewHolder`) | Ép kiểu an toàn, gán dữ liệu chi tiết cho từng loại thẻ. |
+| **202** | Khai báo hằng số ViewType (slide: `TEXT`, `IMAGE`, `USER`; dự án: `HEADER`, `TASK`, `MEETING`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 24–26) | `public static final int HEADER = 0, TASK = 1, MEETING = 2;` |
+| **202** | Khai báo `List<Object> mObjects` và `Context mContext` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 29–30) | Chứa lẫn `String`, `NhiemVu`, `CuocHen`. |
+| **203–205** | 3 lớp lồng ViewHolder (`HeaderViewHolder`, `TaskViewHolder`, `MeetingViewHolder`) | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (dòng 155–250) | Mỗi ViewHolder có `setOnClickListener` trong constructor theo slide 203–205. |
+| **206** | `getItemViewType(int position)` dùng `instanceof` | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`getItemViewType`) | Trả về `HEADER`, `TASK`, `MEETING` hoặc `-1`. |
+| **207** | `onCreateViewHolder`: `switch(viewType)` inflate layout tương ứng | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onCreateViewHolder`) | **[KHÁC SLIDE]**: Ném `IllegalArgumentException` thay vì `return null`. |
+| **208** | `onBindViewHolder`: `switch(getItemViewType(position))` ép kiểu và gán dữ liệu | [TimelineAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/TimelineAdapter.java) (`onBindViewHolder`) | Ép kiểu an toàn, gán dữ liệu chi tiết cho từng loại thẻ. |
 
 ### C. Nhóm Slide 211–223 (Hoạt ảnh Animation & Các hàm Notify)
 | Slide | Nội dung bài giảng | File / Hàm thật trong dự án | Ghi chú so khớp mã nguồn |
 | :--- | :--- | :--- | :--- |
-| **211–212** | `ItemAnimator`, `DefaultItemAnimator`, `notifyDataSetChanged` không có animation | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`setItemAnimator`, `loadData`) | Dùng `DefaultItemAnimator`; gọi `notifyDataSetChanged()` khi nạp mới SQLite. |
-| **213–215** | `addItem(item)` và `addItem(position, item)` kèm `notifyItemInserted` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp 100% mẫu hàm slide 220–221. |
-| **216–218** | `removeItem(position)` và `removeItem(item)` kèm `notifyItemRemoved` | Cả 3 Adapter; gọi tại `onDeleteClick` / `onDelete` trong 3 Activity | Xóa dữ liệu list trước rồi mới notify (mẫu slide 222). |
-| **219** | `notifyItemChanged` / `notifyItemMoved` và tắt nháy qua `setSupportsChangeAnimations(false)` | [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java) (`onToggleStatus`) | Tick xong dòng trượt về đúng nhóm bằng `notifyItemMoved`, không nháy màn hình. |
-| **220–223** | 3 nhóm hàm animation viết trong Adapter và `scrollToPosition` | Đầy đủ trong 3 Adapter; `rv.scrollToPosition` khi thêm phần tử | Kiểm tra biên `position >= 0 && position < size`. |
+| **211–213** | `ItemAnimator`, `DefaultItemAnimator` (211), các hàm notify (212), `notifyDataSetChanged` không có animation (213) | [MainActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/MainActivity.java) (`setItemAnimator`, `loadData`) | Dùng `DefaultItemAnimator`; gọi `notifyDataSetChanged()` khi nạp mới SQLite. |
+| **213, 220** | `addItem(item)` và `addItem(position, item)` kèm `notifyItemInserted` | [DoAnAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/DoAnAdapter.java), [NhiemVuAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuAdapter.java), [CuocHenAdapter.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/CuocHenAdapter.java) | Khớp mẫu hàm slide 213 và 220. |
+| **214, 221** | `removeItem(position)` và `removeItem(item)` kèm `notifyItemRemoved` | Cả 3 Adapter; gọi tại `onDeleteClick` / `onDelete` trong 3 Activity | Xóa dữ liệu list trước rồi mới notify (mẫu slide 214, 221). |
+| **212, 215, 221** | `notifyItemChanged` trong `replaceItem`; `notifyItemMoved` và `setSupportsChangeAnimations(false)` là phần mở rộng (không có trong slide, dựa trên lớp `SimpleItemAnimator` ở slide 211) | [NhiemVuListActivity.java](file:///d:/K%C3%AC%207/B%C3%A0i%20t%E1%BA%ADp%20l%E1%BB%9Bn%20LTTBDD/app/src/main/java/com/example/app/NhiemVuListActivity.java) (`onToggleStatus`) | Tick xong dòng trượt về đúng nhóm bằng `notifyItemMoved`, không nháy màn hình. |
+| **220–223** | Ứng dụng demo animation: 3 nhóm hàm trong Adapter (220–221), nhấn giữ để xóa (222), `scrollToPosition` (223) | Đầy đủ trong 3 Adapter; `rv.scrollToPosition` khi thêm phần tử | Kiểm tra biên `position >= 0 && position < size`. |
 
 ---
 
@@ -338,8 +345,8 @@ Tài liệu này được biên soạn dành riêng cho sinh viên để chuẩn
 
 Trong quá trình đối chiếu với slide của ThS. Nguyễn Hữu Trung, dự án có **2 điểm khác biệt có chủ ý** nhằm khắc phục lỗi tiềm ẩn trong bài giảng mẫu:
 
-1. **Khác biệt 1: Xử lý nhánh default trong `onCreateViewHolder` của `TimelineAdapter` (Slide 202)**:
-   - *Trong slide 202*: Sau câu lệnh `switch (viewType)`, ở cuối hàm thầy cô viết `return null;`.
+1. **Khác biệt 1: Xử lý nhánh default trong `onCreateViewHolder` của `TimelineAdapter` (Slide 207)**:
+   - *Trong slide 207*: Sau câu lệnh `switch (viewType)`, ở cuối hàm thầy cô viết `return null;`.
    - *Thực tế Android*: Nếu `onCreateViewHolder` trả về `null`, hệ thống `RecyclerView` nội bộ sẽ ném ngay lập tức ngoại lệ nghiêm trọng `java.lang.NullPointerException: ViewHolder views must not be null` làm văng ứng dụng ngay lập tức khi cuộn tới dòng không xác định.
    - *Giải pháp trong dự án*: Thay thế `return null;` bằng lệnh ném ngoại lệ rõ ràng:
      ```java
@@ -347,8 +354,8 @@ Trong quá trình đối chiếu với slide của ThS. Nguyễn Hữu Trung, d�
      ```
      Điều này giúp mã nguồn an toàn tuyệt đối và cảnh báo lỗi ngay khi có kiểu dữ liệu lạ.
 
-2. **Khác biệt 2: Giá trị trả về của sự kiện nhấn giữ `onLongClick` (Slide 194, 203)**:
-   - *Trong slide 194*: Hàm `onLongClick(View v)` trả về `false`.
+2. **Khác biệt 2: Giá trị trả về của sự kiện nhấn giữ `onLongClick` (Slide 222)**:
+   - *Trong slide 222* (`CustomAnimationAdapter`, nhấn giữ để xóa item): Hàm `onLongClick(View view)` trả về `false`. Slide 194 và 203–205 chỉ có `onClick`, không có `onLongClick`.
    - *Thực tế Android*: Cơ chế phân phối sự kiện cảm ứng (Touch Event Dispatch) quy định: nếu `onLongClick` trả về `false`, hệ thống hiểu là sự kiện chưa được xử lý xong, do đó khi người dùng nhấc ngón tay ra khỏi màn hình, sự kiện `onClick` (chạm thông thường) sẽ **tự động được kích hoạt tiếp theo**. Điều này dẫn đến lỗi người dùng vừa nhấn giữ để hiện hộp thoại Xóa thì màn hình Chi tiết lại bị mở đè lên!
    - *Giải pháp trong dự án*: Luôn trả về `true`:
      ```java
@@ -469,7 +476,7 @@ Quản lý các hiệu ứng hoạt ảnh khi danh sách có sự biến động
 ## 7. ANIMATION VÀ CÁC HÀM NOTIFY TRONG BÀI GIẢNG (SLIDE 211–223)
 
 ### A. So sánh `notifyDataSetChanged()` và các hàm `notifyItem*()`
-- `notifyDataSetChanged()`: Thông báo toàn bộ tập dữ liệu đã thay đổi hoàn toàn. RecyclerView buộc phải hủy hết tất cả các View hiện tại và vẽ lại từ đầu. **Hàm này không có bất kỳ hiệu ứng hoạt ảnh nào** (slide 212). Thường dùng khi tải mới toàn bộ dữ liệu từ CSDL vào `onResume()`.
+- `notifyDataSetChanged()`: Thông báo toàn bộ tập dữ liệu đã thay đổi hoàn toàn. RecyclerView buộc phải hủy hết tất cả các View hiện tại và vẽ lại từ đầu. **Hàm này không có bất kỳ hiệu ứng hoạt ảnh nào** (slide 213). Thường dùng khi tải mới toàn bộ dữ liệu từ CSDL vào `onResume()`.
 - `notifyItemInserted(int position)`: Báo chèn 1 phần tử mới tại `position`. Kích hoạt hiệu ứng fade-in và đẩy các phần tử phía dưới xuống.
 - `notifyItemRemoved(int position)`: Báo xóa 1 phần tử tại `position`. Kích hoạt hiệu ứng fade-out và kéo các phần tử phía dưới lên lấp chỗ trống.
 - `notifyItemChanged(int position)`: Báo 1 phần tử thay đổi nội dung. Kích hoạt hiệu ứng mờ và hiện lại nội dung mới.
@@ -478,7 +485,7 @@ Quản lý các hiệu ứng hoạt ảnh khi danh sách có sự biến động
 ### B. 3 Hàm cốt lõi theo mẫu bài giảng trong Adapter
 Đã được cài đặt đầy đủ trong `DoAnAdapter`, `NhiemVuAdapter`, `CuocHenAdapter`:
 ```java
-// 1. Thêm phần tử có animation (slide 213–215)
+// 1. Thêm phần tử có animation (slide 213, 220)
 public void addItem(int position, T item) {
     if (mList != null && position >= 0 && position <= mList.size()) {
         mList.add(position, item);
@@ -486,7 +493,7 @@ public void addItem(int position, T item) {
     }
 }
 
-// 2. Xóa phần tử có animation (slide 216–218)
+// 2. Xóa phần tử có animation (slide 214, 221)
 public void removeItem(int position) {
     if (mList != null && position >= 0 && position < mList.size()) {
         mList.remove(position);
@@ -494,7 +501,7 @@ public void removeItem(int position) {
     }
 }
 
-// 3. Thay thế/Cập nhật phần tử có animation (slide 219–221)
+// 3. Thay thế/Cập nhật phần tử có animation (slide 215, 221)
 public void replaceItem(int position, T item) {
     if (mList != null && position >= 0 && position < mList.size()) {
         mList.remove(position);
@@ -510,7 +517,7 @@ public void replaceItem(int position, T item) {
 2. `mList.add(position, item);` $\rightarrow$ rồi mới `notifyItemInserted(position);`
 *Hậu quả nếu làm ngược*: RecyclerView đối chiếu kích thước tập dữ liệu của Adapter với danh sách thực tế thấy không khớp, sẽ ném ngoại lệ `java.lang.IndexOutOfBoundsException` làm sập ứng dụng ngay lập tức!
 
-### D. Tắt hiệu ứng nháy màn hình khi tick CheckBox (Slide 219)
+### D. Tắt hiệu ứng nháy màn hình khi tick CheckBox (mở rộng ngoài slide, dựa trên `SimpleItemAnimator` ở slide 211)
 Khi người dùng tick vào CheckBox của nhiệm vụ, ta gọi `notifyItemChanged(position)`. Mặc định `DefaultItemAnimator` sẽ làm mờ dòng đó và hiện lại (alpha $1 \rightarrow 0 \rightarrow 1$), gây cảm giác nhấp nháy khó chịu. Ta khắc phục bằng cách tắt hoạt ảnh thay đổi:
 ```java
 if (mRvNhiemVu.getItemAnimator() instanceof SimpleItemAnimator) {
@@ -575,7 +582,7 @@ if (mRvNhiemVu.getItemAnimator() instanceof SimpleItemAnimator) {
 > **Trả lời:** Dùng để cuộn danh sách tức thì đến vị trí dòng chỉ định. Ví dụ khi người dùng thêm một nhiệm vụ mới vào cuối danh sách bằng hàm `addItem()`, ta gọi `rv.scrollToPosition(adapter.getItemCount() - 1)` để màn hình tự cuộn xuống dòng mới thêm, giúp người dùng nhìn thấy ngay kết quả.
 
 #### Câu 16: Khi xoay ngang màn hình điện thoại, RecyclerView hoạt động ra sao nếu dùng GridLayoutManager?
-> **Trả lời:** Khi xoay ngang, chiều rộng màn hình tăng lên. Nếu muốn tối ưu giao diện, ta có thể tự động tăng số cột `spanCount` (ví dụ từ 2 cột lên 3 hoặc 4 cột) để tận dụng không gian chiều ngang. Trong bài, em cấu hình thẻ `card_do_an.xml` với lề co giãn linh hoạt nên dù ở chế độ 2 cột dọc hay ngang thì các thẻ đồ án đều hiển thị vừa vặn, không bị tràn hay méo hình.
+> **Trả lời:** Khi xoay ngang, chiều rộng màn hình tăng lên. Nếu muốn tối ưu giao diện, ta có thể tự động tăng số cột `spanCount` (ví dụ từ 2 cột lên 3 hoặc 4 cột) để tận dụng không gian chiều ngang. Trong bài, em cấu hình layout dòng `row_do_an.xml` với lề co giãn linh hoạt nên dù ở chế độ 2 cột dọc hay ngang thì các thẻ đồ án đều hiển thị vừa vặn, không bị tràn hay méo hình.
 
 #### Câu 17: Làm thế nào để tự tạo một hiệu ứng hoạt ảnh riêng cho RecyclerView nếu không muốn dùng `DefaultItemAnimator`?
 > **Trả lời:** Ta tạo một lớp Java mới kế thừa từ `SimpleItemAnimator` (hoặc `ItemAnimator`), sau đó ghi đè (override) 4 phương thức xử lý hoạt ảnh: `animateAdd()`, `animateRemove()`, `animateMove()` và `animateChange()`. Cuối cùng, gán hoạt ảnh tùy biến đó vào danh sách bằng lệnh `recyclerView.setItemAnimator(new MyCustomItemAnimator())`.

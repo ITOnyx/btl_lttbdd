@@ -137,7 +137,8 @@ public class DoAnAdapter extends RecyclerView.Adapter<DoAnAdapter.DoAnViewHolder
         // Hiển thị tiến độ hoàn thành từ thuộc tính model được nạp sẵn qua LEFT JOIN
         int tong = doAn.getTongNhiemVu();
         int xong = doAn.getSoNhiemVuXong();
-        int phanTram = (tong == 0) ? 0 : (xong * 100 / tong);
+        // Làm tròn giống DBHelper.getTienDoDoAn() để danh sách và màn hình chi tiết hiện cùng một con số
+        int phanTram = (tong == 0) ? 0 : (int) Math.round(xong * 100.0 / tong);
         holder.tvTienDo.setText(xong + "/" + tong + " (" + phanTram + "%)");
         holder.progressBar.setProgress(phanTram);
     }

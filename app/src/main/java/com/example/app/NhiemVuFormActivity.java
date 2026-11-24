@@ -88,7 +88,8 @@ public class NhiemVuFormActivity extends AppCompatActivity {
 
     // Mở DatePickerDialog để chọn ngày hạn nộp chuẩn yyyy-MM-dd
     private void moHopThoaiChonNgay() {
-        Calendar cal = Calendar.getInstance();
+        // Mở sẵn đúng hạn đang có trong ô (khi sửa); ô trống thì mở ngày hôm nay
+        Calendar cal = DBHelper.chuoiSangLich(edtHanHoanThanh.getText().toString());
         int nam = cal.get(Calendar.YEAR);
         int thang = cal.get(Calendar.MONTH);
         int ngay = cal.get(Calendar.DAY_OF_MONTH);
@@ -113,11 +114,16 @@ public class NhiemVuFormActivity extends AppCompatActivity {
             return;
         }
 
-        // Ràng buộc: hạn hoàn thành nhiệm vụ không được vượt quá hạn nộp của đồ án
+        // Ràng buộc: hạn hoàn thành nhiệm vụ phải nằm trong khoảng [ngày bắt đầu, hạn nộp] của đồ án
         // (so sánh chuỗi yyyy-MM-dd theo thứ tự từ điển trùng với thứ tự thời gian)
         if (!hanHoanThanh.isEmpty()) {
             DoAn doAn = dbHelper.getDoAnById(doAnId);
+            String ngayBatDauDoAn = (doAn != null && doAn.getNgayBatDau() != null) ? doAn.getNgayBatDau().trim() : "";
             String hanNopDoAn = (doAn != null && doAn.getHanNop() != null) ? doAn.getHanNop().trim() : "";
+            if (!ngayBatDauDoAn.isEmpty() && hanHoanThanh.compareTo(ngayBatDauDoAn) < 0) {
+                Toast.makeText(this, "Hạn hoàn thành không được trước ngày bắt đầu đồ án (" + ngayBatDauDoAn + ")!", Toast.LENGTH_LONG).show();
+                return;
+            }
             if (!hanNopDoAn.isEmpty() && hanHoanThanh.compareTo(hanNopDoAn) > 0) {
                 Toast.makeText(this, "Hạn hoàn thành không được sau hạn nộp đồ án (" + hanNopDoAn + ")!", Toast.LENGTH_LONG).show();
                 return;

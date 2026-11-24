@@ -43,7 +43,6 @@ public class TimelineActivity extends AppCompatActivity {
             return;
         }
 
-        // Ánh xạ các View
         mToolbarTimeline = findViewById(R.id.toolbar_timeline);
         mRvTimeline = findViewById(R.id.rv_timeline);
         mLayoutEmptyTimeline = findViewById(R.id.layout_empty_timeline);

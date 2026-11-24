@@ -92,7 +92,8 @@ public class CuocHenFormActivity extends AppCompatActivity {
 
     // Mở liên tiếp DatePickerDialog và TimePickerDialog để chọn ngày giờ định dạng yyyy-MM-dd HH:mm
     private void moHopThoaiChonNgayGio() {
-        Calendar cal = Calendar.getInstance();
+        // Mở sẵn đúng ngày giờ đang có trong ô (khi sửa); ô trống thì mở thời điểm hiện tại
+        Calendar cal = DBHelper.chuoiSangLich(edtThoiGian.getText().toString());
         int nam = cal.get(Calendar.YEAR);
         int thang = cal.get(Calendar.MONTH);
         int ngay = cal.get(Calendar.DAY_OF_MONTH);

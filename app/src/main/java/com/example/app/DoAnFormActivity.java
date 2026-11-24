@@ -99,7 +99,8 @@ public class DoAnFormActivity extends AppCompatActivity {
 
     // Mở DatePickerDialog để người dùng chọn ngày và điền vào ô EditText theo định dạng yyyy-MM-dd
     private void moHopThoaiChonNgay(EditText targetEdt) {
-        Calendar cal = Calendar.getInstance();
+        // Mở sẵn đúng ngày đang có trong ô (khi sửa); ô trống thì mở ngày hôm nay
+        Calendar cal = DBHelper.chuoiSangLich(targetEdt.getText().toString());
         int nam = cal.get(Calendar.YEAR);
         int thang = cal.get(Calendar.MONTH);
         int ngay = cal.get(Calendar.DAY_OF_MONTH);
@@ -141,6 +142,15 @@ public class DoAnFormActivity extends AppCompatActivity {
             String hanNhiemVuMuonNhat = dbHelper.getHanNhiemVuMuonNhat(doAnId);
             if (hanNhiemVuMuonNhat != null && hanNop.compareTo(hanNhiemVuMuonNhat) < 0) {
                 Toast.makeText(this, "Hạn nộp không được trước hạn của nhiệm vụ muộn nhất (" + hanNhiemVuMuonNhat + ")!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        // Khi sửa đồ án: ngày bắt đầu mới không được sau hạn của nhiệm vụ sớm nhất đã có
+        if (doAnId != -1 && !ngayBatDau.isEmpty()) {
+            String hanNhiemVuSomNhat = dbHelper.getHanNhiemVuSomNhat(doAnId);
+            if (hanNhiemVuSomNhat != null && ngayBatDau.compareTo(hanNhiemVuSomNhat) > 0) {
+                Toast.makeText(this, "Ngày bắt đầu không được sau hạn của nhiệm vụ sớm nhất (" + hanNhiemVuSomNhat + ")!", Toast.LENGTH_LONG).show();
                 return;
             }
         }
